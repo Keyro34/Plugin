@@ -1,7 +1,7 @@
 {
-  "name": "MyPlugin",
+  "name": "online_mod",
   "version": "1.0.0",
-  "description": "Мой тестовый плагин",
+  "description": "HDrezka Auth Fix",
   "author": "Keyro34",
   "url": "https://raw.githubusercontent.com/Keyro34/Plugin/main/plugin.js"
 }
