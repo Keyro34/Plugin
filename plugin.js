@@ -313,16 +313,25 @@ Lampa.Plugin.create('online_mod', function() {
         });
     }
 
-    // ============ ЗАПУСК ПЛАГИНА ============
+// ============ ЗАПУСК ПЛАГИНА ============
 
     function startPlugin() {
-        console.log('HDrezka Auth Plugin started');
+        console.log('✅ HDrezka Auth Plugin успешно запущен');
         
         initLang();
         initSettings();
         addMenuButton();
     }
 
-    startPlugin();
+    // ←←← ЭТО САМОЕ ВАЖНОЕ ИСПРАВЛЕНИЕ
+    if (window.appready) {
+        startPlugin();
+    } else {
+        Lampa.Listener.follow('app', function(e) {
+            if (e.type === 'ready') {
+                startPlugin();
+            }
+        });
+    }
 
 });
