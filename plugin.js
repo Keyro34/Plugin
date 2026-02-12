@@ -1,6 +1,6 @@
 //09.02.2026 - Fix - HDrezka Auth Fix
 
-Lampa.Plugin.create('online_mod', function() {
+Lampa.Plugin.create('online_mod_auth', function() {
     'use strict';
 
     // ============ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ============
@@ -326,3 +326,4 @@ Lampa.Plugin.create('online_mod', function() {
     startPlugin();
 
 });
+
