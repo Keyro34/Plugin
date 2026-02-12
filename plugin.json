@@ -1,0 +1,7 @@
+{
+  "name": "MyPlugin",
+  "version": "1.0.0",
+  "description": "Мой тестовый плагин",
+  "author": "Keyro34",
+  "url": "https://raw.githubusercontent.com/Keyro34/Plugin/main/plugin.js"
+}
