@@ -1587,16 +1587,7 @@
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       var prox = component.proxy('rezka2');
-
-      // НОВАЯ ЛОГИКА ЗЕРКАЛ С АВТОФАЛЛБЕКОМ
-      var mirrors = [
-        Utils.rezka2Mirror(),
-        'https://hdrezka.club',
-        'https://hdrezka.sh',
-        'https://rezka.ag'
-      ];
-      var currentMirrorIndex = 0;
-      var host = mirrors[0];
+      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
       var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
@@ -13394,7 +13385,6 @@
       Lampa.Storage.set('online_mod_proxy_videoseed', Lampa.Platform.is('android') || isLocal ? 'false' : 'true');
       Lampa.Storage.set('online_mod_proxy_vibix', Lampa.Platform.is('android') ? 'false' : 'true');
       Lampa.Storage.set('online_mod_proxy_redheadsound', Lampa.Platform.is('android') ? 'false' : 'true');
-      Lampa.Storage.set('online_mod_rezka2_mirror', 'hdrezka.sh');
       Lampa.Storage.set('online_mod_proxy_videodb', 'false');
       Lampa.Storage.set('online_mod_proxy_zetflix', 'false');
       Lampa.Storage.set('online_mod_proxy_kinopub', 'true');
