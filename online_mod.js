@@ -627,45 +627,45 @@
             if (callback) callback('');
           } else if (error) error(network.errorDecode(a, c));
         };
-
+        
         var returnHeaders = true;
         var prox_enc_cookie = prox_enc;
-
+        
         if (prox) {
           prox_enc_cookie += 'cookie_plus/param/Cookie=/';
           returnHeaders = false;
         }
-
+        
         var success_check = function success_check(json) {
           var cookie = '';
-
+          
           if (json && json.headers && json.body) {
             var cookieHeaders = json.headers['set-cookie'] || null;
-
+            
             if (cookieHeaders && cookieHeaders.forEach) {
               var values = {};
               cookieHeaders.forEach(function (param) {
                 var parts = param.split(';')[0].split('=');
-
+                
                 if (parts[0]) {
                   if (parts[1] === 'deleted') delete values[parts[0]];else values[parts[0]] = parts[1] || '';
                 }
               });
               var cookies = [];
-
+              
               for (var name in values) {
                 cookies.push(name + '=' + values[name]);
               }
-
+              
               cookie = cookies.join('; ');
             }
-
+            
             json = typeof json.body === 'string' ? Lampa.Arrays.decodeJson(json.body, {}) : json.body;
           }
-
+          
           callback(json, cookie);
         };
-
+        
         network.clear();
         network.timeout(20000);
         network["native"](component.proxyLink(api, prox, prox_enc_cookie), success_check, error_check, false, {
@@ -678,6 +678,7 @@
        * @param {Object} _object
        * @param {String} kinopoisk_id
        */
+      
 
 
       this.search = function (_object, kinopoisk_id, data) {
@@ -2263,8 +2264,10 @@
               });
 
               if (premium_content) {
-                error('Перевод доступен только с HDrezka Premium');
-                return;
+                // Контент помечен как premium (HDrezka Premium).
+                // Раньше плагин прерывал выполнение и показывал ошибку — убираем блокировку,
+                // чтобы попытаться воспроизвести поток. При желании можно уведомить пользователя:
+                // Lampa.Noty.show('HDrezka Premium: может потребоваться авторизация');
               }
             }
 
