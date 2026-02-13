@@ -1605,6 +1605,16 @@
         prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
       }
 
+      function getProxEnc(useProxy) {
+        var enc = '';
+        if (!useProxy) return enc;
+        enc += 'param/Origin=' + encodeURIComponent(host) + '/';
+        enc += 'param/Referer=' + encodeURIComponent(ref) + '/';
+        enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
+        if (cookie) enc += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
+        return enc;
+      }
+
       var cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '') + '';
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
 
@@ -2242,7 +2252,9 @@
 
         network.clear();
         network.timeout(10000);
-        network["native"](component.proxyLink(url, prox, prox_enc), function (json) {
+        var cur_prox = component.proxy('rezka2');
+        var cur_enc = getProxEnc(cur_prox) || prox_enc;
+        network["native"](component.proxyLink(url, cur_prox, cur_enc), function (json) {
           if (json && json.url) {
             var video = decode(json.url),
                 file = '',
@@ -2279,6 +2291,61 @@
             } else error();
           } else error();
         }, function (a, c) {
+          try {
+            // Попробуем предложить пользователю включить прокси и повторить запрос один раз
+            element._rezka_retry = element._rezka_retry || 0;
+
+            if (element._rezka_retry === 0) {
+              var proxyEnabled = Lampa.Storage.field('online_mod_proxy_rezka2') === true;
+
+              if (!proxyEnabled) {
+                var tryMsg = 'Не удалось получить поток с HDrezka. Включить прокси (рекомендуется) и повторить запрос?';
+
+                if (window.confirm(tryMsg)) {
+                  Lampa.Storage.set('online_mod_proxy_rezka2', 'true');
+                  element._rezka_retry = 1;
+                  var new_prox = component.proxy('rezka2');
+                  var new_enc = getProxEnc(new_prox);
+                  network.clear();
+                  network.timeout(10000);
+                  network["native"](component.proxyLink(url, new_prox, new_enc), function (json2) {
+                    if (json2 && json2.url) {
+                      var video2 = decode(json2.url);
+                      var items2 = extractItems(video2);
+                      var file2 = '';
+                      var quality2 = false;
+
+                      if (items2 && items2.length) {
+                        file2 = items2[0].file;
+                        quality2 = {};
+                        items2.forEach(function (item) {
+                          quality2[item.label] = item.file;
+                        });
+                      }
+
+                      if (file2) {
+                        element.stream = file2;
+                        element.qualitys = quality2;
+                        element.subtitles = parseSubtitles(json2.subtitle);
+                        call(element);
+                        return;
+                      }
+                    }
+
+                    error();
+                  }, function () {
+                    error();
+                  }, postdata, {
+                    withCredentials: logged_in,
+                    headers: headers
+                  });
+
+                  return;
+                }
+              }
+            }
+          } catch (e) {}
+
           error();
         }, postdata, {
           withCredentials: logged_in,
