@@ -627,45 +627,45 @@
             if (callback) callback('');
           } else if (error) error(network.errorDecode(a, c));
         };
-        
+
         var returnHeaders = true;
         var prox_enc_cookie = prox_enc;
-        
+
         if (prox) {
           prox_enc_cookie += 'cookie_plus/param/Cookie=/';
           returnHeaders = false;
         }
-        
+
         var success_check = function success_check(json) {
           var cookie = '';
-          
+
           if (json && json.headers && json.body) {
             var cookieHeaders = json.headers['set-cookie'] || null;
-            
+
             if (cookieHeaders && cookieHeaders.forEach) {
               var values = {};
               cookieHeaders.forEach(function (param) {
                 var parts = param.split(';')[0].split('=');
-                
+
                 if (parts[0]) {
                   if (parts[1] === 'deleted') delete values[parts[0]];else values[parts[0]] = parts[1] || '';
                 }
               });
               var cookies = [];
-              
+
               for (var name in values) {
                 cookies.push(name + '=' + values[name]);
               }
-              
+
               cookie = cookies.join('; ');
             }
-            
+
             json = typeof json.body === 'string' ? Lampa.Arrays.decodeJson(json.body, {}) : json.body;
           }
-          
+
           callback(json, cookie);
         };
-        
+
         network.clear();
         network.timeout(20000);
         network["native"](component.proxyLink(api, prox, prox_enc_cookie), success_check, error_check, false, {
@@ -678,7 +678,6 @@
        * @param {Object} _object
        * @param {String} kinopoisk_id
        */
-      
 
 
       this.search = function (_object, kinopoisk_id, data) {
@@ -1605,16 +1604,6 @@
         prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
       }
 
-      function getProxEnc(useProxy) {
-        var enc = '';
-        if (!useProxy) return enc;
-        enc += 'param/Origin=' + encodeURIComponent(host) + '/';
-        enc += 'param/Referer=' + encodeURIComponent(ref) + '/';
-        enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
-        if (cookie) enc += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
-        return enc;
-      }
-
       var cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '') + '';
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
 
@@ -2252,9 +2241,7 @@
 
         network.clear();
         network.timeout(10000);
-        var cur_prox = component.proxy('rezka2');
-        var cur_enc = getProxEnc(cur_prox) || prox_enc;
-        network["native"](component.proxyLink(url, cur_prox, cur_enc), function (json) {
+        network["native"](component.proxyLink(url, prox, prox_enc), function (json) {
           if (json && json.url) {
             var video = decode(json.url),
                 file = '',
@@ -2276,10 +2263,8 @@
               });
 
               if (premium_content) {
-                // Контент помечен как premium (HDrezka Premium).
-                // Раньше плагин прерывал выполнение и показывал ошибку — убираем блокировку,
-                // чтобы попытаться воспроизвести поток. При желании можно уведомить пользователя:
-                // Lampa.Noty.show('HDrezka Premium: может потребоваться авторизация');
+                error('Перевод доступен только с HDrezka Premium');
+                return;
               }
             }
 
@@ -2291,61 +2276,6 @@
             } else error();
           } else error();
         }, function (a, c) {
-          try {
-            // Попробуем предложить пользователю включить прокси и повторить запрос один раз
-            element._rezka_retry = element._rezka_retry || 0;
-
-            if (element._rezka_retry === 0) {
-              var proxyEnabled = Lampa.Storage.field('online_mod_proxy_rezka2') === true;
-
-              if (!proxyEnabled) {
-                var tryMsg = 'Не удалось получить поток с HDrezka. Включить прокси (рекомендуется) и повторить запрос?';
-
-                if (window.confirm(tryMsg)) {
-                  Lampa.Storage.set('online_mod_proxy_rezka2', 'true');
-                  element._rezka_retry = 1;
-                  var new_prox = component.proxy('rezka2');
-                  var new_enc = getProxEnc(new_prox);
-                  network.clear();
-                  network.timeout(10000);
-                  network["native"](component.proxyLink(url, new_prox, new_enc), function (json2) {
-                    if (json2 && json2.url) {
-                      var video2 = decode(json2.url);
-                      var items2 = extractItems(video2);
-                      var file2 = '';
-                      var quality2 = false;
-
-                      if (items2 && items2.length) {
-                        file2 = items2[0].file;
-                        quality2 = {};
-                        items2.forEach(function (item) {
-                          quality2[item.label] = item.file;
-                        });
-                      }
-
-                      if (file2) {
-                        element.stream = file2;
-                        element.qualitys = quality2;
-                        element.subtitles = parseSubtitles(json2.subtitle);
-                        call(element);
-                        return;
-                      }
-                    }
-
-                    error();
-                  }, function () {
-                    error();
-                  }, postdata, {
-                    withCredentials: logged_in,
-                    headers: headers
-                  });
-
-                  return;
-                }
-              }
-            }
-          } catch (e) {}
-
           error();
         }, postdata, {
           withCredentials: logged_in,
