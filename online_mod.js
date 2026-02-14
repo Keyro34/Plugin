@@ -85,11 +85,22 @@
     }
 
     function rezka2Mirror() {
-      var url = Lampa.Storage.get('online_mod_rezka2_mirror', '') + '';
-      if (!url) return 'https://kvk.zone';
-      if (url.indexOf('://') == -1) url = 'https://' + url;
-      if (url.charAt(url.length - 1) === '/') url = url.substring(0, url.length - 1);
-      return url;
+        var url = Lampa.Storage.get('online_mod_rezka2_mirror', '') + '';
+        if (!url) {
+            // Новые актуальные зеркала на февраль 2026
+            var mirrors = [
+                'https://rezka.ag',           // основное живое
+                'https://kvk.zone',           // старое дефолтное
+                'https://hdrezka.website',
+                'https://rezka.me',
+                'https://hdrezka.ink'
+            ];
+            // Берём случайное, чтобы не все сразу блокировали
+            return mirrors[Math.floor(Math.random() * mirrors.length)];
+        }
+        if (url.indexOf('://') == -1) url = 'https://' + url;
+        if (url.charAt(url.length - 1) === '/') url = url.substring(0, url.length - 1);
+        return url;
     }
 
     function kinobaseMirror() {
@@ -1873,6 +1884,21 @@
             if (links && links.length) data = data.concat(links);
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
+            if (a.status === 0 || a.status === 403 || a.status === 429) {
+        
+                console.log(`[HDrezka] Ошибка ${a.status} — пробуем другое зеркало...`);
+
+                // Сбрасываем сохранённое зеркало, чтобы rezka2Mirror() выбрало новое
+                Lampa.Storage.set('online_mod_rezka2_mirror', '');
+
+                // Повторяем поиск заново (с новым зеркалом)
+                setTimeout(function() {
+                    query_title_search();   // ← повторный запуск поиска
+                }, 800);
+
+                return; // выходим, не показываем ошибку пользователю
+            }
+
             if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
               Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
             }
@@ -1882,7 +1908,8 @@
               checkErrorForm(str);
             }
 
-            if (error_message) component.empty(error_message);else component.empty(network.errorDecode(a, c));
+            if (error_message) component.empty(error_message);
+            else component.empty(network.errorDecode(a, c));
           }, postdata, {
             dataType: 'text',
             withCredentials: logged_in,
