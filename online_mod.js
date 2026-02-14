@@ -1,5 +1,4 @@
-//09.02.2026 - Fix & Improvements for HDrezka & others
-
+//09.02.2026 - Полное исправление HDrezka
 (function () {
     'use strict';
 
@@ -86,7 +85,10 @@
 
     function rezka2Mirror() {
       var url = Lampa.Storage.get('online_mod_rezka2_mirror', '') + '';
-      if (!url) return 'https://rezka.cc'; // Более стабильное зеркало по умолчанию
+      if (!url || url.indexOf('hdrezka.sh') !== -1) {
+        url = 'https://rezka.cc';
+        Lampa.Storage.set('online_mod_rezka2_mirror', 'rezka.cc');
+      }
       if (url.indexOf('://') == -1) url = 'https://' + url;
       if (url.charAt(url.length - 1) === '/') url = url.substring(0, url.length - 1);
       return url;
@@ -133,12 +135,7 @@
     }
 
     function baseUserAgent() {
-      var userAgents = [
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
-      ];
-      return userAgents[Math.floor(Math.random() * userAgents.length)];
+      return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
     }
 
     function vcdnToken() {
@@ -182,15 +179,18 @@
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
       
-      // Расширенный список прокси
-      var proxies = [
+      var workingProxies = [
+        'https://proxy.farside.pl/',
         'https://cors-proxy.fusioniptv.com/',
         'https://proxy.ram-02.workers.dev/',
-        'https://worker.lampa-iptv.workers.dev/',
-        'https://proxy.farside.pl/'
+        'https://worker.lampa-iptv.workers.dev/'
       ];
-      var proxy1 = proxies[Math.floor(Math.random() * proxies.length)];
       
+      if (name === 'rezka2') {
+        return workingProxies[Math.floor(Math.random() * workingProxies.length)] + param_ip;
+      }
+      
+      var proxy1 = workingProxies[0];
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
@@ -688,12 +688,6 @@
           returnHeaders: returnHeaders
         });
       }
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
-
 
       this.search = function (_object, kinopoisk_id, data) {
         object = _object;
@@ -728,10 +722,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -745,13 +735,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -766,10 +749,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -822,10 +801,6 @@
           append(filtred());
         } else component.emptyForQuery(select_title);
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -882,11 +857,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -933,12 +903,6 @@
 
         return filtred;
       }
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @returns array
-       */
-
 
       function extractItems(str, url) {
         if (!str) return [];
@@ -975,11 +939,6 @@
 
         return [];
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function parseStream(element, call, error, itemsExtractor, str, url) {
         var file = '';
@@ -1000,11 +959,6 @@
           call(element);
         } else error();
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStreamM3U(element, call, error, file) {
         file = file.replace(/\.mp4:hls:manifest/, '');
@@ -1051,11 +1005,6 @@
         });
         return subtitles.length ? subtitles : false;
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStream(element, call, error) {
         if (element.stream) return call(element);
@@ -1085,11 +1034,6 @@
           headers: headers2
         });
       }
-      /**
-       * Добавить видео
-       * @param {Array} items
-       */
-
 
       function append(items) {
         component.reset();
@@ -1221,12 +1165,6 @@
         network.timeout(20000);
         network["native"](api, success_check, error_check);
       }
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
-
 
       this.search = function (_object, kinopoisk_id, data) {
         object = _object;
@@ -1271,10 +1209,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -1287,13 +1221,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -1303,10 +1230,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -1367,10 +1290,6 @@
           append(filtred());
         } else component.emptyForQuery(select_title);
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -1402,11 +1321,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -1465,11 +1379,6 @@
         });
         return subtitles.length ? subtitles : false;
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStream(element, call, error) {
         if (element.stream) return call(element);
@@ -1484,11 +1393,6 @@
           } else error();
         }, error);
       }
-      /**
-       * Добавить видео
-       * @param {Array} items
-       */
-
 
       function append(items) {
         component.reset();
@@ -1593,60 +1497,6 @@
       }
     }
 
-    // --- Функция для поиска рабочего прокси и зеркала для HDrezka ---
-    function findWorkingRezka2Resources(component, callback) {
-        var testMirrors = [
-            'https://rezka.cc',
-            'https://hdrezka.ag',
-            'https://rezka.ag',
-            'https://hdrezka.me',
-            'https://rezka.tv'
-        ];
-        var testProxies = [
-            'https://proxy.ram-02.workers.dev/',
-            'https://cors-proxy.fusioniptv.com/',
-            'https://worker.lampa-iptv.workers.dev/'
-        ];
-        
-        var foundMirror = null;
-        var foundProxy = null;
-        var completed = 0;
-        var total = testMirrors.length + testProxies.length;
-
-        function checkComplete() {
-            completed++;
-            if (completed >= total && callback) {
-                callback(foundMirror, foundProxy);
-            }
-        }
-
-        // Проверяем зеркала
-        testMirrors.forEach(function(mirror) {
-            var testUrl = mirror + '/';
-            component.proxyCall('GET', testUrl, 5000, null, function(response) {
-                if (response && response.indexOf('HDrezka') !== -1) {
-                    if (!foundMirror) foundMirror = mirror;
-                }
-                checkComplete();
-            }, function() {
-                checkComplete();
-            });
-        });
-
-        // Проверяем прокси
-        testProxies.forEach(function(proxy) {
-            var testUrl = proxy + 'https://rezka.cc/';
-            component.proxyCall('GET', testUrl, 5000, null, function(response) {
-                if (response) {
-                    if (!foundProxy) foundProxy = proxy;
-                }
-                checkComplete();
-            }, function() {
-                checkComplete();
-            });
-        });
-    }
-
     function rezka2(component, _object) {
       var network = new Lampa.Reguest();
       var extract = {};
@@ -1654,21 +1504,12 @@
       var select_title = '';
       var prefer_http = Lampa.Storage.field('online_mod_prefer_http') === true;
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
-      var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       var prox = component.proxy('rezka2');
-      
-      // Динамический выбор хоста
-      var workingMirror = Lampa.Storage.get('online_mod_rezka2_working_mirror', '');
-      var host = prox && !proxy_mirror ? (workingMirror || 'https://rezka.cc') : (workingMirror || Utils.rezka2Mirror());
-      
+      var host = Utils.rezka2Mirror();
       var ref = host + '/';
-      var logged_in = !(prox || Lampa.Platform.is('android'));
+      var logged_in = false;
       var user_agent = Utils.baseUserAgent();
-      var headers = Lampa.Platform.is('android') ? {
-        'Origin': host,
-        'Referer': ref,
-        'User-Agent': user_agent
-      } : {};
+      var headers = {};
       var prox_enc = '';
 
       if (prox) {
@@ -1680,14 +1521,8 @@
       var cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '') + '';
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
 
-      if (cookie) {
-        if (Lampa.Platform.is('android')) {
-          headers.Cookie = cookie;
-        }
-
-        if (prox) {
-          prox_enc += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
-        }
+      if (cookie && prox) {
+        prox_enc += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
       }
 
       var embed = ref;
@@ -1728,7 +1563,6 @@
         }
       }
       
-      // --- Функция для фикса потока HDrezka (подмена домена) ---
       function rezka2FixStream(url) {
           var domains = ['stream.voidboost.cc', 'stream.voidboost.top', 'stream.voidboost.link', 'stream.voidboost.club', 'sambray.org', 'rumbegg.org', 'laptostack.org', 'frntroy.org', 'femeretes.org'];
           var replacements = [
@@ -1744,10 +1578,6 @@
           return url;
       }
 
-      /**
-       * Поиск
-       * @param {Object} _object
-       */
       this.search = function (_object, kinopoisk_id, data) {
         var _this = this;
 
@@ -1773,7 +1603,7 @@
         var query_more = function query_more(query, page, data, callback) {
           var url = more_url + '&q=' + encodeURIComponent(query) + '&page=' + encodeURIComponent(page);
           network.clear();
-          network.timeout(10000);
+          network.timeout(15000);
           network["native"](component.proxyLink(url, prox, prox_enc, prox_enc), function (str) {
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
@@ -1952,7 +1782,7 @@
         var query_search = function query_search(query, data, callback) {
           var postdata = 'q=' + encodeURIComponent(query);
           network.clear();
-          network.timeout(10000);
+          network.timeout(15000);
           network["native"](component.proxyLink(url, prox, prox_enc), function (str) {
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
@@ -1990,10 +1820,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -2007,13 +1833,6 @@
         getEpisodes(success);
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -2025,10 +1844,6 @@
         component.saveChoice(choice);
         setTimeout(component.closeFilter, 10);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -2038,7 +1853,7 @@
       function getPage(url) {
         url = component.fixLink(url, ref);
         network.clear();
-        network.timeout(10000);
+        network.timeout(15000);
         network["native"](component.proxyLink(url, prox, prox_enc), function (str) {
           extractData(str);
 
@@ -2059,11 +1874,6 @@
         filter();
         append(filtred());
       }
-      /**
-       * Получить данные о фильме
-       * @param {String} str
-       */
-
 
       function extractData(str) {
         extract.voice = [];
@@ -2199,7 +2009,7 @@
               postdata += '&favs=' + encodeURIComponent(extract.favs);
               postdata += '&action=get_episodes';
               network.clear();
-              network.timeout(10000);
+              network.timeout(15000);
               network["native"](component.proxyLink(url, prox, prox_enc), function (json) {
                 extractEpisodes(json, translator_id);
                 call();
@@ -2264,10 +2074,6 @@
           }
         }
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -2301,11 +2107,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStream(element, call, error) {
         if (element.stream) return call(element);
@@ -2328,7 +2129,7 @@
         }
 
         network.clear();
-        network.timeout(10000);
+        network.timeout(15000);
         network["native"](component.proxyLink(url, prox, prox_enc), function (json) {
           if (json && json.url) {
             var video = decode(json.url),
@@ -2400,12 +2201,6 @@
 
         return x;
       }
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @returns array
-       */
-
 
       function extractItems(str) {
         if (!str) return [];
@@ -2440,10 +2235,7 @@
             if (!links.length) links = item.links;
             var link = links[0] || '';
             link = component.fixLinkProtocol(link, prefer_http, 'full');
-            
-            // Применяем фикс потока
             link = rezka2FixStream(link);
-            
             return {
               label: item.label,
               quality: int_quality,
@@ -2480,11 +2272,6 @@
 
         return subtitles.length ? subtitles : false;
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -2521,10 +2308,6 @@
 
         return filtred;
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -2650,11 +2433,6 @@
         season: 0,
         voice: 0
       };
-      /**
-       * Поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
 
       this.search = function (_object, kinopoisk_id, data) {
         var _this = this;
@@ -2775,10 +2553,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -2790,13 +2564,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -2805,10 +2572,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -2926,11 +2689,6 @@
         });
         return subtitles.length ? subtitles : false;
       }
-      /**
-       * Получить данные о фильме
-       * @param {String} str
-       */
-
 
       function extractData(vod, page) {
         var quality_match = page.match(/<li><b>Качество:<\/b>([^<,]+)<\/li>/i);
@@ -3139,13 +2897,6 @@
           headers: headers
         });
       }
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @param {String} voice
-       * @returns array
-       */
-
 
       function extractItems(str, voice) {
         if (!str) return [];
@@ -3210,10 +2961,6 @@
           quality: quality
         };
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -3298,8 +3045,7 @@
       var extract = {};
       var object = _object;
       var select_title = '';
-      var prefer_http = Lampa.Storage.field('online_mod_prefer_http') === true; //let prefer_dash  = Lampa.Storage.field('online_mod_prefer_dash') === true
-
+      var prefer_http = Lampa.Storage.field('online_mod_prefer_http') === true;
       var lampa_player = Lampa.Storage.field('online_mod_collaps_lampa_player') === true;
       var prox = component.proxy('collaps');
       var base = 'api.namy.ws';
@@ -3361,11 +3107,6 @@
           headers: play_headers
         });
       }
-      /**
-       * Поиск
-       * @param {Object} _object
-       */
-
 
       this.search = function (_object, kinopoisk_id) {
         object = _object;
@@ -3384,10 +3125,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -3399,13 +3136,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -3414,10 +3144,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -3447,10 +3173,6 @@
           append(filtred());
         } else component.emptyForQuery(select_title);
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -3474,11 +3196,6 @@
         url = component.fixLinkProtocol(url, prefer_http, true);
         return url;
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -3573,10 +3290,6 @@
 
         return filtred;
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -3717,12 +3430,6 @@
           }
         }
       }
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
-
 
       this.search = function (_object, kinopoisk_id) {
         object = _object;
@@ -3748,10 +3455,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -3764,13 +3467,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -3780,10 +3476,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -3843,12 +3535,6 @@
 
         return x;
       }
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @returns array
-       */
-
 
       function extractItemsPlaylist(str, url) {
         if (!str) return [];
@@ -3878,11 +3564,6 @@
 
         return [];
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function parseStream(element, call, error, itemsExtractor, str, url) {
         var file = '';
@@ -3903,11 +3584,6 @@
           call(element);
         } else error();
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStream(element, call, error) {
         if (element.stream) return call(element);
@@ -3928,10 +3604,6 @@
           call(element);
         } else error();
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -3995,11 +3667,6 @@
         });
         return subtitles.length ? subtitles : false;
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -4071,11 +3738,6 @@
         });
         return filtred;
       }
-      /**
-       * Добавить видео
-       * @param {Array} items
-       */
-
 
       function append(items) {
         component.reset();
@@ -4242,11 +3904,6 @@
       var token = Lampa.Storage.get('filmix_token', '') + '';
       var dev_token = Utils.filmixToken(Utils.randomHex(16), token || 'aaaabbbbccccddddeeeeffffaaaabbbb');
       var abuse_token = prox3 ? Utils.filmixToken(Utils.randomHex(16), 'aaaabbbbccccddddeeeeffffaaaabbbb') : '';
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
 
       this.search = function (_object, kinopoisk_id, data) {
         var _this = this;
@@ -4439,10 +4096,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -4455,13 +4108,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -4471,20 +4117,11 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
         extract = null;
       };
-      /**
-       * Успешно, есть данные
-       * @param {Object} json
-       */
-
 
       function success(json, low_quality) {
         component.loading(false);
@@ -4520,11 +4157,6 @@
 
         return false;
       }
-      /**
-       * Получить информацию о фильме
-       * @param {Arrays} data
-       */
-
 
       function extractData(data, low_quality) {
         extract = {};
@@ -4655,12 +4287,6 @@
           extract.movies = movies;
         }
       }
-      /**
-       * Найти поток
-       * @param {Object} element
-       * @returns string
-       */
-
 
       function getFile(element) {
         var media = element.media || {};
@@ -4683,10 +4309,6 @@
           quality: quality
         };
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -4714,11 +4336,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -4752,11 +4369,6 @@
 
         return filtred;
       }
-      /**
-       * Добавить видео
-       * @param {Array} items
-       */
-
 
       function append(items) {
         component.reset();
@@ -4851,11 +4463,6 @@
         voice: 0,
         voice_name: ''
       };
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
 
       this.search = function (_object, kinopoisk_id) {
         object = _object;
@@ -4913,10 +4520,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -4929,13 +4532,6 @@
         getEpisodes();
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -4946,21 +4542,11 @@
         component.saveChoice(choice);
         setTimeout(component.closeFilter, 10);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
         extract = null;
       };
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @returns array
-       */
-
 
       function extractItems(str) {
         if (!str) return [];
@@ -5019,10 +4605,6 @@
           append(filtred());
         } else component.emptyForQuery(select_title);
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -5055,11 +4637,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -5102,12 +4679,6 @@
         });
         return filtred;
       }
-      /**
-       * Найти поток
-       * @param {Object} element
-       * @returns string
-       */
-
 
       function getFile(element) {
         var file = '';
@@ -5127,10 +4698,6 @@
           quality: quality
         };
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -5270,11 +4837,6 @@
         voice: 0,
         voice_name: ''
       };
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
 
       this.search = function (_object, kinopoisk_id, data) {
         var _this = this;
@@ -5443,10 +5005,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -5459,13 +5017,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -5475,21 +5026,11 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
         extract = null;
       };
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @returns array
-       */
-
 
       function extractItems(str, url) {
         if (!str) return [];
@@ -5523,12 +5064,6 @@
 
         return [];
       }
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @returns array
-       */
-
 
       function extractItemsPlaylist(str, url) {
         if (!str) return [];
@@ -5556,11 +5091,6 @@
 
         return [];
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function parseStream(element, call, error, itemsExtractor, str, url) {
         var file = '';
@@ -5582,11 +5112,6 @@
           call(element);
         } else error();
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStreamM3U(element, call, error, file) {
         file = file.replace(/\.mp4:hls:manifest/, '');
@@ -5611,11 +5136,6 @@
           dataType: 'text'
         });
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStream(element, call, error) {
         if (element.stream) return call(element);
@@ -5670,10 +5190,6 @@
           append(filtred());
         } else component.emptyForQuery(select_title);
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -5726,11 +5242,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -5771,10 +5282,6 @@
         });
         return filtred;
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -5918,12 +5425,6 @@
           headers: headers
         });
       }
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
-
 
       this.search = function (_object, kinopoisk_id) {
         object = _object;
@@ -5945,10 +5446,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -5961,13 +5458,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -5977,21 +5467,11 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
         extract = null;
       };
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @returns array
-       */
-
 
       function extractItems(str, url) {
         if (!str) return [];
@@ -6025,12 +5505,6 @@
 
         return [];
       }
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @returns array
-       */
-
 
       function extractItemsPlaylist(str, url) {
         if (!str) return [];
@@ -6058,11 +5532,6 @@
 
         return [];
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function parseStream(element, call, error, itemsExtractor, str, url) {
         var file = '';
@@ -6084,11 +5553,6 @@
           call(element);
         } else error();
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStreamM3U(element, call, error, file) {
         file = file.replace(/\.mp4:hls:manifest/, '');
@@ -6113,11 +5577,6 @@
           dataType: 'text'
         });
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStream(element, call, error) {
         if (element.stream) return call(element);
@@ -6164,10 +5623,6 @@
           append(filtred());
         } else empty();
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -6220,11 +5675,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -6265,10 +5715,6 @@
         });
         return filtred;
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -6401,11 +5847,6 @@
         voice: 0,
         voice_name: ''
       };
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
 
       this.search = function (_object, kinopoisk_id) {
         object = _object;
@@ -6438,10 +5879,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -6454,13 +5891,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -6470,20 +5900,11 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
         extract = null;
       };
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function parseStream(element, call, error, url, str) {
         var file = '';
@@ -6524,11 +5945,6 @@
           call(element);
         } else error();
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getBaseStream(element, call, error) {
         if (element.stream) return call(element);
@@ -6548,11 +5964,6 @@
           headers: headers
         });
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStream(element, call, error) {
         getBaseStream(element, function (element) {
@@ -6635,10 +6046,6 @@
           append(filtred());
         } else component.emptyForQuery(select_title);
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -6692,11 +6099,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -6732,10 +6134,6 @@
 
         return filtred;
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -6866,11 +6264,6 @@
         voice: 0,
         voice_name: ''
       };
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
 
       this.search = function (_object, kinopoisk_id) {
         object = _object;
@@ -6917,10 +6310,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -6933,13 +6322,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -6949,10 +6331,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -7044,10 +6422,6 @@
         });
         return voices;
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -7103,13 +6477,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @param {String} voice
-       * @returns array
-       */
-
 
       function extractItems(str, voice) {
         if (!str) return [];
@@ -7169,11 +6536,6 @@
         });
         return subtitles.length ? subtitles : false;
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -7251,12 +6613,6 @@
         });
         return filtred;
       }
-      /**
-       * Найти поток
-       * @param {Object} element
-       * @returns string
-       */
-
 
       function getFile(element) {
         var file = '';
@@ -7276,10 +6632,6 @@
           quality: quality
         };
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -7393,12 +6745,6 @@
           headers: headers
         });
       }
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
-
 
       this.search = function (_object, kinopoisk_id) {
         object = _object;
@@ -7424,10 +6770,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -7440,13 +6782,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -7456,10 +6791,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -7600,10 +6931,6 @@
         });
         return voices;
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -7659,13 +6986,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @param {String} voice
-       * @returns array
-       */
-
 
       function extractItems(str, voice) {
         if (!str) return [];
@@ -7731,11 +7051,6 @@
         });
         return subtitles.length ? subtitles : false;
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -7813,12 +7128,6 @@
         });
         return filtred;
       }
-      /**
-       * Найти поток
-       * @param {Object} element
-       * @returns string
-       */
-
 
       function getFile(element) {
         var file = '';
@@ -7838,10 +7147,6 @@
           quality: quality
         };
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -7974,11 +7279,6 @@
           dataType: 'text'
         });
       }
-      /**
-       * Поиск
-       * @param {Object} _object
-       */
-
 
       this.search = function (_object, kinopoisk_id, data) {
         var _this = this;
@@ -8171,10 +7471,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -8186,13 +7482,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -8201,10 +7490,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -8227,10 +7512,6 @@
           append(filtred());
         } else component.emptyForQuery(select_title);
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -8239,11 +7520,6 @@
         };
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -8258,12 +7534,6 @@
         });
         return filtred;
       }
-      /**
-       * Найти поток
-       * @param {Object} element
-       * @returns string
-       */
-
 
       function getFile(element) {
         return {
@@ -8272,10 +7542,6 @@
           subtitles: false
         };
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -8362,11 +7628,6 @@
         voice: 0,
         voice_name: ''
       };
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
 
       this.search = function (_object, kinopoisk_id) {
         object = _object;
@@ -8392,10 +7653,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -8408,13 +7665,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -8424,10 +7674,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -8478,10 +7724,6 @@
           append(filtred());
         } else component.emptyForQuery(select_title);
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -8504,11 +7746,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -8544,17 +7781,10 @@
 
         return filtred;
       }
-      /**
-       * Получить потоки
-       * @param {String} str
-       * @returns array
-       */
-
 
       function extractItems(sources) {
         if (!sources) return [];
         var items = [];
-        /* 4K и 2K перепутаны */
 
         if (sources.mpeg2kUrl) {
           items.push({
@@ -8641,11 +7871,6 @@
         });
         return items;
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStream(element, call, error) {
         if (element.stream) return call(element);
@@ -8677,10 +7902,6 @@
           error();
         });
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -8784,10 +8005,6 @@
         season: 0,
         voice: 0
       };
-      /**
-       * Поиск
-       * @param {Object} _object
-       */
 
       this.search = function (_object, kinopoisk_id, data) {
         var _this = this;
@@ -8904,10 +8121,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -8919,13 +8132,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -8934,10 +8140,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -8959,10 +8161,6 @@
         filter();
         append(filtred());
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -8971,13 +8169,6 @@
         };
         component.filter(filter_items, choice);
       }
-      /**
-       * Получить потоки
-       * @param {String} host
-       * @param {Object} hls
-       * @returns array
-       */
-
 
       function extractItems(host, hls) {
         var items = [];
@@ -9010,11 +8201,6 @@
 
         return items;
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -9055,12 +8241,6 @@
 
         return filtred;
       }
-      /**
-       * Найти поток
-       * @param {Object} element
-       * @returns string
-       */
-
 
       function getFile(element) {
         var file = '';
@@ -9080,10 +8260,6 @@
           quality: quality
         };
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -9166,10 +8342,6 @@
         season: 0,
         voice: 0
       };
-      /**
-       * Поиск
-       * @param {Object} _object
-       */
 
       this.search = function (_object, kinopoisk_id, data) {
         var _this = this;
@@ -9283,10 +8455,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -9298,13 +8466,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -9313,10 +8474,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -9347,10 +8504,6 @@
         filter();
         append(filtred());
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -9359,13 +8512,6 @@
         };
         component.filter(filter_items, choice);
       }
-      /**
-       * Получить потоки
-       * @param {String} host
-       * @param {Object} hls
-       * @returns array
-       */
-
 
       function extractItems(episode) {
         var items = [];
@@ -9396,11 +8542,6 @@
 
         return items;
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -9435,12 +8576,6 @@
 
         return filtred;
       }
-      /**
-       * Найти поток
-       * @param {Object} element
-       * @returns string
-       */
-
 
       function getFile(element) {
         var file = '';
@@ -9460,10 +8595,6 @@
           quality: quality
         };
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -9569,10 +8700,6 @@
         voice_name: '',
         server: 0
       };
-      /**
-       * Поиск
-       * @param {Object} _object
-       */
 
       this.search = function (_object, kinopoisk_id, data) {
         var _this = this;
@@ -9684,10 +8811,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -9701,13 +8824,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -9717,10 +8833,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -9773,10 +8885,6 @@
         filter();
         append(filtred());
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -9814,12 +8922,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Получить потоки
-       * @param {Object} player
-       * @returns array
-       */
-
 
       function extractItems(player) {
         try {
@@ -9867,11 +8969,6 @@
 
         return false;
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -9931,11 +9028,6 @@
 
         return filtred;
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStream(element, call, error) {
         if (element.stream) return call(element);
@@ -9994,10 +9086,6 @@
           } else error();
         });
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -10127,11 +9215,6 @@
           if (error) error(network.errorDecode(a, c));
         });
       }
-      /**
-       * Поиск
-       * @param {Object} _object
-       */
-
 
       this.search = function (_object, kinopoisk_id, data) {
         var _this = this;
@@ -10323,10 +9406,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -10339,13 +9418,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -10355,10 +9427,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -10384,11 +9452,6 @@
           append(filtred());
         }, error);
       }
-      /**
-       * Получить данные о фильме
-       * @param {Array} items
-       */
-
 
       function extractData(items) {
         var seasons = [];
@@ -10422,10 +9485,6 @@
           seasons: seasons
         };
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -10462,11 +9521,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -10510,11 +9564,6 @@
 
         return filtred;
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStream(element, call, error) {
         if (element.stream) return call(element);
@@ -10624,7 +9673,6 @@
             var quality = parseInt(key);
             var link = decode(obj && obj[0] && obj[0].src || '');
             link = component.fixLinkProtocol(link, prefer_http, true);
-            if (prefer_mp4) ;
             items.push({
               label: quality ? quality + 'p' : '360p ~ 1080p',
               quality: quality,
@@ -10654,10 +9702,6 @@
           return '';
         }
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -10792,11 +9836,6 @@
           if (error) error(network.errorDecode(a, c));
         });
       }
-      /**
-       * Поиск
-       * @param {Object} _object
-       */
-
 
       this.search = function (_object, kinopoisk_id, data) {
         var _this = this;
@@ -10928,10 +9967,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -10944,13 +9979,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -10960,10 +9988,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -10982,11 +10006,6 @@
           } else component.emptyForQuery(select_title);
         }, error);
       }
-      /**
-       * Получить информацию о фильме
-       * @param {Object} item
-       */
-
 
       function extractData(item) {
         extract = item;
@@ -11225,10 +10244,6 @@
 
         return audios.length == 1 ? audios[0] : null;
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -11272,11 +10287,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -11358,12 +10368,6 @@
 
         return filtred;
       }
-      /**
-       * Найти поток
-       * @param {Object} element
-       * @returns string
-       */
-
 
       function getFile(element) {
         var file = '';
@@ -11411,10 +10415,6 @@
           subtitles: subtitles
         };
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -11524,12 +10524,6 @@
           if (error) error(network.errorDecode(a, c));
         });
       }
-      /**
-       * Начать поиск
-       * @param {Object} _object
-       * @param {String} kinopoisk_id
-       */
-
 
       this.search = function (_object, kinopoisk_id) {
         object = _object;
@@ -11561,10 +10555,6 @@
       this.extendChoice = function (saved) {
         Lampa.Arrays.extend(choice, saved, true);
       };
-      /**
-       * Сброс фильтра
-       */
-
 
       this.reset = function () {
         component.reset();
@@ -11577,13 +10567,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Применить фильтр
-       * @param {*} type
-       * @param {*} a
-       * @param {*} b
-       */
-
 
       this.filter = function (type, a, b) {
         choice[a.stype] = b.index;
@@ -11593,10 +10576,6 @@
         append(filtred());
         component.saveChoice(choice);
       };
-      /**
-       * Уничтожить
-       */
-
 
       this.destroy = function () {
         network.clear();
@@ -11639,10 +10618,6 @@
           append(filtred());
         } else component.emptyForQuery(select_title);
       }
-      /**
-       * Построить фильтр
-       */
-
 
       function filter() {
         filter_items = {
@@ -11701,11 +10676,6 @@
 
         component.filter(filter_items, choice);
       }
-      /**
-       * Отфильтровать файлы
-       * @returns array
-       */
-
 
       function filtred() {
         var filtred = [];
@@ -11755,11 +10725,6 @@
 
         return filtred;
       }
-      /**
-       * Получить поток
-       * @param {*} element
-       */
-
 
       function getStream(element, call, error) {
         if (element.stream) return call(element);
@@ -11831,10 +10796,6 @@
           headers: extract.headers
         });
       }
-      /**
-       * Показать файлы
-       */
-
 
       function append(items) {
         component.reset();
@@ -11938,7 +10899,7 @@
     var proxyInitialized = {};
     var proxyWindow = {};
     var proxyCalls = {};
-    var default_balanser = 'vibix';
+    var default_balanser = 'rezka2';
 
     function component(object) {
       var network = new Lampa.Reguest();
@@ -11952,7 +10913,7 @@
       var last_bls = Lampa.Storage.field('online_mod_save_last_balanser') === true ? Lampa.Storage.cache('online_mod_last_balanser', 200, {}) : {};
       var use_stream_proxy = Lampa.Storage.field('online_mod_use_stream_proxy') === true;
       var rezka2_prx_ukr = '//' + (Lampa.Storage.field('online_mod_rezka2_prx_ukr') || 'prx.ukrtelcdn.net') + '/';
-      var rezka2_fix_stream = Lampa.Storage.field('online_mod_rezka2_fix_stream') === true;
+      var rezka2_fix_stream = true;
       var prefer_http = Lampa.Storage.field('online_mod_prefer_http') === true;
       var forcedQuality = '';
       var qualityFilter = {
@@ -12126,6 +11087,7 @@
       var isAndroid = Lampa.Platform.is('android');
       isAndroid && Utils.checkAndroidVersion(339);
       var collapsBlocked = (!startsWith(window.location.protocol, 'http') || window.location.hostname.indexOf('lampa') !== -1) && disable_dbg;
+      
       var all_sources = [{
         name: 'lumex',
         title: 'Lumex',
@@ -12305,6 +11267,7 @@
         imdb: true,
         disabled: true
       }];
+      
       var obj_filter_sources = all_sources.filter(function (s) {
         return !s.disabled;
       });
@@ -12329,7 +11292,7 @@
         return s.imdb;
       }).map(function (s) {
         return s.name;
-      }); // шаловливые ручки
+      });
 
       if (filter_sources.indexOf(balanser) == -1) {
         balanser = default_balanser;
@@ -12343,9 +11306,6 @@
 
       scroll.body().addClass('torrent-list');
       scroll.minus(files.render().find('.explorer__files-head'));
-      /**
-       * Подготовка
-       */
 
       this.create = function () {
         var _this = this;
@@ -12421,10 +11381,6 @@
         qualityFilter.items = items;
         setTimeout(this.closeFilter, 10);
       };
-      /**
-       * Начать поиск
-       */
-
 
       this.search = function () {
         this.activity.loader(true);
@@ -12932,11 +11888,6 @@
         data[selected_id || object.movie.id] = choice;
         Lampa.Storage.set('online_mod_choice_' + balanser, data);
       };
-      /**
-       * Есть похожие карточки
-       * @param {Object} json
-       */
-
 
       this.similars = function (json, search_more, more_params) {
         var _this5 = this;
@@ -12987,10 +11938,6 @@
           this.append(item);
         }
       };
-      /**
-       * Очистить список файлов
-       */
-
 
       this.reset = function () {
         contextmenu_all = [];
@@ -13004,10 +11951,6 @@
         var body = $('body');
         return !(body.hasClass('settings--open') || body.hasClass('menu--open') || body.hasClass('keyboard-input--visible') || body.hasClass('selectbox--open') || body.hasClass('search--open') || body.hasClass('ambience--enable') || $('div.modal').length);
       };
-      /**
-       * Загрузка
-       */
-
 
       this.loading = function (status) {
         if (status) this.activity.loader(true);else {
@@ -13072,10 +12015,6 @@
 
         return renamed;
       };
-      /**
-       * Построить фильтр
-       */
-
 
       this.filter = function (filter_items, choice) {
         var select = [];
@@ -13125,18 +12064,10 @@
         }));
         this.selected(filter_items);
       };
-      /**
-       * Закрыть фильтр
-       */
-
 
       this.closeFilter = function () {
         if ($('body').hasClass('selectbox--open')) Lampa.Select.close();
       };
-      /**
-       * Показать что выбрано в фильтре
-       */
-
 
       this.selected = function (filter_items) {
         var need = Lampa.Storage.get('online_mod_filter', '{}'),
@@ -13154,10 +12085,6 @@
         filter.chosen('filter', select);
         filter.chosen('sort', [source_obj ? source_obj.title : balanser]);
       };
-      /**
-       * Добавить файл
-       */
-
 
       this.append = function (item) {
         item.on('hover:focus', function (e) {
@@ -13166,10 +12093,6 @@
         });
         scroll.append(item);
       };
-      /**
-       * Меню
-       */
-
 
       this.contextmenu = function (params) {
         contextmenu_all.push(params);
@@ -13331,10 +12254,6 @@
           if (Lampa.Helper) Lampa.Helper.show('online_file', Lampa.Lang.translate('online_mod_file_helper'), params.item);
         });
       };
-      /**
-       * Показать пустой результат
-       */
-
 
       this.empty = function (msg) {
         var empty = Lampa.Template.get('list_empty');
@@ -13342,10 +12261,6 @@
         scroll.append(empty);
         this.loading(false);
       };
-      /**
-       * Показать пустой результат по ключевому слову
-       */
-
 
       this.emptyForQuery = function (query) {
         this.empty(Lampa.Lang.translate('online_mod_query_start') + ' (' + query + ') ' + Lampa.Lang.translate('online_mod_query_end'));
@@ -13358,13 +12273,9 @@
         });
         return last_episode;
       };
-      /**
-       * Начать навигацию по файлам
-       */
-
 
       this.start = function (first_select) {
-        if (Lampa.Activity.active().activity !== this.activity) return; //обязательно, иначе наблюдается баг, активность создается но не стартует, в то время как компонент загружается и стартует самого себя.
+        if (Lampa.Activity.active().activity !== this.activity) return;
 
         if (first_select) {
           var last_views = scroll.render().find('.selector.online').find('.torrent-item__viewed').parent().last();
@@ -13439,9 +12350,13 @@
     }
 
     function initStorage() {
+      // Принудительно устанавливаем правильные настройки для HDrezka
+      Lampa.Storage.set('online_mod_rezka2_mirror', 'rezka.cc');
+      Lampa.Storage.set('online_mod_proxy_rezka2', 'true');
+      Lampa.Storage.set('online_mod_rezka2_fix_stream', 'true');
+      
       if (!Utils.isDebug()) {
         Lampa.Storage.set('online_mod_proxy_lumex', 'false');
-        Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
         Lampa.Storage.set('online_mod_proxy_kinobase', 'false');
         Lampa.Storage.set('online_mod_proxy_collaps', 'false');
         Lampa.Storage.set('online_mod_proxy_cdnmovies', 'false');
@@ -13481,7 +12396,7 @@
       Lampa.Params.trigger('online_mod_proxy_other', false);
       Lampa.Params.trigger('online_mod_proxy_lumex', false);
       Lampa.Params.trigger('online_mod_proxy_rezka', false);
-      Lampa.Params.trigger('online_mod_proxy_rezka2', false);
+      Lampa.Params.trigger('online_mod_proxy_rezka2', true);
       Lampa.Params.trigger('online_mod_proxy_rezka2_mirror', false);
       Lampa.Params.trigger('online_mod_proxy_kinobase', false);
       Lampa.Params.trigger('online_mod_proxy_collaps', false);
@@ -13513,10 +12428,10 @@
       Lampa.Params.trigger('online_mod_full_episode_title', false);
       Lampa.Params.trigger('online_mod_av1_support', true);
       Lampa.Params.trigger('online_mod_save_last_balanser', false);
-      Lampa.Params.trigger('online_mod_rezka2_fix_stream', true); // Включаем фикс потока по умолчанию
+      Lampa.Params.trigger('online_mod_rezka2_fix_stream', true);
       Lampa.Params.select('online_mod_kinobase_mirror', '', '');
       Lampa.Params.select('online_mod_kinobase_cookie', '', '');
-      Lampa.Params.select('online_mod_rezka2_mirror', '', '');
+      Lampa.Params.select('online_mod_rezka2_mirror', '', 'rezka.cc');
       Lampa.Params.select('online_mod_rezka2_name', '', '');
       Lampa.Params.select('online_mod_rezka2_password', '', '');
       Lampa.Params.select('online_mod_rezka2_cookie', '', '');
@@ -14124,9 +13039,7 @@
     }
 
     function initMain() {
-      // нужна заглушка, а то при страте лампы говорит пусто
-      Lampa.Component.add('online_mod', component); //то же самое
-
+      Lampa.Component.add('online_mod', component);
       resetTemplates();
       var manifest = {
         type: 'video',
@@ -14183,8 +13096,7 @@
           };
         }
       }
-    } ///////FILMIX/////////
-
+    }
 
     var filmix_headers = Lampa.Platform.is('android') ? {
       'User-Agent': Utils.filmixUserAgent()
@@ -14306,7 +13218,7 @@
               if (found && found.status == 'ok') {
                 user_token = found.code;
                 user_code = found.user_code;
-                modal.find('.selector').text(user_code); //modal.find('.broadcast__scan').remove()
+                modal.find('.selector').text(user_code);
               } else {
                 clearInterval(ping_auth);
                 modal.find('.selector').text(Lampa.Lang.translate('network_401'));
@@ -14325,8 +13237,7 @@
           showStatus();
         }
       });
-    } ///////Rezka2/////////
-
+    }
 
     function rezka2Login(success, error) {
       var host = Utils.rezka2Mirror();
@@ -14401,7 +13312,7 @@
       var prox_enc = '';
       var returnHeaders = androidHeaders;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
+      var host = Utils.rezka2Mirror();
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
@@ -14737,8 +13648,7 @@
         headers: headers,
         returnHeaders: returnHeaders
       });
-    } ///////Онлайн Мод/////////
-
+    }
 
     function addSettingsOnlineMod() {
       if (Lampa.Settings.main && Lampa.Settings.main() && !Lampa.Settings.main().render().find('[data-component="online_mod"]').length) {
