@@ -85,28 +85,29 @@
     }
 
     function rezka2Mirror() {
-        var saved = Lampa.Storage.get('online_mod_rezka2_mirror', '') + '';
+        var saved = (Lampa.Storage.get('online_mod_rezka2_mirror', '') + '').trim();
     
         // Если пользователь вручную задал зеркало — используем его
         if (saved) {
-            if (saved.indexOf('://') === -1) saved = 'https://' + saved;
-            if (saved.charAt(saved.length - 1) === '/') saved = saved.substring(0, saved.length - 1);
+            if (!saved.startsWith('http')) saved = 'https://' + saved;
+            if (saved.endsWith('/')) saved = saved.slice(0, -1);
             return saved;
         }
 
         // Автоматический пул живых зеркал (февраль 2026)
         var mirrors = [
             'https://rezka.ag',
-            'https://kvk.zone',
             'https://hdrezka.website',
-            'https://hdrezka.ink'
+            'https://hdrezka.ink',
+            'https://rezka.me',
+            'https://hdrezka.club',
+            'https://kvk.zone'
         ];
 
-        // Случайный выбор + запоминаем, какое зеркало выбрали
-        var randomIndex = Math.floor(Math.random() * mirrors.length);
-        var chosen = mirrors[randomIndex];
+        var chosen = mirrors[Math.floor(Math.random() * mirrors.length)];
 
-        Lampa.Storage.set('online_mod_rezka2_mirror_temp', chosen); // временно запоминаем
+        console.log('[HDRezka] Авто-выбрано зеркало:', chosen);
+        Lampa.Storage.set('online_mod_rezka2_mirror_temp', chosen);
         return chosen;
     }
 
@@ -1606,17 +1607,17 @@
       var prefer_http = Lampa.Storage.field('online_mod_prefer_http') === true;
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var prox = component.proxy('rezka2');
+      var prox = Lampa.Storage.field('online_mod_proxy_rezka2') === true ? component.proxy('rezka2') || component.proxy('cookie') : '';
       if (!prox) prox = component.proxy('cookie');
 
       var host = Utils.rezka2Mirror();
 
       if (prox && proxy_mirror) {
-        host = 'https://rezka.ag';   // с прокси лучше всего работает именно этот домен
+          host = 'https://rezka.ag';   // с прокси лучше всего работает именно этот домен
      }
 
-     if (host.indexOf('://') === -1) host = 'https://' + host;
-     if (host.charAt(host.length - 1) === '/') host = host.substring(0, host.length - 1);
+     if (!host.startsWith('http')) host = 'https://' + host;
+     if (host.endsWith('/')) host = host.slice(0, -1);
 
       var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
@@ -1903,19 +1904,21 @@
             if (links && links.length) data = data.concat(links);
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
-            console.log(`[HDrezka] Ошибка: ${a.status} | ${a.statusText}`);
+            var status = a.status || 0;
+            console.log(`[HDRezka] Ошибка ${status} на ${host}`);
             
-            if (a.status === 0 || a.status === 403 || a.status === 429 || a.statusText === 'ERR_FAILED') {
-                console.log('[HDrezka] Cloudflare / блокировка — меняем зеркало...');
+            if (status === 0 || status === 1016 || status === 403 || status === 500 || status === 502 || status === 530) {
+                console.log('[HDRezka] Критическая ошибка — меняем зеркало...');
 
                 Lampa.Storage.set('online_mod_rezka2_mirror', '');
+                Lampa.Storage.set('online_mod_rezka2_mirror_temp', '');
 
                 // Повторяем поиск (максимум 4 попытки)
                 if (!window.rezka_retry) window.rezka_retry = 0;
                 window.rezka_retry++;
 
                 if (window.rezka_retry < 4) {
-                    setTimeout(query_title_search, 700);
+                    setTimeout(query_title_search, 900);
                     return;
                 }
             }
