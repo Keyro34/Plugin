@@ -96,13 +96,10 @@
 
         // Автоматический пул живых зеркал (февраль 2026)
         var mirrors = [
-            'https://rezka.ag',
-            'https://kvk.zone',
             'https://hdrezka.website',
-            'https://rezka.me',
-            'https://hdrezka.ink',
-            'https://rezka.today',
-            'https://hdrezka.cc'   // иногда работает
+            'https://kvk.zone',
+            'https://rezka.ag',
+            'https://hdrezka.ink'
         ];
 
         // Случайный выбор + запоминаем, какое зеркало выбрали
@@ -1610,18 +1607,24 @@
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       var prox = component.proxy('rezka2');
-      if (!prox) prox = component.proxy('cookie');
 
+      var prox = Lampa.Storage.field('online_mod_proxy_rezka2') === true ? Utils.proxy('rezka2') || Utils.proxy('cookie') || '' : '';
       var host = Utils.rezka2Mirror();
 
       if (prox && proxy_mirror) {
         host = 'https://rezka.ag';   // с прокси лучше всего работает именно этот домен
+        console.log('[HDRezka] Прокси + зеркало → принудительно rezka.ag');
      }
+
+     // Нормализация
+     if (!host.startsWith('http')) host = 'https://' + host;
+     if (host.endsWith('/')) host = host.slice(0, -1);
+
+     var ref = host + '/';
 
      if (host.indexOf('://') === -1) host = 'https://' + host;
      if (host.charAt(host.length - 1) === '/') host = host.substring(0, host.length - 1);
 
-      var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
       var headers = Lampa.Platform.is('android') ? {
@@ -1629,7 +1632,21 @@
         'Referer': ref,
         'User-Agent': user_agent
       } : {};
-      var prox_enc = '';
+      var prox_enc = ''; // оставляем пустым — меньше проблем с Cloudflare
+
+      var returnHeaders = androidHeaders;
+
+      // Если прокси не выбран и нет заголовков — пробуем cookie как запасной
+
+      if (!prox && !returnHeaders) {
+        prox = Utils.proxy('cookie');
+        if (prox) console.log('[HDRezka] Fallback на cookie-прокси');
+     }
+
+    // Если всё равно ничего — логируем и продолжаем (не return, чтобы не ломать)
+        if (!prox && !returnHeaders) {
+            console.warn('[HDRezka] Нет доступного прокси — идём напрямую');
+        }
 
       if (prox) {
         prox_enc += 'param/Origin=' + encodeURIComponent(host) + '/';
@@ -1906,20 +1923,29 @@
             if (links && links.length) data = data.concat(links);
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
-            console.log(`[HDrezka] Ошибка: ${a.status} | ${a.statusText}`);
+            var status = a.status || 0;
+            console.log(`[HDRezka] Ошибка: ${status} | ${a.statusText || 'нет описания'} на ${host}`);
+
             
+            // Cloudflare / DNS / серверные ошибки — меняем зеркало
             if (a.status === 0 || a.status === 403 || a.status === 429 || a.statusText === 'ERR_FAILED') {
                 console.log('[HDrezka] Cloudflare / блокировка — меняем зеркало...');
 
                 Lampa.Storage.set('online_mod_rezka2_mirror', '');
+                Lampa.Storage.set('online_mod_rezka2_mirror_temp', '');
 
                 // Повторяем поиск (максимум 4 попытки)
                 if (!window.rezka_retry) window.rezka_retry = 0;
                 window.rezka_retry++;
 
-                if (window.rezka_retry < 4) {
-                    setTimeout(query_title_search, 700);
+                if (window.rezka_retry_count <= 4) {
+                    setTimeout(function() {
+                        query_title_search();
+                    }, 1200);
                     return;
+                } else {
+                    console.warn('[HDRezka] Превышено 4 попытки — показываем ошибку');
+                    window.rezka_retry_count = 0;
                 }
             }
 
