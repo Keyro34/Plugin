@@ -235,6 +235,32 @@
     }
 
     /**
+     * Форматирует дату релиза
+     * @param {string} dateStr - Дата в формате YYYY-MM-DD или просто год
+     * @returns {string} Отформатированная дата
+     */
+    function formatReleaseDate(dateStr) {
+      if (!dateStr) return '';
+      
+      // Если это просто год
+      if (/^\d{4}$/.test(dateStr)) {
+        return dateStr;
+      }
+      
+      // Пробуем распарсить полную дату
+      var date = new Date(dateStr);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleDateString('ru-RU', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }).replace('.', '');
+      }
+      
+      return dateStr;
+    }
+
+    /**
      * Добавляет стили для улучшенного UI
      */
     function addEnhancedStyles() {
@@ -1509,14 +1535,7 @@
       }
     }
 
-    // ... (остальные функции источников: lumex2, rezka2, kinobase и т.д.)
-    // Для краткости я не включаю их сюда, но они остаются без изменений
-    // Вам нужно сохранить все остальные функции источников из вашего original plugin.js
-
-    // [Здесь должны быть все остальные функции: lumex2, rezka2, kinobase, collaps, cdnmovies, filmix, zetflix, fancdn, fancdn2, fanserials, videoseed, vibix, redheadsound, cdnvideohub, anilibria, anilibria2, animelib, kodik, alloha, kinopub]
-
-    // В функции resetTemplates заменяем шаблоны на новые с постером, датой и рейтингом
-    function resetTemplates() {
+        function resetTemplates() {
       // Шаблон для обычных файлов (видео) с датой и рейтингом
       Lampa.Template.add('online_mod', `
         <div class="online selector" data-id="{id}">
@@ -1559,8 +1578,6 @@
         </div>
       `);
     }
-
-    // ... (остальной код плагина: proxyInitialized, component, и т.д.)
 
     var mod_version = '13.02.2026';
     var isMSX = !!(window.TVXHost || window.TVXManager);
@@ -3055,6 +3072,8 @@
 
     function startPlugin() {
       if (Utils.isDebug3()) return;
+      
+      addEnhancedStyles();
       logApp();
       initStorage();
       initLang();
