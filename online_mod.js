@@ -12351,7 +12351,7 @@
 
     function initStorage() {
       // Принудительно устанавливаем правильные настройки для HDrezka
-      Lampa.Storage.set('online_mod_rezka2_mirror', 'rezka.cc');
+      Lampa.Storage.set('online_mod_rezka2_mirror', 'rezka.ag');
       Lampa.Storage.set('online_mod_proxy_rezka2', 'true');
       Lampa.Storage.set('online_mod_rezka2_fix_stream', 'true');
       
@@ -12431,7 +12431,7 @@
       Lampa.Params.trigger('online_mod_rezka2_fix_stream', true);
       Lampa.Params.select('online_mod_kinobase_mirror', '', '');
       Lampa.Params.select('online_mod_kinobase_cookie', '', '');
-      Lampa.Params.select('online_mod_rezka2_mirror', '', 'rezka.cc');
+      Lampa.Params.select('online_mod_rezka2_mirror', '', 'rezka.ag');
       Lampa.Params.select('online_mod_rezka2_name', '', '');
       Lampa.Params.select('online_mod_rezka2_password', '', '');
       Lampa.Params.select('online_mod_rezka2_cookie', '', '');
@@ -13830,4 +13830,3 @@
     startPlugin();
 
 })();
-
