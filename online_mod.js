@@ -1601,6 +1601,11 @@
 
     function rezka2(component, _object) {
       var network = new Lampa.Reguest();
+      var extract = {};
+      var object = _object;                   
+      var select_title = '';
+      var prefer_http = Lampa.Storage.field('online_mod_prefer_http') === true;
+      var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       var prox = component.proxy('rezka2');
       if (!prox) prox = component.proxy('cookie');
