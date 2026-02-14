@@ -85,22 +85,32 @@
     }
 
     function rezka2Mirror() {
-        var url = Lampa.Storage.get('online_mod_rezka2_mirror', '') + '';
-        if (!url) {
-            // Новые актуальные зеркала на февраль 2026
-            var mirrors = [
-                'https://rezka.ag',           // основное живое
-                'https://kvk.zone',           // старое дефолтное
-                'https://hdrezka.website',
-                'https://rezka.me',
-                'https://hdrezka.ink'
-            ];
-            // Берём случайное, чтобы не все сразу блокировали
-            return mirrors[Math.floor(Math.random() * mirrors.length)];
+        var saved = Lampa.Storage.get('online_mod_rezka2_mirror', '') + '';
+    
+        // Если пользователь вручную задал зеркало — используем его
+        if (saved) {
+            if (saved.indexOf('://') === -1) saved = 'https://' + saved;
+            if (saved.charAt(saved.length - 1) === '/') saved = saved.substring(0, saved.length - 1);
+            return saved;
         }
-        if (url.indexOf('://') == -1) url = 'https://' + url;
-        if (url.charAt(url.length - 1) === '/') url = url.substring(0, url.length - 1);
-        return url;
+
+        // Автоматический пул живых зеркал (февраль 2026)
+        var mirrors = [
+            'https://rezka.ag',
+            'https://kvk.zone',
+            'https://hdrezka.website',
+            'https://rezka.me',
+            'https://hdrezka.ink',
+            'https://rezka.today',
+            'https://hdrezka.cc'   // иногда работает
+        ];
+
+        // Случайный выбор + запоминаем, какое зеркало выбрали
+        var randomIndex = Math.floor(Math.random() * mirrors.length);
+        var chosen = mirrors[randomIndex];
+
+        Lampa.Storage.set('online_mod_rezka2_mirror_temp', chosen); // временно запоминаем
+        return chosen;
     }
 
     function kinobaseMirror() {
@@ -1598,7 +1608,17 @@
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       var prox = component.proxy('rezka2');
-      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
+
+      var host = Utils.rezka2Mirror();
+
+      if (prox && proxy_mirror) {
+        host = 'https://rezka.ag';
+     }
+
+     // Приводим к чистому виду
+     if (host.indexOf('://') === -1) host = 'https://' + host;
+     if (host.charAt(host.length - 1) === '/') host = host.substring(0, host.length - 1);
+
       var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
@@ -1884,33 +1904,40 @@
             if (links && links.length) data = data.concat(links);
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
+            // === УЛУЧШЕННЫЙ FALLBACK ДЛЯ HDREЗKA ===
             if (a.status === 0 || a.status === 403 || a.status === 429) {
         
-                console.log(`[HDrezka] Ошибка ${a.status} — пробуем другое зеркало...`);
+                console.log(`[HDrezka] Ошибка ${a.status} на ${host} — меняем зеркало...`);
 
-                // Сбрасываем сохранённое зеркало, чтобы rezka2Mirror() выбрало новое
+                // Сбрасываем текущее зеркало
                 Lampa.Storage.set('online_mod_rezka2_mirror', '');
+                Lampa.Storage.set('online_mod_rezka2_mirror_temp', '');
 
-                // Повторяем поиск заново (с новым зеркалом)
-                setTimeout(function() {
-                    query_title_search();   // ← повторный запуск поиска
-                }, 800);
+                // Повторяем поиск (максимум 4 попытки)
+                if (!window.rezka_retry) window.rezka_retry = 0;
+                window.rezka_retry++;
 
-                return; // выходим, не показываем ошибку пользователю
+                if (window.rezka_retry < 4) {
+                    setTimeout(function() {
+                    query_title_search();
+                    }, 900);
+                    return;
+                }
             }
 
+            // Если уже 4 попытки или другая ошибка — показываем как раньше
             if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
-              Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
+                Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
             }
 
             if (a.status == 403 && a.responseText) {
-              var str = (a.responseText || '').replace(/\n/g, '');
-              checkErrorForm(str);
+                var str = (a.responseText || '').replace(/\n/g, '');
+                checkErrorForm(str);
             }
 
             if (error_message) component.empty(error_message);
             else component.empty(network.errorDecode(a, c));
-          }, postdata, {
+        }, postdata, {
             dataType: 'text',
             withCredentials: logged_in,
             headers: headers
