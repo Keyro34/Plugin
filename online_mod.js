@@ -86,8 +86,8 @@
     function rezka2Mirror() {
       var url = Lampa.Storage.get('online_mod_rezka2_mirror', '') + '';
       if (!url || url.indexOf('hdrezka.sh') !== -1) {
-        url = 'https://rezka.cc';
-        Lampa.Storage.set('online_mod_rezka2_mirror', 'rezka.cc');
+        url = 'https://rezka.ag';
+        Lampa.Storage.set('online_mod_rezka2_mirror', 'rezka.ag');
       }
       if (url.indexOf('://') == -1) url = 'https://' + url;
       if (url.charAt(url.length - 1) === '/') url = url.substring(0, url.length - 1);
@@ -13830,3 +13830,4 @@
     startPlugin();
 
 })();
+
