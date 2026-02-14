@@ -228,7 +228,7 @@
         if (name === 'iframe') return user_proxy2;
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
-        if (name === 'rezka2') return user_proxy2;
+        if (name === 'rezka2') return 'https://corsproxy.io/?';
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
@@ -1601,21 +1601,16 @@
 
     function rezka2(component, _object) {
       var network = new Lampa.Reguest();
-      var extract = {};
-      var object = _object;
-      var select_title = '';
-      var prefer_http = Lampa.Storage.field('online_mod_prefer_http') === true;
-      var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       var prox = component.proxy('rezka2');
+      if (!prox) prox = component.proxy('cookie');
 
       var host = Utils.rezka2Mirror();
 
       if (prox && proxy_mirror) {
-        host = 'https://rezka.ag';
+        host = 'https://rezka.ag';   // с прокси лучше всего работает именно этот домен
      }
 
-     // Приводим к чистому виду
      if (host.indexOf('://') === -1) host = 'https://' + host;
      if (host.charAt(host.length - 1) === '/') host = host.substring(0, host.length - 1);
 
@@ -1904,23 +1899,19 @@
             if (links && links.length) data = data.concat(links);
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
-            // === УЛУЧШЕННЫЙ FALLBACK ДЛЯ HDREЗKA ===
-            if (a.status === 0 || a.status === 403 || a.status === 429) {
-        
-                console.log(`[HDrezka] Ошибка ${a.status} на ${host} — меняем зеркало...`);
+            console.log(`[HDrezka] Ошибка: ${a.status} | ${a.statusText}`);
+            
+            if (a.status === 0 || a.status === 403 || a.status === 429 || a.statusText === 'ERR_FAILED') {
+                console.log('[HDrezka] Cloudflare / блокировка — меняем зеркало...');
 
-                // Сбрасываем текущее зеркало
                 Lampa.Storage.set('online_mod_rezka2_mirror', '');
-                Lampa.Storage.set('online_mod_rezka2_mirror_temp', '');
 
                 // Повторяем поиск (максимум 4 попытки)
                 if (!window.rezka_retry) window.rezka_retry = 0;
                 window.rezka_retry++;
 
                 if (window.rezka_retry < 4) {
-                    setTimeout(function() {
-                    query_title_search();
-                    }, 900);
+                    setTimeout(query_title_search, 700);
                     return;
                 }
             }
