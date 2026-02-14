@@ -1,4 +1,4 @@
-//13.02.2026 - Fix
+//13.02.2026
 
 (function () {
     'use strict';
@@ -1088,6 +1088,10 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
+          element.poster = object.movie.poster || 
+                 object.movie.poster_path || 
+                 object.movie.backdrop_path || 
+                 'https://via.placeholder.com/68x102/1a1a1a/ffffff?text=Нет+постера';
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -1487,6 +1491,10 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
+          element.poster = object.movie.poster || 
+                 object.movie.poster_path || 
+                 object.movie.backdrop_path || 
+                 'https://via.placeholder.com/68x102/1a1a1a/ffffff?text=Нет+постера';
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -2445,6 +2453,10 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
+          element.poster = object.movie.poster || 
+                 object.movie.poster_path || 
+                 object.movie.backdrop_path || 
+                 'https://via.placeholder.com/68x102/1a1a1a/ffffff?text=Нет+постера';
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -14022,8 +14034,25 @@
     }
 
     function resetTemplates() {
-      Lampa.Template.add('online_mod', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <circle cx=\"64\" cy=\"64\" r=\"56\" stroke=\"white\" stroke-width=\"16\"/>\n                    <path d=\"M90.5 64.3827L50 87.7654L50 41L90.5 64.3827Z\" fill=\"white\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
-      Lampa.Template.add('online_mod_folder', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 112\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect y=\"20\" width=\"128\" height=\"92\" rx=\"13\" fill=\"white\"/>\n                    <path d=\"M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z\" fill=\"white\" fill-opacity=\"0.23\"/>\n                    <rect x=\"11\" y=\"8\" width=\"106\" height=\"76\" rx=\"13\" fill=\"white\" fill-opacity=\"0.51\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
+        Lampa.Template.add('online_mod', `
+            <div class="online selector" style="display:flex; align-items:center; padding:10px 12px; background:rgba(255,255,255,0.06); border-radius:12px; margin-bottom:6px; transition:all .2s;">
+                <img src="{poster}" style="width:68px; height:102px; object-fit:cover; border-radius:8px; margin-right:14px; flex-shrink:0; box-shadow:0 4px 12px rgba(0,0,0,0.4);">
+                <div style="flex:1; min-width:0;">
+                    <div class="online__title" style="font-size:1.05em; font-weight:600; line-height:1.25; margin-bottom:4px;">{title}</div>
+                    <div class="online__quality" style="font-size:0.88em; opacity:0.85;">{quality}{info}</div>
+                </div>
+            </div>
+        `);
+      
+        Lampa.Template.add('online_mod_folder', `
+            <div class="online selector" style="display:flex; align-items:center; padding:10px 12px; background:rgba(255,255,255,0.06); border-radius:12px; margin-bottom:6px; transition:all .2s;">
+                <img src="{poster}" style="width:68px; height:102px; object-fit:cover; border-radius:8px; margin-right:14px; flex-shrink:0; box-shadow:0 4px 12px rgba(0,0,0,0.4);">
+                <div style="flex:1; min-width:0;">
+                    <div class="online__title" style="font-size:1.05em; font-weight:600; line-height:1.25; margin-bottom:4px;">{title}</div>
+                    <div class="online__quality" style="font-size:0.88em; opacity:0.85;">{quality}{info}</div>
+                </div>
+            </div>
+        `);
     }
 
     function checkMyIp(onComplite) {
