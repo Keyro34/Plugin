@@ -227,7 +227,9 @@
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
         if (name === 'rezka2') {
-            return 'https://corsproxy.io/?';
+            return Lampa.Storage.field('online_mod_proxy_rezka2') === true 
+            ? 'https://apn-latest.onrender.com/'  // только если пользователь сам включил
+            : '';
         }
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
@@ -1611,6 +1613,10 @@
       if (!prox) prox = component.proxy('cookie');
 
       var host = Utils.rezka2Mirror();
+
+      if (!Lampa.Storage.get('online_mod_rezka2_mirror', '')) {
+        host = 'https://rezka.ag';
+      }
 
       if (prox && proxy_mirror) {
           host = 'https://rezka.ag';   // с прокси лучше всего работает именно этот домен
