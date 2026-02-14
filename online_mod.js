@@ -96,9 +96,9 @@
 
         // Автоматический пул живых зеркал (февраль 2026)
         var mirrors = [
-            'https://hdrezka.website',
-            'https://kvk.zone',
             'https://rezka.ag',
+            'https://kvk.zone',
+            'https://hdrezka.website',
             'https://hdrezka.ink'
         ];
 
