@@ -228,7 +228,11 @@
         if (name === 'iframe') return user_proxy2;
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
-        if (name === 'rezka2') return 'https://corsproxy.io/?';
+        if (name === 'rezka2') {
+            return Lampa.Storage.field('online_mod_proxy_rezka2') === true
+            ? 'https://apn-latest.onrender.com/'
+            : '';
+        }
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
@@ -14364,17 +14368,23 @@
     }
 
     function rezka2FillCookie(success, error) {
-      var prox = Utils.proxy('rezka2');
+      var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
+      var prox = Lampa.Storage.field('online_mod_proxy_rezka2') === true ? Utils.proxy('rezka2') || Utils.proxy('cookie') : '';
       var prox_enc = '';
       var returnHeaders = androidHeaders;
-      var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
-      if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
+      var host = Utils.rezka2Mirror();
+      if (prox && proxy_mirror) {
+        host = 'https://rezka.ag';
+     }
 
-      if (!prox && !returnHeaders) {
-        if (error) error();
-        return;
-      }
+     if (host.indexOf('://') === -1) host = 'https://' + host;
+     if (host.charAt(host.length - 1) === '/') host = host.substring(0, host.length - 1);
+
+     if (!prox && !returnHeaders) {
+        prox = Utils.proxy('cookie');
+     }
+
+     var ref = host + '/';
 
       var user_agent = Utils.baseUserAgent();
       var headers = Lampa.Platform.is('android') ? {
