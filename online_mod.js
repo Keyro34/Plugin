@@ -229,9 +229,7 @@
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
         if (name === 'rezka2') {
-            return Lampa.Storage.field('online_mod_proxy_rezka2') === true
-            ? 'https://apn-latest.onrender.com/'
-            : '';
+            return 'https://corsproxy.io/?';
         }
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
