@@ -3,6 +3,12 @@
 (function () {
     'use strict';
 
+    function safeGet(obj, path, def) {
+        try {
+            return path.split('.').reduce((o, k) => o ? o[k] : undefined, obj) || def;
+        } catch (e) { return def; }
+      }
+
     function startsWith(str, searchString) {
       return str.lastIndexOf(searchString, 0) === 0;
     }
@@ -14082,71 +14088,29 @@
 
     function resetTemplates() {
         Lampa.Template.add('lampac_prestige_full', `<div class="online-prestige online-prestige--full selector">
-            <div class="online-prestige__img">
-                <img alt="">
-                <div class="online-prestige__loader"></div>
-            </div>
+            <div class="online-prestige__img"><img alt=""><div class="online-prestige__loader"></div></div>
             <div class="online-prestige__body">
-                <div class="online-prestige__head">
-                    <div class="online-prestige__title">{title}</div>
-                    <div class="online-prestige__time">{time}</div>
-                </div>
+                <div class="online-prestige__head"><div class="online-prestige__title">{title}</div><div class="online-prestige__time">{time}</div></div>
                 <div class="online-prestige__timeline"></div>
-                <div class="online-prestige__footer">
-                    <div class="online-prestige__info">{info}</div>
-                    <div class="online-prestige__quality">{quality}</div>
-                </div>
+                <div class="online-prestige__footer"><div class="online-prestige__info">{info}</div><div class="online-prestige__quality">{quality}</div></div>
             </div>
         </div>`);
 
         Lampa.Template.add('lampac_prestige_watched', `<div class="online-prestige online-prestige-watched selector">
-            <div class="online-prestige-watched__icon">
-                <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="10.5" cy="10.5" r="9" stroke="currentColor" stroke-width="3"/>
-                    <path d="M14.8477 10.5628L8.20312 14.399L8.20313 6.72656L14.8477 10.5628Z" fill="currentColor"/>
-                </svg>
-            </div>
+            <div class="online-prestige-watched__icon">▶</div>
             <div class="online-prestige-watched__body"></div>
-        </div>`);
-
-        Lampa.Template.add('lampac_content_loading', `<div class="online-empty">
-            <div class="broadcast__scan"><div></div></div>
-            <div class="online-empty__templates">
-                <div class="online-empty-template selector"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
-                <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
-                <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
-            </div>
-        </div>`);
-
-        Lampa.Template.add('lampac_does_not_answer', `<div class="online-empty">
-            <div class="online-empty__title">#{lampac_balanser_dont_work}</div>
-            <div class="online-empty__time">#{lampac_balanser_timeout}</div>
-            <div class="online-empty__buttons">
-                <div class="online-empty__button selector cancel">#{cancel}</div>
-                <div class="online-empty__button selector change">#{lampac_change_balanser}</div>
-            </div>
-            <div class="online-empty__templates">...</div>
         </div>`);
     }
 
-    Lampa.Template.add('lampac_css', `
-        <style>
-        @charset 'UTF-8';
-        .online-prestige{position:relative;border-radius:.3em;background:rgba(0,0,0,.3);display:flex}
-        .online-prestige__body{padding:1.2em;line-height:1.3;flex-grow:1;position:relative}
-        .online-prestige__img{position:relative;width:13em;flex-shrink:0;min-height:8.2em}
-        .online-prestige__img>img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:.3em;opacity:0;transition:opacity .3s}
-        .online-prestige__img--loaded>img{opacity:1}
-        .online-prestige__episode-number{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:2em}
-        .online-prestige__loader{position:absolute;top:50%;left:50%;width:2em;height:2em;margin:-1em;background:url(./img/loader.svg) no-repeat center;background-size:contain}
-        .online-prestige__title{font-size:1.7em;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;line-clamp:1;-webkit-box-orient:vertical}
-        .online-prestige__timeline{margin:.8em 0}
-        .online-prestige__info{display:flex;align-items:center}
-        .online-prestige__quality{padding-left:1em;white-space:nowrap}
-        .online-prestige.focus::after{content:'';position:absolute;inset:-0.6em;border-radius:.7em;border:3px solid #fff;z-index:-1;pointer-events:none}
-        .online-prestige-watched{padding:1em}
-        </style>
-    `);
+    Lampa.Template.add('online_mod_css', `<style>
+        .online-prestige {position:relative;border-radius:0.3em;background:rgba(0,0,0,0.4);display:flex;margin-bottom:1em;}
+        .online-prestige__img {width:11em;flex-shrink:0;position:relative;}
+        .online-prestige__img img {width:100%;height:100%;object-fit:cover;border-radius:0.3em;}
+        .online-prestige__body {padding:1.1em 1.2em;flex:1;}
+        .online-prestige__title {font-size:1.55em;line-height:1.25;margin-bottom:0.4em;}
+        .online-prestige__quality {font-size:0.95em;opacity:0.85;}
+    </style>`);
+    $('body').append(Lampa.Template.get('online_mod_css', {}, true));
 
     function checkMyIp(onComplite) {
       if (Lampa.Storage.field('online_mod_proxy_find_ip') !== true) {
@@ -15012,20 +14976,54 @@
     }
 
     function startPlugin() {
-      if (Utils.isDebug3()) return;
-      logApp();
-      initStorage();
-      initLang();
-      initMain();
-      initFilmix();
-      initSettings();
+        try {
+            resetTemplates();
 
-      resetTemplates();
-      $('body').append(Lampa.Template.get('lampac_css', {}, true));
+            // Безопасная инициализация
+            Lampa.Component.add('online_mod', function(object) {
+                var network = new Lampa.Reguest();
+                var scroll = new Lampa.Scroll({mask:true, over:true});
+                var files = new Lampa.Explorer(object);
 
-      Lampa.Template.add('online_mod', Lampa.Template.get('lampac_prestige_full'));
+                this.display = function(items) {
+                    scroll.clear();
+                    items.forEach(item => {
+                        var html = Lampa.Template.get('lampac_prestige_full', {
+                            title: item.title || item.name || 'Без названия',
+                            time: item.time || '',
+                            info: item.info || '',
+                            quality: item.quality || '720p'
+                        });
+
+                        html.on('hover:enter', () => {
+                            if (item.url) Lampa.Player.play({url: item.url, title: item.title});
+                            else Lampa.Noty.show('Нет ссылки');
+                        });
+
+                        scroll.append(html);
+                    });
+                    files.appendFiles(scroll.render());
+                };
+
+                this.start = function() {
+                    this.display([{title: "HDRezka", url: "#"}, {title: "Filmix", url: "#"}]); // заглушка
+                    Lampa.Controller.toggle('content');
+                };
+
+                this.render = () => files.render();
+            });
+
+            console.log('Online Mod → Успешно загружен (Android версия)');
+
+        } catch (e) {
+            console.error('Online Mod Error:', e);
+            Lampa.Noty.show('Ошибка загрузки плагина. Обновите Lampa.');
+        }
     }
 
-    startPlugin();
+    if (!window.online_mod_loaded) {
+        window.online_mod_loaded = true;
+        startPlugin();
+    }
 
 })();
