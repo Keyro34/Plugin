@@ -955,6 +955,8 @@
                       info: ' / ' + (voice.translation_name || v.name),
                       season: season_num,
                       episode: episode_count,
+                      episode_num: '0' + episode_count,
+                      poster: voice.poster || episode.poster || object.movie.poster || '',
                       media: voice
                     });
                   }
