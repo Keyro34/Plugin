@@ -1473,7 +1473,7 @@
                           info: ' / ' + voice_name,
                           season: parseInt(episode.season_id),
                           episode: ep,
-                          episode_num: ep.toString().padStart(2, '0'),  // ← вот это решает проблему с {episode_num}
+                          episode_num: (parseInt(episode.episode_id) || 1).toString().padStart(2, '0'),  // ← вот это решает проблему с {episode_num}
                           poster: object.movie.poster || object.movie.background || 'https://via.placeholder.com/120x68?text=S'+episode.season_id+'E'+ep,
                           media: episode
                       });
@@ -1612,7 +1612,9 @@
               Lampa.Noty.show(Lampa.Lang.translate('online_mod_nolink'));
             });
           });
-          component.append(item);
+          component.append(
+              Lampa.Template.get('online_mod', item)
+          );
           component.contextmenu({
             item: item,
             view: view,
@@ -14081,41 +14083,19 @@
     function resetTemplates() {
         // Основная карточка с постером (как на твоём скриншоте)
         Lampa.Template.add('online_mod', `
-            <div class="online selector" style="
-                display: flex;
-                align-items: center;
-                background: rgba(20,20,30,0.85);
-                border-radius: 12px;
-                overflow: hidden;
-                padding: 8px;
-                margin: 4px 8px;
-            ">
-                <!-- Постер + номер -->
-                <div style="position:relative; width:118px; height:66px; flex-shrink:0; border-radius:9px; overflow:hidden; background:#111;">
-                    <img src="{poster}" style="width:100%; height:100%; object-fit:cover;" 
-                        onerror="this.src='https://via.placeholder.com/118x66/1a1a2e/ffffff?text=E'+{episode_num}">
-                
-                    <!-- Номер эпизода в чёрном квадрате -->
-                    <div style="
-                        position: absolute;
-                        left: 6px;
-                        top: 6px;
-                        background: rgba(0,0,0,0.85);
-                        color: #fff;
-                        font-size: 14px;
-                        font-weight: 700;
-                        padding: 3px 8px;
-                        border-radius: 5px;
-                        line-height: 1;
-                    ">{episode_num}</div>
-                </div>
-            
-                <!-- Текстовая часть -->
-                <div style="flex:1; padding-left:14px; min-width:0;">
-                    <div class="online__title" style="font-size:15.5px; line-height:1.35; margin-bottom:4px; color:#eee;">{title}</div>
-                    <div class="online__quality" style="font-size:13.2px; color:#aaa;">{quality}{info}</div>
-                </div>
-            </div>
+          <div class="online selector" style="display:flex; align-items:center; background:rgba(18,20,32,0.9); border-radius:12px; overflow:hidden; padding:8px 10px; margin:6px 8px;">
+              <div style="position:relative; width:120px; height:68px; flex-shrink:0; border-radius:9px; overflow:hidden; background:#0e0e20;">
+                  <img src="{poster}" style="width:100%; height:100%; object-fit:cover;" 
+                      onerror="this.src='https://via.placeholder.com/120x68/111133/888?text=Эпизод'; this.onerror=null;">
+                  <div style="position:absolute; left:7px; top:7px; background:rgba(0,0,0,0.82); color:white; font-size:14px; font-weight:bold; padding:3px 8px; border-radius:5px; line-height:1;">
+                      {episode_num}
+                  </div>
+              </div>
+              <div style="flex:1; padding-left:14px; min-width:0;">
+                  <div style="font-size:15.5px; color:#e8e8ff; line-height:1.32; margin-bottom:4px;">{title}</div>
+                  <div style="font-size:13px; color:#a8a8d8;">{quality}{info}</div>
+              </div>
+          </div>
         `);
 
         // Для сезонов (если вдруг папки)
