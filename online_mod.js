@@ -1849,34 +1849,74 @@
                     };
                 });
 
-                // Улучшенное сравнение: название + год + тип (фильм/сериал)
                 var bestMatch = null;
                 var bestScore = -1;
 
                 var inputTitle   = (select_title || object.movie.title || object.movie.original_title || '').toLowerCase().trim();
-                var inputYear    = object.movie.release_date ? parseInt(object.movie.release_date.substring(0,4)) : null;
-                var inputIsSeries = object.movie.number_of_seasons > 1 || object.movie.first_air_date || false;
-
+                var inputYear    = object.movie.release_date ? parseInt(object.movie.release_date.substring(0,4)) : 
+                                   object.movie.year ? parseInt(object.movie.year) : null;
+                var inputIsSeries = object.movie.number_of_seasons > 1 || 
+                                    object.movie.first_air_date || 
+                                    object.movie.type === 'tv' || 
+                                    object.movie.media_type === 'tv';
+                
                 items.forEach(function (item) {
                     var nameLower = (item.title || item.orig_title || '').toLowerCase().trim();
                     var score = 0;
 
-                    // Название — основное совпадение
-                    if (nameLower === inputTitle) score += 100;
-                    else if (nameLower.includes(inputTitle) || inputTitle.includes(nameLower)) score += 40;
+                    if (nameLower === inputTitle) {
+                        score += 120;
+                    } else if (nameLower.includes(inputTitle) || inputTitle.includes(nameLower)) {
+                        score += 50;
+                    } else {
+                        score -= 30;  // сильно штрафуем, если название вообще не похоже
+                    }
 
-                    // Год — очень важный фактор
-                    if (item.year && inputYear && item.year === inputYear) score += 60;
-                    else if (item.year && inputYear && Math.abs(item.year - inputYear) <= 1) score += 30;
+                    if (inputYear) {
+                        if (item.year === inputYear) {
+                            score += 150;          // очень сильно повышаем
+                        } else if (Math.abs(item.year - inputYear) <= 1) {
+                            score += 80;
+                        } else if (item.year) {
+                            score -= 100;          // сильно штрафуем за неправильный год
+                        }
+                    }
 
-                    // Тип (фильм/сериал)
-                    if (item.is_series === inputIsSeries) score += 50;
+                    if (item.is_series === inputIsSeries) {
+                        score += 100;
+                    } else {
+                        score -= 80;
+                    }
 
                     if (score > bestScore) {
                         bestScore = score;
                         bestMatch = item;
                     }
-                });
+                 });
+
+                if (bestMatch && bestScore >= 180) {
+                   console.log('HDRezka → Выбран по строгому совпадению: ' + bestMatch.title + ' (год ' + bestMatch.year + ', score: ' + bestScore + ')');
+                   getPage(bestMatch.link);
+                   return;
+                }
+
+                console.log('HDRezka → Слабое совпадение (score ' + (bestScore || 0) + '), показываем список');
+                if (items.length) {
+                    _this.wait_similars = true;
+                    items.forEach(function (c) {
+                        c.is_similars = true;
+                    });
+
+                    if (have_more) {
+                        component.similars(items, search_more, { query: query });
+                    } else {
+                        component.similars(items);
+                    }  
+                    
+                    component.loading(false);
+                } else {
+                    component.emptyForQuery(select_title);
+                }
 
                 if (bestMatch && bestScore >= 80) {   // порог можно поднять до 100–120, если хочешь строже
                     console.log('HDRezka → Выбран по совпадению: ' + bestMatch.title + ' (score: ' + bestScore + ')');
