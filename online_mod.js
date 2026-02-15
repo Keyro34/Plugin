@@ -955,8 +955,6 @@
                       info: ' / ' + (voice.translation_name || v.name),
                       season: season_num,
                       episode: episode_count,
-                      episode_num: '0' + episode_count,
-                      poster: voice.poster || episode.poster || object.movie.poster || '',
                       media: voice
                     });
                   }
@@ -1459,23 +1457,24 @@
 
           if (extract.is_series) {
               var season_name = filter_items.season[choice.season];
-              var season_id;
-              extract.season.forEach(function (season) {
-                  if (season.name == season_name) season_id = season.id;
+              var season_id = null;
+              extract.season.forEach(function (s) {
+                  if (s.name == season_name) season_id = s.id;
               });
 
-              var voice = filter_items.voice[choice.voice];
+              var voice_name = filter_items.voice[choice.voice] || 'HDrezka Studio';
 
               extract.episode.forEach(function (episode) {
                   if (episode.season_id == season_id) {
+                      var ep = parseInt(episode.episode_id || episode.episode || 1);
                       filtred.push({
-                          title: component.formatEpisodeTitle(episode.season_id, null, episode.name),
+                          title: component.formatEpisodeTitle(episode.season_id, ep, episode.name),
                           quality: '360p ~ 1080p',
-                          info: ' / ' + voice,
+                          info: ' / ' + voice_name,
                           season: parseInt(episode.season_id),
-                          episode: parseInt(episode.episode_id),
-                          episode_num: parseInt(episode.episode_id).toString().padStart(2, '0'),   // ← 01, 02...
-                          poster: object.movie.poster || object.movie.background || '',             // ← постер сериала
+                          episode: ep,
+                          episode_num: ep.toString().padStart(2, '0'),  // ← вот это решает проблему с {episode_num}
+                          poster: object.movie.poster || object.movie.background || 'https://via.placeholder.com/120x68?text=S'+episode.season_id+'E'+ep,
                           media: episode
                       });
                   }
@@ -1483,7 +1482,7 @@
           } else {
               extract.voice.forEach(function (voice) {
                   filtred.push({
-                      title: voice.name || select_title,
+                      title: voice.name || 'Озвучка',
                       quality: '360p ~ 1080p',
                       info: '',
                       episode_num: '01',
@@ -1494,7 +1493,7 @@
           }
 
           return filtred;
-    }
+      }
 
       function parseSubs(tracks) {
         if (!(tracks && tracks.forEach)) return false;
