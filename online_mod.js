@@ -15021,9 +15021,6 @@
         }
     }
 
-    if (!window.online_mod_loaded) {
-        window.online_mod_loaded = true;
-        startPlugin();
-    }
+    startPlugin();
 
 })();
