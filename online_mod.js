@@ -4252,124 +4252,80 @@
           clean_title = clean_title.replace(new RegExp(' \\+(' + object_year + ')$'), ' $1');
         }
 
-        this.display = function(videos) {
-      var _this5 = this;
-      this.draw(videos, {
-        onEnter: function onEnter(item, html) {
-          _this5.getFileUrl(item, function(json, json_call) {
-            if (json && json.url) {
-              var playlist = [];
-              var first = _this5.toPlayElement(item);
-              first.url = json.url;
-              first.headers = json_call.headers || json.headers;
-              first.quality = json_call.quality || item.qualitys;
-			  first.segments = json_call.segments || item.segments;
-              first.hls_manifest_timeout = json_call.hls_manifest_timeout || json.hls_manifest_timeout;
-              first.subtitles = json.subtitles;
-			  first.subtitles_call = json_call.subtitles_call || json.subtitles_call;
-			  if (json.vast && json.vast.url) {
-                first.vast_url = json.vast.url;
-                first.vast_msg = json.vast.msg;
-                first.vast_region = json.vast.region;
-                first.vast_platform = json.vast.platform;
-                first.vast_screen = json.vast.screen;
-			  }
-              _this5.orUrlReserve(first);
-              _this5.setDefaultQuality(first);
-              if (item.season) {
-                videos.forEach(function(elem) {
-                  var cell = _this5.toPlayElement(elem);
-                  if (elem == item) cell.url = json.url;
-                  else {
-                    if (elem.method == 'call') {
-                      if (Lampa.Storage.field('player') !== 'inner') {
-                        cell.url = elem.stream;
-						delete cell.quality;
-                      } else {
-                        cell.url = function(call) {
-                          _this5.getFileUrl(elem, function(stream, stream_json) {
-                            if (stream.url) {
-                              cell.url = stream.url;
-                              cell.quality = stream_json.quality || elem.qualitys;
-							  cell.segments = stream_json.segments || elem.segments;
-                              cell.subtitles = stream.subtitles;
-                              _this5.orUrlReserve(cell);
-                              _this5.setDefaultQuality(cell);
-                              elem.mark();
-                            } else {
-                              cell.url = '';
-                              Lampa.Noty.show(Lampa.Lang.translate('lampac_nolink'));
-                            }
-                            call();
-                          }, function() {
-                            cell.url = '';
-                            call();
-                          });
-                        };
-                      }
-                    } else {
-                      cell.url = elem.url;
-                    }
-                  }
-                  _this5.orUrlReserve(cell);
-                  _this5.setDefaultQuality(cell);
-                  playlist.push(cell);
-                }); //Lampa.Player.playlist(playlist) 
-              } else {
-                playlist.push(first);
-              }
-              if (playlist.length > 1) first.playlist = playlist;
-              if (first.url) {
-                var element = first;
-				element.isonline = true;
-                if (element.url && element.isonline) {
-  // online.js
-} 
-else if (element.url) {
-  if (false) {
-    if (Platform.is('browser') && location.host.indexOf("127.0.0.1") !== -1) {
-      Noty.show('Видео открыто в playerInner', {time: 3000});
-      $.get('http://wtch.ch/player-inner/' + element.url);
-      return;
-    }
-
-    Player.play(element);
-  } 
-  else {
-    if (true && Platform.is('browser') && location.host.indexOf("127.0.0.1") !== -1)
-      Noty.show('Внешний плеер можно указать в init.conf (playerInner)', {time: 3000});
-    Player.play(element);
-  }
-}
-                Lampa.Player.play(element);
-                Lampa.Player.playlist(playlist);
-				if(element.subtitles_call) _this5.loadSubtitles(element.subtitles_call)
-                item.mark();
-                _this5.updateBalanser(balanser);
-              } else {
-                Lampa.Noty.show(Lampa.Lang.translate('lampac_nolink'));
-              }
-            } else Lampa.Noty.show(Lampa.Lang.translate('lampac_nolink'));
-          }, true);
-        },
-        onContextMenu: function onContextMenu(item, html, data, call) {
-          _this5.getFileUrl(item, function(stream) {
-            call({
-              file: stream.url,
-              quality: item.qualitys
+        var display = function display(json) {
+          if (json && json.length && json.forEach) {
+            var is_sure = false;
+            json.forEach(function (c) {
+              if (!c.orig_title) c.orig_title = c.original_title || c.original_name;
+              if (!c.year && c.alt_name) c.year = parseInt(c.alt_name.split('-').pop());
             });
-          }, true);
-        }
-      });
-      this.filter({
-        season: filter_find.season.map(function(s) {
-          return s.title;
-        }),
-        voice: filter_find.voice.map(function(b) {
-          return b.title;
-        })
-      }, this.getChoice());
-    };
+            var cards = json;
+
+            if (cards.length) {
+              if (orig_titles.length) {
+                var tmp = cards.filter(function (c) {
+                  return component.containsAnyTitle([c.orig_title, c.title], orig_titles);
+                });
+
+                if (tmp.length) {
+                  cards = tmp;
+                  is_sure = true;
+                }
+              }
+
+              if (select_title) {
+                var _tmp = cards.filter(function (c) {
+                  return component.containsAnyTitle([c.title, c.orig_title], [select_title]);
+                });
+
+                if (_tmp.length) {
+                  cards = _tmp;
+                  is_sure = true;
+                }
+              }
+
+              if (cards.length > 1 && search_year) {
+                var _tmp2 = cards.filter(function (c) {
+                  return c.year == search_year;
+                });
+
+                if (!_tmp2.length) _tmp2 = cards.filter(function (c) {
+                  return c.year && c.year > search_year - 2 && c.year < search_year + 2;
+                });
+                if (_tmp2.length) cards = _tmp2;
+              }
+            }
+
+            if (cards.length == 1 && is_sure) {
+              if (search_year && cards[0].year) {
+                is_sure = cards[0].year > search_year - 2 && cards[0].year < search_year + 2;
+              }
+
+              if (is_sure) {
+                is_sure = false;
+
+                if (orig_titles.length) {
+                  is_sure |= component.equalAnyTitle([cards[0].orig_title, cards[0].title], orig_titles);
+                }
+
+                if (select_title) {
+                  is_sure |= component.equalAnyTitle([cards[0].title, cards[0].orig_title], [select_title]);
+                }
+              }
+            }
+
+            if (cards.length == 1 && is_sure) find(cards[0].id);else if (json.length) {
+              _this.wait_similars = true;
+              json.forEach(function (c) {
+                c.is_similars = true;
+                c.seasons_count = c.last_episode && c.last_episode.season;
+                c.episodes_count = c.last_episode && c.last_episode.episode;
+              });
+              component.similars(json);
+              component.loading(false);
+            } else component.emptyForQuery(select_title);
+          } else component.emptyForQuery(select_title);
+        };
 
         var siteSearch = function siteSearch() {
           var url = site + 'api/v2/suggestions?search_word=' + encodeURIComponent(clean_title);
