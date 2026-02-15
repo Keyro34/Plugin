@@ -1853,40 +1853,51 @@
                 var bestScore = -1;
 
                 var inputTitle   = (select_title || object.movie.title || object.movie.original_title || '').toLowerCase().trim();
-                var inputYear    = object.movie.release_date ? parseInt(object.movie.release_date.substring(0,4)) : 
+                var inputYear    = object.movie.release_date ? parseInt(object.movie.release_date.substring(0,4)) :
                                    object.movie.year ? parseInt(object.movie.year) : null;
-                var inputIsSeries = object.movie.number_of_seasons > 1 || 
+                var inputIsSeries = object.movie.number_of_seasons > 1 ||
                                     object.movie.first_air_date || 
                                     object.movie.type === 'tv' || 
-                                    object.movie.media_type === 'tv';
+                                    object.movie.media_type === 'tv' ||
+                                    (object.movie.original_name && !object.movie.original_title);
                 
                 items.forEach(function (item) {
                     var nameLower = (item.title || item.orig_title || '').toLowerCase().trim();
                     var score = 0;
 
                     if (nameLower === inputTitle) {
-                        score += 120;
+                        score += 100;
                     } else if (nameLower.includes(inputTitle) || inputTitle.includes(nameLower)) {
-                        score += 50;
+                        score += 30;
                     } else {
-                        score -= 30;  // сильно штрафуем, если название вообще не похоже
+                        score -= 50;  // сильно штрафуем, если название вообще не похоже
                     }
 
                     if (inputYear) {
                         if (item.year === inputYear) {
-                            score += 150;          // очень сильно повышаем
+                            score += 200;          // очень сильно повышаем
                         } else if (Math.abs(item.year - inputYear) <= 1) {
-                            score += 80;
+                            score += 100;
                         } else if (item.year) {
-                            score -= 100;          // сильно штрафуем за неправильный год
+                            score -= 300;          // сильно штрафуем за неправильный год
                         }
                     }
 
-                    if (item.is_series === inputIsSeries) {
-                        score += 100;
+                    if (inputIsSeries) {
+                        if (item.is_series) {
+                            score += 250;
+                        } else { 
+                            score -= 400;
+                        }
                     } else {
-                        score -= 80;
+                        if (!item.is_series) {
+                            score += 150;
+                        } else {
+                            score -= 300;
+                        }
                     }
+
+                    console.log('Оцениваем "' + item.title + '" (' + (item.year || '?') + ', сериал=' + item.is_series + '): ' + score);
 
                     if (score > bestScore) {
                         bestScore = score;
@@ -1894,13 +1905,14 @@
                     }
                  });
 
-                if (bestMatch && bestScore >= 180) {
-                   console.log('HDRezka → Выбран по строгому совпадению: ' + bestMatch.title + ' (год ' + bestMatch.year + ', score: ' + bestScore + ')');
+                if (bestMatch && bestScore >= 350) {
+                   console.log('Выбран: ' + bestMatch.title + ' (score: ' + bestScore + ')');
                    getPage(bestMatch.link);
                    return;
                 }
 
-                console.log('HDRezka → Слабое совпадение (score ' + (bestScore || 0) + '), показываем список');
+                console.log('Слишком низкий score (' + (bestScore || 0) + '), показываем список результатов');
+
                 if (items.length) {
                     _this.wait_similars = true;
                     items.forEach(function (c) {
@@ -1917,28 +1929,8 @@
                 } else {
                     component.emptyForQuery(select_title);
                 }
-
-                if (bestMatch && bestScore >= 80) {   // порог можно поднять до 100–120, если хочешь строже
-                    console.log('HDRezka → Выбран по совпадению: ' + bestMatch.title + ' (score: ' + bestScore + ')');
-                    getPage(bestMatch.link);
-                    return;
-                }
-
-                // Fallback: если ничего хорошего не нашли — берём первый
-                if (items.length > 0) {
-                    console.log('HDRezka → Нет хорошего совпадения, беру первый: ' + items[0].title);
-                    getPage(items[0].link);
-                    return;
-                }
-
-                // Если вообще ничего нет
-                component.emptyForQuery(select_title);
-            } else if (error_message) {
-                component.empty(error_message);
-            } else {
-                component.emptyForQuery(select_title);
-            }
-        };
+             }
+         };
 
         var query_search = function query_search(query, data, callback) {
           var postdata = 'q=' + encodeURIComponent(query);
