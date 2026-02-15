@@ -933,45 +933,51 @@
 
 
       function filtred() {
-          var filtred = [];
+        var filtred = [];
 
-          if (extract.is_series) {
-              var season_name = filter_items.season[choice.season];
-              var season_id;
-              extract.season.forEach(function (season) {
-                  if (season.name == season_name) season_id = season.id;
-              });
+        if (filter_items.season_num.length) {
+          var season = extract.seasons[choice.season];
+          var season_num = extract.season_num[choice.season];
+          var v = filter_items.voice_info[choice.voice];
 
-              var voice = filter_items.voice[choice.voice];
+          if (season && season.episodes && v) {
+            var episode_count = 0;
+            season.episodes.forEach(function (episode) {
+              episode_count++;
 
-              extract.episode.forEach(function (episode) {
-                  if (episode.season_id == season_id) {
-                      filtred.push({
-                          title: component.formatEpisodeTitle(episode.season_id, null, episode.name),
-                          quality: '360p ~ 1080p',
-                          info: ' / ' + voice,
-                          season: parseInt(episode.season_id),
-                          episode: parseInt(episode.episode_id),
-                          episode_num: parseInt(episode.episode_id).toString().padStart(2, '0'),   // ← 01, 02...
-                          poster: object.movie.poster || object.movie.background || '',             // ← постер сериала
-                          media: episode
-                      });
-                  }
-              });
-          } else {
-              extract.voice.forEach(function (voice) {
-                  filtred.push({
-                      title: voice.name || select_title,
-                      quality: '360p ~ 1080p',
-                      info: '',
-                      episode_num: '01',
-                      poster: object.movie.poster || '',
+              if (episode.media) {
+                episode.media.forEach(function (voice) {
+                  if (voice.translation_id == v.id) {
+                    var episode_num = episode.episode_id != null ? episode.episode_id : episode_count;
+                    filtred.push({
+                      title: component.formatEpisodeTitle(season_num, episode_num),
+                      quality: voice.max_quality ? voice.max_quality + 'p' : '360p ~ 1080p',
+                      info: ' / ' + (voice.translation_name || v.name),
+                      season: season_num,
+                      episode: episode_count,
+                      episode_num: '0' + episode_count,
+                      poster: voice.poster || episode.poster || object.movie.poster || '',
                       media: voice
-                  });
-              });
+                    });
+                  }
+                });
+              }
+            });
           }
+        } else {
+          extract.media.forEach(function (voice) {
+            if (voice.translation_id != null && voice.translation_name != null) {
+              filtred.push({
+                title: voice.translation_name || select_title,
+                quality: voice.max_quality ? voice.max_quality + 'p' : '360p ~ 1080p',
+                info: '',
+                media: voice
+              });
+            }
+          });
+        }
 
-          return filtred;
+        return filtred;
       }
       /**
        * Получить потоки
@@ -1488,7 +1494,7 @@
           }
 
           return filtred;
-      }
+    }
 
       function parseSubs(tracks) {
         if (!(tracks && tracks.forEach)) return false;
@@ -2446,45 +2452,39 @@
 
 
       function filtred() {
-          var filtred = [];
+        var filtred = [];
 
-          if (extract.is_series) {
-              var season_name = filter_items.season[choice.season];
-              var season_id;
-              extract.season.forEach(function (season) {
-                  if (season.name == season_name) season_id = season.id;
+        if (extract.is_series) {
+          var season_name = filter_items.season[choice.season];
+          var season_id;
+          extract.season.forEach(function (season) {
+            if (season.name == season_name) season_id = season.id;
+          });
+          var voice = filter_items.voice[choice.voice];
+          extract.episode.forEach(function (episode) {
+            if (episode.season_id == season_id) {
+              filtred.push({
+                title: component.formatEpisodeTitle(episode.season_id, null, episode.name),
+                quality: '360p ~ 1080p',
+                info: ' / ' + voice,
+                season: parseInt(episode.season_id),
+                episode: parseInt(episode.episode_id),
+                media: episode
               });
+            }
+          });
+        } else {
+          extract.voice.forEach(function (voice) {
+            filtred.push({
+              title: voice.name || select_title,
+              quality: '360p ~ 1080p',
+              info: '',
+              media: voice
+            });
+          });
+        }
 
-              var voice = filter_items.voice[choice.voice];
-
-              extract.episode.forEach(function (episode) {
-                  if (episode.season_id == season_id) {
-                      filtred.push({
-                          title: component.formatEpisodeTitle(episode.season_id, null, episode.name),
-                          quality: '360p ~ 1080p',
-                          info: ' / ' + voice,
-                          season: parseInt(episode.season_id),
-                          episode: parseInt(episode.episode_id),
-                          episode_num: parseInt(episode.episode_id).toString().padStart(2, '0'),   // ← 01, 02...
-                          poster: object.movie.poster || object.movie.background || '',             // ← постер сериала
-                          media: episode
-                      });
-                  }
-              });
-          } else {
-              extract.voice.forEach(function (voice) {
-                  filtred.push({
-                      title: voice.name || select_title,
-                      quality: '360p ~ 1080p',
-                      info: '',
-                      episode_num: '01',
-                      poster: object.movie.poster || '',
-                      media: voice
-                  });
-              });
-          }
-
-          return filtred;
+        return filtred;
       }
       /**
        * Показать файлы
@@ -2827,45 +2827,57 @@
       }
 
       function filtred() {
-          var filtred = [];
+        var filtred = [];
 
-          if (extract.is_series) {
-              var season_name = filter_items.season[choice.season];
-              var season_id;
-              extract.season.forEach(function (season) {
-                  if (season.name == season_name) season_id = season.id;
-              });
+        if (is_playlist) {
+          var playlist = extract;
+          var season = object.movie.number_of_seasons && 1;
 
-              var voice = filter_items.voice[choice.voice];
-
-              extract.episode.forEach(function (episode) {
-                  if (episode.season_id == season_id) {
-                      filtred.push({
-                          title: component.formatEpisodeTitle(episode.season_id, null, episode.name),
-                          quality: '360p ~ 1080p',
-                          info: ' / ' + voice,
-                          season: parseInt(episode.season_id),
-                          episode: parseInt(episode.episode_id),
-                          episode_num: parseInt(episode.episode_id).toString().padStart(2, '0'),   // ← 01, 02...
-                          poster: object.movie.poster || object.movie.background || '',             // ← постер сериала
-                          media: episode
-                      });
-                  }
-              });
-          } else {
-              extract.voice.forEach(function (voice) {
-                  filtred.push({
-                      title: voice.name || select_title,
-                      quality: '360p ~ 1080p',
-                      info: '',
-                      episode_num: '01',
-                      poster: object.movie.poster || '',
-                      media: voice
-                  });
-              });
+          if (extract[choice.season] && (extract[choice.season].playlist || extract[choice.season].folder)) {
+            playlist = extract[choice.season].playlist || extract[choice.season].folder;
+            season = parseInt(extract[choice.season].title || extract[choice.season].comment || '');
+            if (isNaN(season)) season = 1;
           }
 
-          return filtred;
+          playlist.forEach(function (eps, index) {
+            var items = extractItems(eps.file, filter_items.voice[choice.voice]);
+
+            if (items.length) {
+              var title = eps.title || eps.comment || '';
+              var alt_voice = title.match(/\d+ серия (.*)$/i);
+              var info = items[0].voice || alt_voice && alt_voice[1].trim() || translation;
+              if (info == title) info = '';
+
+              if (season) {
+                var episode = parseInt(title);
+                if (isNaN(episode)) episode = index + 1;
+                filtred.push({
+                  title: component.formatEpisodeTitle(season, null, title),
+                  quality: items[0].quality + 'p' + (quality_type ? ' - ' + quality_type : ''),
+                  info: info ? ' / ' + info : '',
+                  season: season,
+                  episode: episode,
+                  file: eps.file,
+                  voice: items[0].voice,
+                  subtitles: parseSubs(eps.subtitle)
+                });
+              } else {
+                filtred.push({
+                  title: title || select_title,
+                  quality: items[0].quality + 'p' + (quality_type ? ' - ' + quality_type : ''),
+                  info: info ? ' / ' + info : '',
+                  file: eps.file,
+                  voice: items[0].voice,
+                  subtitles: parseSubs(eps.subtitle)
+                });
+              }
+            }
+          });
+        } else {
+          filtred = extract;
+        }
+
+        return filtred;
       }
 
       function parseSubs(str) {
