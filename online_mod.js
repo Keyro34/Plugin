@@ -14081,9 +14081,72 @@
     }
 
     function resetTemplates() {
-      Lampa.Template.add('online_mod', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <circle cx=\"64\" cy=\"64\" r=\"56\" stroke=\"white\" stroke-width=\"16\"/>\n                    <path d=\"M90.5 64.3827L50 87.7654L50 41L90.5 64.3827Z\" fill=\"white\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
-      Lampa.Template.add('online_mod_folder', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 112\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect y=\"20\" width=\"128\" height=\"92\" rx=\"13\" fill=\"white\"/>\n                    <path d=\"M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z\" fill=\"white\" fill-opacity=\"0.23\"/>\n                    <rect x=\"11\" y=\"8\" width=\"106\" height=\"76\" rx=\"13\" fill=\"white\" fill-opacity=\"0.51\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
+        Lampa.Template.add('lampac_prestige_full', `<div class="online-prestige online-prestige--full selector">
+            <div class="online-prestige__img">
+                <img alt="">
+                <div class="online-prestige__loader"></div>
+            </div>
+            <div class="online-prestige__body">
+                <div class="online-prestige__head">
+                    <div class="online-prestige__title">{title}</div>
+                    <div class="online-prestige__time">{time}</div>
+                </div>
+                <div class="online-prestige__timeline"></div>
+                <div class="online-prestige__footer">
+                    <div class="online-prestige__info">{info}</div>
+                    <div class="online-prestige__quality">{quality}</div>
+                </div>
+            </div>
+        </div>`);
+
+        Lampa.Template.add('lampac_prestige_watched', `<div class="online-prestige online-prestige-watched selector">
+            <div class="online-prestige-watched__icon">
+                <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="10.5" cy="10.5" r="9" stroke="currentColor" stroke-width="3"/>
+                    <path d="M14.8477 10.5628L8.20312 14.399L8.20313 6.72656L14.8477 10.5628Z" fill="currentColor"/>
+                </svg>
+            </div>
+            <div class="online-prestige-watched__body"></div>
+        </div>`);
+
+        Lampa.Template.add('lampac_content_loading', `<div class="online-empty">
+            <div class="broadcast__scan"><div></div></div>
+            <div class="online-empty__templates">
+                <div class="online-empty-template selector"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
+                <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
+                <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
+            </div>
+        </div>`);
+
+        Lampa.Template.add('lampac_does_not_answer', `<div class="online-empty">
+            <div class="online-empty__title">#{lampac_balanser_dont_work}</div>
+            <div class="online-empty__time">#{lampac_balanser_timeout}</div>
+            <div class="online-empty__buttons">
+                <div class="online-empty__button selector cancel">#{cancel}</div>
+                <div class="online-empty__button selector change">#{lampac_change_balanser}</div>
+            </div>
+            <div class="online-empty__templates">...</div>
+        </div>`);
     }
+
+    Lampa.Template.add('lampac_css', `
+        <style>
+        @charset 'UTF-8';
+        .online-prestige{position:relative;border-radius:.3em;background:rgba(0,0,0,.3);display:flex}
+        .online-prestige__body{padding:1.2em;line-height:1.3;flex-grow:1;position:relative}
+        .online-prestige__img{position:relative;width:13em;flex-shrink:0;min-height:8.2em}
+        .online-prestige__img>img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:.3em;opacity:0;transition:opacity .3s}
+        .online-prestige__img--loaded>img{opacity:1}
+        .online-prestige__episode-number{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:2em}
+        .online-prestige__loader{position:absolute;top:50%;left:50%;width:2em;height:2em;margin:-1em;background:url(./img/loader.svg) no-repeat center;background-size:contain}
+        .online-prestige__title{font-size:1.7em;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;line-clamp:1;-webkit-box-orient:vertical}
+        .online-prestige__timeline{margin:.8em 0}
+        .online-prestige__info{display:flex;align-items:center}
+        .online-prestige__quality{padding-left:1em;white-space:nowrap}
+        .online-prestige.focus::after{content:'';position:absolute;inset:-0.6em;border-radius:.7em;border:3px solid #fff;z-index:-1;pointer-events:none}
+        .online-prestige-watched{padding:1em}
+        </style>
+    `);
 
     function checkMyIp(onComplite) {
       if (Lampa.Storage.field('online_mod_proxy_find_ip') !== true) {
@@ -14956,6 +15019,11 @@
       initMain();
       initFilmix();
       initSettings();
+
+      resetTemplates();
+      $('body').append(Lampa.Template.get('lampac_css', {}, true));
+
+      Lampa.Template.add('online_mod', Lampa.Template.get('lampac_prestige_full'));
     }
 
     startPlugin();
