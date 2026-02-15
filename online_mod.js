@@ -1813,71 +1813,91 @@
         };
 
         var display = function display(links, have_more, query) {
-          if (links && links.length && links.forEach) {
-            var items = links.map(function (l) {
-              var li = $(l);
-              var link = $('a', li);
-              var enty = $('.enty', link);
-              var rating = $('.rating', link);
-              var titl = enty.text().trim() || '';
-              enty.remove();
-              rating.remove();
-              var alt_titl = link.text().trim() || '';
-              var orig_title = '';
-              var year;
-              var found = alt_titl.match(/\((.*,\s*)?\b(\d{4})(\s*-\s*[\d.]*)?\)$/);
+            if (links && links.length && links.forEach) {
+                var items = links.map(function (l) {
+                    var li = $(l);
+                    var link = $('a', li);
+                    var enty = $('.enty', link);
+                    var rating = $('.rating', link);
+                    var titl = enty.text().trim() || '';
+                    enty.remove();
+                    rating.remove();
+                    var alt_titl = link.text().trim() || '';
+                    var orig_title = '';
+                    var year;
+                    var found = alt_titl.match(/\((.*,\s*)?\b(\d{4})(\s*-\s*[\d.]*)?\)$/);
 
-              if (found) {
-                if (found[1]) {
-                  var found_alt = found[1].match(/^([^а-яА-ЯёЁ]+),/);
-                  if (found_alt) orig_title = found_alt[1].trim();
+                    if (found) {
+                        if (found[1]) {
+                            var found_alt = found[1].match(/^([^а-яА-ЯёЁ]+),/);
+                            if (found_alt) orig_title = found_alt[1].trim();
+                        }
+                        year = parseInt(found[2]);
+                    }
+
+                    // Определяем тип: фильм или сериал (по наличию слова "Сериал" или году + названию)
+                    var is_series_guess = alt_titl.toLowerCase().includes('сериал') ||
+                                        titl.toLowerCase().includes('сериал') ||
+                                        (year && alt_titl.includes('сезон'));
+
+                    return {
+                        year: year,
+                        title: titl,
+                        orig_title: orig_title,
+                        link: link.attr('href') || '',
+                        is_series: is_series_guess
+                    };
+                });
+
+                // Улучшенное сравнение: название + год + тип (фильм/сериал)
+                var bestMatch = null;
+                var bestScore = -1;
+
+                var inputTitle   = (select_title || object.movie.title || object.movie.original_title || '').toLowerCase().trim();
+                var inputYear    = object.movie.release_date ? parseInt(object.movie.release_date.substring(0,4)) : null;
+                var inputIsSeries = object.movie.number_of_seasons > 1 || object.movie.first_air_date || false;
+
+                items.forEach(function (item) {
+                    var nameLower = (item.title || item.orig_title || '').toLowerCase().trim();
+                    var score = 0;
+
+                    // Название — основное совпадение
+                    if (nameLower === inputTitle) score += 100;
+                    else if (nameLower.includes(inputTitle) || inputTitle.includes(nameLower)) score += 40;
+
+                    // Год — очень важный фактор
+                    if (item.year && inputYear && item.year === inputYear) score += 60;
+                    else if (item.year && inputYear && Math.abs(item.year - inputYear) <= 1) score += 30;
+
+                    // Тип (фильм/сериал)
+                    if (item.is_series === inputIsSeries) score += 50;
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMatch = item;
+                    }
+                });
+
+                if (bestMatch && bestScore >= 80) {   // порог можно поднять до 100–120, если хочешь строже
+                    console.log('HDRezka → Выбран по совпадению: ' + bestMatch.title + ' (score: ' + bestScore + ')');
+                    getPage(bestMatch.link);
+                    return;
                 }
-                year = parseInt(found[2]);
-              }
 
-              return {
-                year: year,
-                title: titl,
-                orig_title: orig_title,
-                link: link.attr('href') || ''
-              };
-            });
-
-            var bestMatch = null;
-            var inputTitle = (select_title || object.movie.title || object.movie.original_title || '').toLowerCase().trim();
-
-            items.forEach(function (item) {
-              var name = (item.title || item.orig_title || '').toLowerCase().trim();
-              if (name === inputTitle || 
-                name.includes(inputTitle) || 
-                inputTitle.includes(name)) {
-
-                if (!bestMatch || name.length === inputTitle.length) {
-                    bestMatch = item;
+                // Fallback: если ничего хорошего не нашли — берём первый
+                if (items.length > 0) {
+                    console.log('HDRezka → Нет хорошего совпадения, беру первый: ' + items[0].title);
+                    getPage(items[0].link);
+                    return;
                 }
-              }
-            });
 
-            // Если нашли хорошее совпадение — сразу открываем
-            if (bestMatch) {
-                console.log('HDRezka → Автовыбор: ' + bestMatch.title);
-                getPage(bestMatch.link);
-                return;
+                // Если вообще ничего нет
+                component.emptyForQuery(select_title);
+            } else if (error_message) {
+                component.empty(error_message);
+            } else {
+                component.emptyForQuery(select_title);
             }
-
-            if (items.length) {
-                console.log('HDRezka → Нет точного совпадения, беру первый: ' + items[0].title);
-                getPage(items[0].link);
-                return;
-            }
-
-            component.emptyForQuery(select_title);
-          } else if (error_message) {
-            component.empty(error_message);
-          } else {
-            component.emptyForQuery(select_title);
-          }
-
         };
 
         var query_search = function query_search(query, data, callback) {
