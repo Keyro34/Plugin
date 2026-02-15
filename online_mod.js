@@ -1453,46 +1453,48 @@
 
 
       function filtred() {
-          var filtred = [];
+        var filtred = [];
 
-          if (extract.is_series) {
-              var season_name = filter_items.season[choice.season];
-              var season_id = null;
-              extract.season.forEach(function (s) {
-                  if (s.name == season_name) season_id = s.id;
-              });
+        if (is_playlist) {
+          var season = extract[choice.season];
 
-              var voice_name = filter_items.voice[choice.voice] || 'HDrezka Studio';
-
-              extract.episode.forEach(function (episode) {
-                  if (episode.season_id == season_id) {
-                      var ep = parseInt(episode.episode_id || episode.episode || 1);
-                      filtred.push({
-                          title: component.formatEpisodeTitle(episode.season_id, ep, episode.name),
-                          quality: '360p ~ 1080p',
-                          info: ' / ' + voice_name,
-                          season: parseInt(episode.season_id),
-                          episode: ep,
-                          episode_num: (parseInt(episode.episode_id) || 1).toString().padStart(2, '0'),  // ← вот это решает проблему с {episode_num}
-                          poster: object.movie.poster || object.movie.background || 'https://via.placeholder.com/120x68?text=S'+episode.season_id+'E'+ep,
-                          media: episode
-                      });
-                  }
-              });
-          } else {
-              extract.voice.forEach(function (voice) {
+          if (season && season.voices) {
+            var voice_title = filter_items.voice[choice.voice];
+            season.voices.forEach(function (voice) {
+              if (voice.title == voice_title && voice.episodes) {
+                voice.episodes.forEach(function (episode) {
                   filtred.push({
-                      title: voice.name || 'Озвучка',
-                      quality: '360p ~ 1080p',
-                      info: '',
-                      episode_num: '01',
-                      poster: object.movie.poster || '',
-                      media: voice
+                    title: component.formatEpisodeTitle(episode.season, episode.episode),
+                    quality: episode.quality || '360p ~ 1080p',
+                    info: ' / ' + voice_title,
+                    season: episode.season + '',
+                    episode: episode.episode,
+                    media: episode,
+                    subtitles: parseSubs(episode.subtitles),
+                    vast_url: episode.vast_url,
+                    vast_msg: episode.vast_msg
                   });
-              });
+                });
+              }
+            });
           }
+        } else {
+          extract.forEach(function (voice) {
+            if (voice.url) {
+              filtred.push({
+                title: voice.title || select_title,
+                quality: voice.quality || '360p ~ 1080p',
+                info: '',
+                media: voice,
+                subtitles: parseSubs(voice.subtitles),
+                vast_url: voice.vast_url,
+                vast_msg: voice.vast_msg
+              });
+            }
+          });
+        }
 
-          return filtred;
+        return filtred;
       }
 
       function parseSubs(tracks) {
@@ -1612,9 +1614,7 @@
               Lampa.Noty.show(Lampa.Lang.translate('online_mod_nolink'));
             });
           });
-          component.append(
-              Lampa.Template.get('online_mod', item)
-          );
+          component.append(item);
           component.contextmenu({
             item: item,
             view: view,
@@ -1814,7 +1814,6 @@
 
         var display = function display(links, have_more, query) {
           if (links && links.length && links.forEach) {
-            var is_sure = false;
             var items = links.map(function (l) {
               var li = $(l);
               var link = $('a', li);
@@ -1833,7 +1832,6 @@
                   var found_alt = found[1].match(/^([^а-яА-ЯёЁ]+),/);
                   if (found_alt) orig_title = found_alt[1].trim();
                 }
-
                 year = parseInt(found[2]);
               }
 
@@ -1844,80 +1842,42 @@
                 link: link.attr('href') || ''
               };
             });
-            var cards = items;
 
-            if (cards.length) {
-              if (orig_titles.length) {
-                var tmp = cards.filter(function (c) {
-                  return component.containsAnyTitle([c.orig_title, c.title], orig_titles);
-                });
+            var bestMatch = null;
+            var inputTitle = (select_title || object.movie.title || object.movie.original_title || '').toLowerCase().trim();
 
-                if (tmp.length) {
-                  cards = tmp;
-                  is_sure = true;
+            items.forEach(function (item) {
+              var name = (item.title || item.orig_title || '').toLowerCase().trim();
+              if (name === inputTitle || 
+                name.includes(inputTitle) || 
+                inputTitle.includes(name)) {
+
+                if (!bestMatch || name.length === inputTitle.length) {
+                    bestMatch = item;
                 }
               }
+            });
 
-              if (select_title) {
-                var _tmp = cards.filter(function (c) {
-                  return component.containsAnyTitle([c.title, c.orig_title], [select_title]);
-                });
-
-                if (_tmp.length) {
-                  cards = _tmp;
-                  is_sure = true;
-                }
-              }
-
-              if (cards.length > 1 && search_year) {
-                var _tmp2 = cards.filter(function (c) {
-                  return c.year == search_year;
-                });
-
-                if (!_tmp2.length) _tmp2 = cards.filter(function (c) {
-                  return c.year && c.year > search_year - 2 && c.year < search_year + 2;
-                });
-                if (_tmp2.length) cards = _tmp2;
-              }
+            // Если нашли хорошее совпадение — сразу открываем
+            if (bestMatch) {
+                console.log('HDRezka → Автовыбор: ' + bestMatch.title);
+                getPage(bestMatch.link);
+                return;
             }
 
-            if (cards.length == 1 && is_sure) {
-              if (search_year && cards[0].year) {
-                is_sure = cards[0].year > search_year - 2 && cards[0].year < search_year + 2;
-              }
-
-              if (is_sure) {
-                is_sure = false;
-
-                if (orig_titles.length) {
-                  is_sure |= component.equalAnyTitle([cards[0].orig_title, cards[0].title], orig_titles);
-                }
-
-                if (select_title) {
-                  is_sure |= component.equalAnyTitle([cards[0].title, cards[0].orig_title], [select_title]);
-                }
-              }
+            if (items.length) {
+                console.log('HDRezka → Нет точного совпадения, беру первый: ' + items[0].title);
+                getPage(items[0].link);
+                return;
             }
 
-            if (cards.length == 1 && is_sure) getPage(cards[0].link);else if (items.length) {
-              _this.wait_similars = true;
-              items.forEach(function (c) {
-                c.is_similars = true;
-              });
+            component.emptyForQuery(select_title);
+          } else if (error_message) {
+            component.empty(error_message);
+          } else {
+            component.emptyForQuery(select_title);
+          }
 
-              if (have_more) {
-                component.similars(items, search_more, {
-                  items: [],
-                  query: query,
-                  page: 1
-                });
-              } else {
-                component.similars(items);
-              }
-
-              component.loading(false);
-            } else component.emptyForQuery(select_title);
-          } else if (error_message) component.empty(error_message);else component.emptyForQuery(select_title);
         };
 
         var query_search = function query_search(query, data, callback) {
@@ -14081,34 +14041,8 @@
     }
 
     function resetTemplates() {
-        // Основная карточка с постером (как на твоём скриншоте)
-        Lampa.Template.add('online_mod', `
-          <div class="online selector" style="display:flex; align-items:center; background:rgba(18,20,32,0.9); border-radius:12px; overflow:hidden; padding:8px 10px; margin:6px 8px;">
-              <div style="position:relative; width:120px; height:68px; flex-shrink:0; border-radius:9px; overflow:hidden; background:#0e0e20;">
-                  <img src="{poster}" style="width:100%; height:100%; object-fit:cover;" 
-                      onerror="this.src='https://via.placeholder.com/120x68/111133/888?text=Эпизод'; this.onerror=null;">
-                  <div style="position:absolute; left:7px; top:7px; background:rgba(0,0,0,0.82); color:white; font-size:14px; font-weight:bold; padding:3px 8px; border-radius:5px; line-height:1;">
-                      {episode_num}
-                  </div>
-              </div>
-              <div style="flex:1; padding-left:14px; min-width:0;">
-                  <div style="font-size:15.5px; color:#e8e8ff; line-height:1.32; margin-bottom:4px;">{title}</div>
-                  <div style="font-size:13px; color:#a8a8d8;">{quality}{info}</div>
-              </div>
-          </div>
-        `);
-
-        // Для сезонов (если вдруг папки)
-        Lampa.Template.add('online_mod_folder', `
-            <div class="online selector" style="display:flex; align-items:center; background:rgba(30,30,40,0.8); border-radius:12px; padding:12px;">
-                <div style="width:52px;height:52px;background:rgba(255,255,255,0.08);border-radius:10px;display:flex;align-items:center;justify-content:center;">
-                    📁
-                </div>
-                <div style="flex:1;padding-left:16px;">
-                    <div style="font-size:16px;color:#ddd;">{title}</div>
-                </div>
-            </div>
-        `);
+      Lampa.Template.add('online_mod', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <circle cx=\"64\" cy=\"64\" r=\"56\" stroke=\"white\" stroke-width=\"16\"/>\n                    <path d=\"M90.5 64.3827L50 87.7654L50 41L90.5 64.3827Z\" fill=\"white\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
+      Lampa.Template.add('online_mod_folder', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 112\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect y=\"20\" width=\"128\" height=\"92\" rx=\"13\" fill=\"white\"/>\n                    <path d=\"M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z\" fill=\"white\" fill-opacity=\"0.23\"/>\n                    <rect x=\"11\" y=\"8\" width=\"106\" height=\"76\" rx=\"13\" fill=\"white\" fill-opacity=\"0.51\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
     }
 
     function checkMyIp(onComplite) {
