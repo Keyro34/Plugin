@@ -1811,110 +1811,186 @@
             } else if (error_message) component.empty(error_message);else component.emptyForQuery(select_title);
           });
         };
-        
+
         var display = function display(links, have_more, query) {
             if (!links || !links.length) {
                 component.emptyForQuery(select_title);
                 return;
             }
 
-            var items = links.map(function (l) {
-                var li = $(l);
-                var link = $('a', li);
-                var enty = $('.enty', link);
-                var rating = $('.rating', link);
-                var titl = enty.text().trim() || '';
+            // ==================== НОРМАЛИЗАЦИЯ ====================
+            const normalize = (str) => {
+                if (!str) return '';
+                return str
+                    .toLowerCase()
+                    .replace(/сериал|фильм|сезон|сез\.|s\d+|season|episode/gi, '')
+                    .replace(/\(\d{4}.*?\)/g, '')           // (2023)
+                    .replace(/[^\p{L}\p{N}\s]/gu, ' ')      // оставляем только буквы и цифры
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            };
+
+            const words = (str) => normalize(str).split(/\s+/).filter(Boolean);
+
+            // Jaccard similarity (очень хорошо работает для названий)
+            const jaccard = (a, b) => {
+                const setA = new Set(words(a));
+                const setB = new Set(words(b));
+                if (!setA.size || !setB.size) return 0;
+                const inter = new Set([...setA].filter(x => setB.has(x)));
+                return inter.size / (setA.size + setB.size - inter.size);
+            };
+
+            // ==================== ПАРАМЕТРЫ ВХОДНЫЕ ====================
+            const inputTitle = normalize(select_title || object.movie.title || '');
+            const inputOrig = normalize(object.movie.original_title || object.movie.original_name || '');
+            const inputYear = object.movie.release_date ? parseInt(object.movie.release_date) :
+                            object.movie.year ? parseInt(object.movie.year) : null;
+
+            const isSeries = !!(
+                object.movie.number_of_seasons > 1 ||
+                object.movie.first_air_date ||
+                object.movie.type === 'tv' ||
+                object.movie.media_type === 'tv' ||
+                (object.movie.original_name && !object.movie.original_title)
+            );
+
+            // ==================== ОБРАБОТКА РЕЗУЛЬТАТОВ ====================
+            let bestMatch = null;
+            let bestScore = -1;
+            let goodMatches = [];
+
+            items = links.map(l => {
+                const li = $(l);
+                const linkEl = $('a', li);
+                const enty = $('.enty', linkEl);
+                const rating = $('.rating', linkEl);
+
+                let title = enty.text().trim() || '';
                 enty.remove();
                 rating.remove();
-                var alt_titl = link.text().trim() || '';
 
-                var year = null;
-                var orig_title = '';
-                var found = alt_titl.match(/\((.*,\s*)?\b(\d{4})(\s*-\s*[\d.]*)?\)$/);
-                if (found) {
-                    if (found[1]) {
-                        var found_alt = found[1].match(/^([^а-яА-ЯёЁ]+),/);
-                        if (found_alt) orig_title = found_alt[1].trim();
-                    }
-                    year = parseInt(found[2]);
-                }
+                let fullTitle = linkEl.text().trim() || '';
+                let yearMatch = fullTitle.match(/\((?:.*?,?\s*)?(\d{4})(?:\s*-\s*[\d.]*)?\)/);
+                let year = yearMatch ? parseInt(yearMatch[1]) : null;
 
-                // Определяем тип: сериал или фильм
-                var is_series = alt_titl.toLowerCase().includes('сериал') ||
-                              titl.toLowerCase().includes('сериал') ||
-                              (year && alt_titl.includes('сезон')) ||
-                              object.movie.number_of_seasons > 1;
+                // Определяем тип
+                const isSeriesGuess = fullTitle.toLowerCase().includes('сериал') ||
+                                    title.toLowerCase().includes('сериал') ||
+                                    (year && fullTitle.includes('сезон'));
 
                 return {
-                    year: year,
-                    title: titl,
-                    orig_title: orig_title,
-                    link: link.attr('href') || '',
-                    is_series: is_series,
-                    raw_html: l
+                    year,
+                    title: title,
+                    fullTitle,
+                    link: linkEl.attr('href') || '',
+                    is_series: isSeriesGuess || (year && !fullTitle.includes('фильм'))
                 };
             });
 
-            // === ТВОЯ ЛОГИКА ОЦЕНКИ ===
-            var inputTitle = (select_title || object.movie.title || object.movie.original_title || '').toLowerCase().trim();
-            var inputYear = object.movie.release_date ? parseInt(object.movie.release_date.substring(0,4)) : 
-                            object.movie.year ? parseInt(object.movie.year) : null;
-            var inputIsSeries = !!object.movie.number_of_seasons || 
-                              !!object.movie.first_air_date || 
-                              object.movie.type === 'tv' || 
-                              object.movie.media_type === 'tv';
+            items.forEach(item => {
+                const name = normalize(item.title || item.fullTitle);
+                let score = 0;
 
-            var bestMatch = null;
-            var bestScore = -9999;
+        // Основное название
+                const sim1 = jaccard(inputTitle, name);
+                score += sim1 * 120;
 
-            items.forEach(function (item) {
-                var nameLower = (item.title + ' ' + item.orig_title).toLowerCase().trim();
-                var score = 0;
-
-                // 1. Год — самый важный
-                if (inputYear && item.year) {
-                    if (item.year === inputYear) score += 300;
-                    else if (Math.abs(item.year - inputYear) <= 1) score += 150;
-                    else score -= 350;
+                // Оригинальное название (очень сильный бонус)
+                if (inputOrig) {
+                    const sim2 = jaccard(inputOrig, name);
+                    score += sim2 * 90;
                 }
 
-                // 2. Тип (сериал/фильм)
-                if (inputIsSeries === item.is_series) score += 250;
-                else score -= 450;
+                // Точное совпадение любого слова
+                const inputWords = words(inputTitle);
+                const itemWords = words(name);
+                const exactWordMatches = inputWords.filter(w => itemWords.includes(w)).length;
+                score += exactWordMatches * 35;
 
-                // 3. Название
-                if (nameLower === inputTitle) score += 120;
-                else if (nameLower.includes(inputTitle) || inputTitle.includes(nameLower)) score += 45;
-                else score -= 80;
+                // Год
+                if (inputYear && item.year) {
+                    const diff = Math.abs(inputYear - item.year);
+                    if (diff === 0) score += 220;
+                    else if (diff === 1) score += 140;
+                    else if (diff <= 2) score += 60;
+                    else score -= 180;
+                }
 
-                // 4. ID (если есть)
-                if (object.movie.kinopoisk_id && item.link.includes(object.movie.kinopoisk_id)) score += 200;
-                if (object.movie.imdb_id && item.link.includes(object.movie.imdb_id)) score += 180;
+                // Тип (сериал/фильм)
+                if (isSeries === item.is_series) {
+                    score += 110;
+                } else {
+                    score -= 160;
+                }
+
+                // Дополнительный бонус за длину совпадения
+                if (name.length > 4 && inputTitle.length > 4) {
+                    if (name.includes(inputTitle) || inputTitle.includes(name)) {
+                        score += 70;
+                    }
+                }
+
+                console.log(`[Rezka] "${item.title}" (${item.year || '?'}) → score: ${Math.round(score)}`);
 
                 if (score > bestScore) {
                     bestScore = score;
                     bestMatch = item;
                 }
+
+                if (score >= 240) goodMatches.push({ item, score });
             });
 
-            console.log('Лучший матч: "' + (bestMatch ? bestMatch.title : '—') + '" | score = ' + bestScore);
+            console.log(`[Rezka] Лучший матч: "${bestMatch?.title}" (${bestScore})`);
 
-            // Если уверены — сразу открываем
-            if (bestMatch && bestScore >= 380) {
+            // ==================== РЕШЕНИЕ ====================
+            if (bestMatch && bestScore >= 280) {
+                console.log(`[Rezka] Автовыбор: ${bestMatch.title} (score ${Math.round(bestScore)})`);
                 getPage(bestMatch.link);
                 return;
             }
 
-            // Иначе показываем список (но уже отсортированный)
-            items.sort(function (a, b) { return (b.score || 0) - (a.score || 0); });
+            // Если несколько хороших — показываем их первыми
+            if (goodMatches.length >= 2) {
+                goodMatches.sort((a, b) => b.score - a.score);
+                const topItems = goodMatches.map(g => g.item);
+        
+                _this.wait_similars = true;
+                topItems.forEach(c => c.is_similars = true);
+        
+                if (have_more) {
+                    component.similars(topItems, search_more, { query: query, items: topItems });
+                } else {
+                    component.similars(topItems);
+                }
+            } 
+            // Один хороший — показываем его + остальные
+            else if (goodMatches.length === 1) {
+                const top = goodMatches[0].item;
+                const rest = items.filter(i => i !== top);
+        
+                _this.wait_similars = true;
+                [top, ...rest].forEach((c, i) => c.is_similars = i !== 0);
+        
+                if (have_more) {
+                    component.similars([top, ...rest], search_more, { query: query });
+                } else {
+                    component.similars([top, ...rest]);
+                }
+            } 
+            // Совсем плохо — показываем всё
+            else {
+                _this.wait_similars = true;
+                items.forEach(c => c.is_similars = true);
+        
+                if (have_more) {
+                    component.similars(items, search_more, { query: query });
+                } else {
+                    component.similars(items);
+                }
+            }
 
-            var finalItems = items.map(function (item) {
-                item.is_similars = true;
-                return item;
-            });
-
-            component.similars(finalItems, have_more ? search_more : null, { query: query });
-            component.loading(false);
+            component.loading(false);        
         };
 
         var query_search = function query_search(query, data, callback) {
