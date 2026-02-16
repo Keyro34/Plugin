@@ -1,4 +1,4 @@
-//13.02.2026 - Fix + Prestige Design + Enhanced Search
+//13.02.2026
 
 (function () {
     'use strict';
@@ -3687,3 +3687,4 @@
     startPlugin();
 
 })();
+
