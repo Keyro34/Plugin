@@ -1812,6 +1812,107 @@
           });
         };
 
+        links = smartNormalizeAndSort(links);
+        function smartNormalizeAndSort(links){
+
+            function getYear(item){
+                let fields = [
+                    item.release_date,
+                    item.first_air_date,
+                    item.year,
+                    item.date,
+                    item.premiere,
+                    item.created_at
+                ];
+
+                for(let f of fields){
+                    if(f){
+                        let y = String(f).match(/\d{4}/);
+                        if(y) return Number(y[0]);
+                    }
+                }
+                return 0;
+            }
+
+            function detectType(item){
+
+                // прямые признаки
+                if(item.media_type === 'tv') return 'tv';
+                if(item.media_type === 'movie') return 'movie';
+
+                if(item.type === 'tv') return 'tv';
+                if(item.type === 'movie') return 'movie';
+
+                // косвенные признаки сериалов
+                if(item.seasons || item.season_count || item.episodes || item.episode_run_time) return 'tv';
+
+                // косвенные признаки фильма
+                if(item.runtime || item.duration || item.movie_length) return 'movie';
+
+                // запасной вариант — если есть слово сезон
+                let text = JSON.stringify(item).toLowerCase();
+                if(text.includes('season')) return 'tv';
+
+                return 'movie';
+            }
+
+            function getTitle(item){
+                return (
+                    item.title ||
+                    item.name ||
+                    item.original_title ||
+                    item.original_name ||
+                    item.label ||
+                    ''
+                )
+                .replace(/\(\d{4}\)/g,'')
+                .replace(/\s+/g,' ')
+                .trim()
+                .toLowerCase();
+            }
+
+            function scoreItem(item){
+                let score = 0;
+
+                if(item.vote_average) score += item.vote_average;
+                if(item.popularity) score += item.popularity / 10;
+                if(item.vote_count) score += item.vote_count / 1000;
+
+                return score;
+            }
+
+            return links
+            .map(item => {
+
+                item.__year = getYear(item);
+                item.__type = detectType(item);
+                item.__title = getTitle(item);
+                item.__score = scoreItem(item);
+
+                return item;
+            })
+            .sort((a,b)=>{
+
+                // 1. ГОД
+                if(a.__year !== b.__year){
+                    return b.__year - a.__year;
+                }
+
+                // 2. ТИП (Сначала сериалы)
+                if(a.__type !== b.__type){
+                    if(a.__type === 'tv') return -1;
+                    if(b.__type === 'tv') return 1;
+                }
+
+                // 3. ПОПУЛЯРНОСТЬ
+                if(a.__score !== b.__score){
+                    return b.__score - a.__score;
+                }
+
+                // 4. НАЗВАНИЕ
+                return a.__title.localeCompare(b.__title);
+            });
+        }
         var display = function display(links, have_more, query) {
             if (links && links.length && links.forEach) {
                 var items = links.map(function (l) {
