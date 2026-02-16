@@ -1,4 +1,4 @@
-//13.02.2026 - Fix + Prestige Design Update
+//13.02.2026 - Fix
 
 (function () {
     'use strict';
@@ -1813,112 +1813,124 @@
         };
 
         var display = function display(links, have_more, query) {
-          if (links && links.length && links.forEach) {
-            var is_sure = false;
-            var items = links.map(function (l) {
-              var li = $(l);
-              var link = $('a', li);
-              var enty = $('.enty', link);
-              var rating = $('.rating', link);
-              var titl = enty.text().trim() || '';
-              enty.remove();
-              rating.remove();
-              var alt_titl = link.text().trim() || '';
-              var orig_title = '';
-              var year;
-              var found = alt_titl.match(/\((.*,\s*)?\b(\d{4})(\s*-\s*[\d.]*)?\)$/);
+            if (links && links.length && links.forEach) {
+                var items = links.map(function (l) {
+                    var li = $(l);
+                    var link = $('a', li);
+                    var enty = $('.enty', link);
+                    var rating = $('.rating', link);
+                    var titl = enty.text().trim() || '';
+                    enty.remove();
+                    rating.remove();
+                    var alt_titl = link.text().trim() || '';
+                    var orig_title = '';
+                    var year;
+                    var found = alt_titl.match(/\((.*,\s*)?\b(\d{4})(\s*-\s*[\d.]*)?\)$/);
 
-              if (found) {
-                if (found[1]) {
-                  var found_alt = found[1].match(/^([^а-яА-ЯёЁ]+),/);
-                  if (found_alt) orig_title = found_alt[1].trim();
-                }
+                    if (found) {
+                        if (found[1]) {
+                            var found_alt = found[1].match(/^([^а-яА-ЯёЁ]+),/);
+                            if (found_alt) orig_title = found_alt[1].trim();
+                        }
+                        year = parseInt(found[2]);
+                    }
 
-                year = parseInt(found[2]);
-              }
+                    // Определяем тип: фильм или сериал (по наличию слова "Сериал" или году + названию)
+                    var is_series_guess = alt_titl.toLowerCase().includes('сериал') ||
+                                        titl.toLowerCase().includes('сериал') ||
+                                        (year && alt_titl.includes('сезон'));
 
-              return {
-                year: year,
-                title: titl,
-                orig_title: orig_title,
-                link: link.attr('href') || ''
-              };
-            });
-            var cards = items;
-
-            if (cards.length) {
-              if (orig_titles.length) {
-                var tmp = cards.filter(function (c) {
-                  return component.containsAnyTitle([c.orig_title, c.title], orig_titles);
+                    return {
+                        year: year,
+                        title: titl,
+                        orig_title: orig_title,
+                        link: link.attr('href') || '',
+                        is_series: is_series_guess
+                    };
                 });
 
-                if (tmp.length) {
-                  cards = tmp;
-                  is_sure = true;
+                var bestMatch = null;
+                var bestScore = -1;
+
+                var inputTitle   = (select_title || object.movie.title || object.movie.original_title || '').toLowerCase().trim();
+                var inputYear    = object.movie.release_date ? parseInt(object.movie.release_date.substring(0,4)) :
+                                   object.movie.year ? parseInt(object.movie.year) : null;
+                var inputIsSeries = object.movie.number_of_seasons > 1 ||
+                                    object.movie.first_air_date || 
+                                    object.movie.type === 'tv' || 
+                                    object.movie.media_type === 'tv' ||
+                                    (object.movie.original_name && !object.movie.original_title);
+                
+                items.forEach(function (item) {
+                    var nameLower = (item.title || item.orig_title || '').toLowerCase().trim();
+                    var score = 0;
+
+                    if (nameLower === inputTitle) {
+                        score += 100;
+                    } else if (nameLower.includes(inputTitle) || inputTitle.includes(nameLower)) {
+                        score += 30;
+                    } else {
+                        score -= 50;  // сильно штрафуем, если название вообще не похоже
+                    }
+
+                    if (inputYear) {
+                        if (item.year === inputYear) {
+                            score += 200;          // очень сильно повышаем
+                        } else if (Math.abs(item.year - inputYear) <= 1) {
+                            score += 100;
+                        } else if (item.year) {
+                            score -= 300;          // сильно штрафуем за неправильный год
+                        }
+                    }
+
+                    if (inputIsSeries) {
+                        if (item.is_series) {
+                            score += 250;
+                        } else { 
+                            score -= 400;
+                        }
+                    } else {
+                        if (!item.is_series) {
+                            score += 150;
+                        } else {
+                            score -= 300;
+                        }
+                    }
+
+                    console.log('Оцениваем "' + item.title + '" (' + (item.year || '?') + ', сериал=' + item.is_series + '): ' + score);
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMatch = item;
+                    }
+                 });
+
+                if (bestMatch && bestScore >= 350) {
+                   console.log('Выбран: ' + bestMatch.title + ' (score: ' + bestScore + ')');
+                   getPage(bestMatch.link);
+                   return;
                 }
-              }
 
-              if (select_title) {
-                var _tmp = cards.filter(function (c) {
-                  return component.containsAnyTitle([c.title, c.orig_title], [select_title]);
-                });
+                console.log('Слишком низкий score (' + (bestScore || 0) + '), показываем список результатов');
 
-                if (_tmp.length) {
-                  cards = _tmp;
-                  is_sure = true;
+                if (items.length) {
+                    _this.wait_similars = true;
+                    items.forEach(function (c) {
+                        c.is_similars = true;
+                    });
+
+                    if (have_more) {
+                        component.similars(items, search_more, { query: query });
+                    } else {
+                        component.similars(items);
+                    }  
+                    
+                    component.loading(false);
+                } else {
+                    component.emptyForQuery(select_title);
                 }
-              }
-
-              if (cards.length > 1 && search_year) {
-                var _tmp2 = cards.filter(function (c) {
-                  return c.year == search_year;
-                });
-
-                if (!_tmp2.length) _tmp2 = cards.filter(function (c) {
-                  return c.year && c.year > search_year - 2 && c.year < search_year + 2;
-                });
-                if (_tmp2.length) cards = _tmp2;
-              }
-            }
-
-            if (cards.length == 1 && is_sure) {
-              if (search_year && cards[0].year) {
-                is_sure = cards[0].year > search_year - 2 && cards[0].year < search_year + 2;
-              }
-
-              if (is_sure) {
-                is_sure = false;
-
-                if (orig_titles.length) {
-                  is_sure |= component.equalAnyTitle([cards[0].orig_title, cards[0].title], orig_titles);
-                }
-
-                if (select_title) {
-                  is_sure |= component.equalAnyTitle([cards[0].title, cards[0].orig_title], [select_title]);
-                }
-              }
-            }
-
-            if (cards.length == 1 && is_sure) getPage(cards[0].link);else if (items.length) {
-              _this.wait_similars = true;
-              items.forEach(function (c) {
-                c.is_similars = true;
-              });
-
-              if (have_more) {
-                component.similars(items, search_more, {
-                  items: [],
-                  query: query,
-                  page: 1
-                });
-              } else {
-                component.similars(items);
-              }
-
-              component.loading(false);
-            } else component.emptyForQuery(select_title);
-          } else if (error_message) component.empty(error_message);else component.emptyForQuery(select_title);
-        };
+             }
+         };
 
         var query_search = function query_search(query, data, callback) {
           var postdata = 'q=' + encodeURIComponent(query);
@@ -11993,7 +12005,6 @@
         stype: 'quality'
       };
       var contextmenu_all = [];
-      var images = [];
 
       if (last_bls[object.movie.id]) {
         balanser = last_bls[object.movie.id];
@@ -13040,7 +13051,6 @@
         scroll.render().find('.empty').remove();
         scroll.clear();
         scroll.reset();
-        this.clearImages();
       };
 
       this.inActivity = function () {
@@ -13438,17 +13448,6 @@
         });
         if (this.inActivity()) Lampa.Controller.toggle('content');
       };
-      /**
-       * Очистить загруженные изображения
-       */
-      this.clearImages = function() {
-        images.forEach(function(img) {
-          img.onerror = function() {};
-          img.onload = function() {};
-          img.src = '';
-        });
-        images = [];
-      };
 
       this.render = function () {
         return files.render();
@@ -13466,7 +13465,6 @@
         network.clear();
         files.destroy();
         scroll.destroy();
-        this.clearImages();
         network = null;
         all_sources.forEach(function (s) {
           s.source.destroy();
@@ -14095,9 +14093,8 @@
     }
 
     function resetTemplates() {
-        Lampa.Template.add('online_mod', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <circle cx=\"64\" cy=\"64\" r=\"56\" stroke=\"white\" stroke-width=\"16\"/>\n                    <path d=\"M90.5 64.3827L50 87.7654L50 41L90.5 64.3827Z\" fill=\"white\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
-        Lampa.Template.add('online_mod_folder', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 112\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect y=\"20\" width=\"128\" height=\"92\" rx=\"13\" fill=\"white\"/>\n                    <path d=\"M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z\" fill=\"white\" fill-opacity=\"0.23\"/>\n                    <rect x=\"11\" y=\"8\" width=\"106\" height=\"76\" rx=\"13\" fill=\"white\" fill-opacity=\"0.51\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
-        Lampa.Template.add('online_mod_prestige_full', "<div class=\"online-prestige online-prestige--full selector\">\n            <div class=\"online-prestige__img\">\n                <img alt=\"\">\n                <div class=\"online-prestige__loader\"></div>\n            </div>\n            <div class=\"online-prestige__body\">\n                <div class=\"online-prestige__head\">\n                    <div class=\"online-prestige__title\">{title}</div>\n                    <div class=\"online-prestige__time\">{time}</div>\n                </div>\n\n                <div class=\"online-prestige__timeline\"></div>\n\n                <div class=\"online-prestige__footer\">\n                    <div class=\"online-prestige__info\">{info}</div>\n                    <div class=\"online-prestige__quality\">{quality}</div>\n                </div>\n            </div>\n        </div>");
+      Lampa.Template.add('online_mod', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <circle cx=\"64\" cy=\"64\" r=\"56\" stroke=\"white\" stroke-width=\"16\"/>\n                    <path d=\"M90.5 64.3827L50 87.7654L50 41L90.5 64.3827Z\" fill=\"white\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
+      Lampa.Template.add('online_mod_folder', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 112\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect y=\"20\" width=\"128\" height=\"92\" rx=\"13\" fill=\"white\"/>\n                    <path d=\"M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z\" fill=\"white\" fill-opacity=\"0.23\"/>\n                    <rect x=\"11\" y=\"8\" width=\"106\" height=\"76\" rx=\"13\" fill=\"white\" fill-opacity=\"0.51\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
     }
 
     function checkMyIp(onComplite) {
