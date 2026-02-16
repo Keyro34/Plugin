@@ -1819,12 +1819,16 @@
                     var link = $('a', li);
                     var enty = $('.enty', link);
                     var rating = $('.rating', link);
+
                     var titl = enty.text().trim() || '';
                     enty.remove();
                     rating.remove();
+
                     var alt_titl = link.text().trim() || '';
+
                     var orig_title = '';
                     var year;
+
                     var found = alt_titl.match(/\((.*,\s*)?\b(\d{4})(\s*-\s*[\d.]*)?\)$/);
 
                     if (found) {
@@ -1835,80 +1839,108 @@
                         year = parseInt(found[2]);
                     }
 
-                    // Определяем тип: фильм или сериал (по наличию слова "Сериал" или году + названию)
+                    // ===== Определяем сериал =====
                     var is_series_guess = alt_titl.toLowerCase().includes('сериал') ||
                                         titl.toLowerCase().includes('сериал') ||
                                         (year && alt_titl.includes('сезон'));
+
+                    // ===== Извлекаем ID =====
+                    var href = link.attr('href') || '';
+
+                    var imdb_id = null;
+                    var tmdb_id = null;
+
+                    var imdbMatch = href.match(/tt\d+/i);
+                    if (imdbMatch) imdb_id = imdbMatch[0];
+
+                    var tmdbMatch = href.match(/\/(movie|tv)\/(\d+)/i);
+                    if (tmdbMatch) tmdb_id = parseInt(tmdbMatch[2]);
 
                     return {
                         year: year,
                         title: titl,
                         orig_title: orig_title,
-                        link: link.attr('href') || '',
-                        is_series: is_series_guess
+                        link: href,
+                        is_series: is_series_guess,
+                        imdb_id: imdb_id,
+                        tmdb_id: tmdb_id
                     };
                 });
+
+                // ===== Лучший матч =====
 
                 var bestMatch = null;
                 var bestScore = -1;
 
-                var inputTitle   = (select_title || object.movie.title || object.movie.original_title || '').toLowerCase().trim();
-                var inputYear    = object.movie.release_date ? parseInt(object.movie.release_date.substring(0,4)) :
-                                   object.movie.year ? parseInt(object.movie.year) : null;
-                var inputIsSeries = object.movie.number_of_seasons > 1 ||
-                                    object.movie.first_air_date || 
-                                    object.movie.type === 'tv' || 
-                                    object.movie.media_type === 'tv' ||
-                                    (object.movie.original_name && !object.movie.original_title);
-                
-                items.forEach(function (item) {
-                    var nameLower = (item.title || item.orig_title || '').toLowerCase().trim();
-                    var score = 0;
+                // ===== Входные данные =====
+                var inputTitle = (select_title || object.movie.title || object.movie.original_title || '')
+                    .toLowerCase()
+                    .trim();
 
-                    if (nameLower === inputTitle) {
-                        score += 100;
-                    } else if (nameLower.includes(inputTitle) || inputTitle.includes(nameLower)) {
-                        score += 30;
-                    } else {
-                        score -= 50;  // сильно штрафуем, если название вообще не похоже
-                    }
+                var inputYear = object.movie.release_date
+                    ? parseInt(object.movie.release_date.substring(0, 4))
+                    : object.movie.year
+                    ? parseInt(object.movie.year)
+                    : null;
 
-                    if (inputYear) {
-                        if (item.year === inputYear) {
-                            score += 200;          // очень сильно повышаем
-                        } else if (Math.abs(item.year - inputYear) <= 1) {
-                            score += 100;
-                        } else if (item.year) {
-                            score -= 300;          // сильно штрафуем за неправильный год
-                        }
-                    }
+                var inputIsSeries = 
+                    object.movie.media_type === 'tv' || 
+                    object.movie.type === 'tv' ||
+                    !!object.movie.first_air_date ||
+                    !!object.movie.number_of_seasons;
 
-                    if (inputIsSeries) {
-                        if (item.is_series) {
-                            score += 250;
-                        } else { 
-                            score -= 400;
-                        }
-                    } else {
-                        if (!item.is_series) {
-                            score += 150;
-                        } else {
-                            score -= 300;
-                        }
-                    }
+                // ===== ID из TMDB =====
+                var input_tmdb_id = object.movie.id || null;
+                var input_imdb_id = object.movie.imdb_id || null;
 
-                    console.log('Оцениваем "' + item.title + '" (' + (item.year || '?') + ', сериал=' + item.is_series + '): ' + score);
+                // ===== Главный цикл =====
+                for (var i = 0; i < items.length; i++) {
 
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestMatch = item;
-                    }
-                 });
+                   var item = items[i];
 
-                if (bestMatch && bestScore >= 350) {
-                   console.log('Выбран: ' + bestMatch.title + ' (score: ' + bestScore + ')');
-                   getPage(bestMatch.link);
-                   return;
+                   // ===== Сначала проверяем ID =====
+                   if (input_imdb_id && item.imdb_id && input_imdb_id === item.imdb_id) {
+                       console.log('Совпадение по IMDB ID');
+                       bestMatch = item;
+                       bestScore = 9999;
+                       break;
+                   }
+
+                   if (input_tmdb_id && item.tmdb_id && input_tmdb_id === item.tmdb_id) {
+                       console.log('Совпадение по TMDB ID');
+                       bestMatch = item;
+                       bestScore = 9999;
+                       break;
+                   }
+
+                   // ===== Fallback scoring =====
+                   var nameLower = (item.title || item.orig_title || '').toLowerCase().trim();
+
+                   var score = 0;
+
+                   if (nameLower === inputTitle) score += 100;
+                   else if (nameLower.includes(inputTitle) || inputTitle.includes(nameLower)) score += 30;
+                   else score -= 50;
+
+                   if (inputYear) {
+                       if (item.year === inputYear) score += 200;
+                       else if (item.year && Math.abs(item.year - inputYear) <= 1) score += 100;
+                       else if (item.year) score -= 300;
+                   }
+
+                   if (inputIsSeries === item.is_series) score += 250;
+                   else score -= 400;
+
+                   if (score > bestScore) {
+                       bestScore = score;
+                       bestMatch = item;
+                    } 
+                }
+
+                // ===== Если нашли по ID =====
+                if (bestMatch && bestScore === 9999) {
+                    getPage(bestMatch.link);
+                    return;
                 }
 
                 console.log('Слишком низкий score (' + (bestScore || 0) + '), показываем список результатов');
