@@ -1,4 +1,4 @@
-//13.02.2026 - Fix
+//13.02.2026 - Fix + Prestige Design Update
 
 (function () {
     'use strict';
@@ -1638,8 +1638,6 @@
     }
 
     function rezka2(component, _object) {
-      var _this = this;
-
       var network = new Lampa.Reguest();
       var extract = {};
       var object = _object;
@@ -1814,123 +1812,113 @@
           });
         };
 
-        this.display = function(videos) {
-      var _this5 = this;
-      this.draw(videos, {
-        onEnter: function onEnter(item, html) {
-          _this5.getFileUrl(item, function(json, json_call) {
-            if (json && json.url) {
-              var playlist = [];
-              var first = _this5.toPlayElement(item);
-              first.url = json.url;
-              first.headers = json_call.headers || json.headers;
-              first.quality = json_call.quality || item.qualitys;
-              first.segments = json_call.segments || item.segments;
-              first.hls_manifest_timeout = json_call.hls_manifest_timeout || json.hls_manifest_timeout;
-              first.subtitles = json.subtitles;
-              first.subtitles_call = json_call.subtitles_call || json.subtitles_call;
-              
-              if (json.vast && json.vast.url) {
-                first.vast_url = json.vast.url;
-                first.vast_msg = json.vast.msg;
-                first.vast_region = json.vast.region;
-                first.vast_platform = json.vast.platform;
-                first.vast_screen = json.vast.screen;
+        var display = function display(links, have_more, query) {
+          if (links && links.length && links.forEach) {
+            var is_sure = false;
+            var items = links.map(function (l) {
+              var li = $(l);
+              var link = $('a', li);
+              var enty = $('.enty', link);
+              var rating = $('.rating', link);
+              var titl = enty.text().trim() || '';
+              enty.remove();
+              rating.remove();
+              var alt_titl = link.text().trim() || '';
+              var orig_title = '';
+              var year;
+              var found = alt_titl.match(/\((.*,\s*)?\b(\d{4})(\s*-\s*[\d.]*)?\)$/);
+
+              if (found) {
+                if (found[1]) {
+                  var found_alt = found[1].match(/^([^а-яА-ЯёЁ]+),/);
+                  if (found_alt) orig_title = found_alt[1].trim();
+                }
+
+                year = parseInt(found[2]);
               }
-              
-              _this5.orUrlReserve(first);
-              _this5.setDefaultQuality(first);
-              
-              if (item.season) {
-                videos.forEach(function(elem) {
-                  var cell = _this5.toPlayElement(elem);
-                  if (elem == item) {
-                    cell.url = json.url;
-                  } else {
-                    if (elem.method == 'call') {
-                      if (Lampa.Storage.field('player') !== 'inner') {
-                        cell.url = elem.stream;
-                        delete cell.quality;
-                      } else {
-                        cell.url = function(call) {
-                          _this5.getFileUrl(elem, function(stream, stream_json) {
-                            if (stream.url) {
-                              cell.url = stream.url;
-                              cell.quality = stream_json.quality || elem.qualitys;
-                              cell.segments = stream_json.segments || elem.segments;
-                              cell.subtitles = stream.subtitles;
-                              _this5.orUrlReserve(cell);
-                              _this5.setDefaultQuality(cell);
-                              elem.mark();
-                            } else {
-                              cell.url = '';
-                              Lampa.Noty.show(Lampa.Lang.translate('lampac_nolink'));
-                            }
-                            call();
-                          }, function() {
-                            cell.url = '';
-                            call();
-                          });
-                        };
-                      }
-                    } else {
-                      cell.url = elem.url;
-                    }
-                  }
-                  _this5.orUrlReserve(cell);
-                  _this5.setDefaultQuality(cell);
-                  playlist.push(cell);
+
+              return {
+                year: year,
+                title: titl,
+                orig_title: orig_title,
+                link: link.attr('href') || ''
+              };
+            });
+            var cards = items;
+
+            if (cards.length) {
+              if (orig_titles.length) {
+                var tmp = cards.filter(function (c) {
+                  return component.containsAnyTitle([c.orig_title, c.title], orig_titles);
+                });
+
+                if (tmp.length) {
+                  cards = tmp;
+                  is_sure = true;
+                }
+              }
+
+              if (select_title) {
+                var _tmp = cards.filter(function (c) {
+                  return component.containsAnyTitle([c.title, c.orig_title], [select_title]);
+                });
+
+                if (_tmp.length) {
+                  cards = _tmp;
+                  is_sure = true;
+                }
+              }
+
+              if (cards.length > 1 && search_year) {
+                var _tmp2 = cards.filter(function (c) {
+                  return c.year == search_year;
+                });
+
+                if (!_tmp2.length) _tmp2 = cards.filter(function (c) {
+                  return c.year && c.year > search_year - 2 && c.year < search_year + 2;
+                });
+                if (_tmp2.length) cards = _tmp2;
+              }
+            }
+
+            if (cards.length == 1 && is_sure) {
+              if (search_year && cards[0].year) {
+                is_sure = cards[0].year > search_year - 2 && cards[0].year < search_year + 2;
+              }
+
+              if (is_sure) {
+                is_sure = false;
+
+                if (orig_titles.length) {
+                  is_sure |= component.equalAnyTitle([cards[0].orig_title, cards[0].title], orig_titles);
+                }
+
+                if (select_title) {
+                  is_sure |= component.equalAnyTitle([cards[0].title, cards[0].orig_title], [select_title]);
+                }
+              }
+            }
+
+            if (cards.length == 1 && is_sure) getPage(cards[0].link);else if (items.length) {
+              _this.wait_similars = true;
+              items.forEach(function (c) {
+                c.is_similars = true;
+              });
+
+              if (have_more) {
+                component.similars(items, search_more, {
+                  items: [],
+                  query: query,
+                  page: 1
                 });
               } else {
-                playlist.push(first);
+                component.similars(items);
               }
-              
-              if (playlist.length > 1) first.playlist = playlist;
-              
-              if (first.url) {
-                var element = first;
-                element.isonline = true;
-                
-                if (element.url && element.isonline) {
-                  // Логика плеера
-                } else if (element.url) {
-                  if (false) {
-                    if (Platform.is('browser') && location.host.indexOf("127.0.0.1") !== -1) {
-                      Noty.show('Видео открыто в playerInner', {time: 3000});
-                      $.get('http://wtch.ch/player-inner/' + element.url);
-                      return;
-                    }
-                    Player.play(element);
-                  } else {
-                    if (true && Platform.is('browser') && location.host.indexOf("127.0.0.1") !== -1)
-                      Noty.show('Внешний плеер можно указать в init.conf (playerInner)', {time: 3000});
-                    Player.play(element);
-                  }
-                }
-                
-                Lampa.Player.play(element);
-                Lampa.Player.playlist(playlist);
-                if(element.subtitles_call) _this5.loadSubtitles(element.subtitles_call);
-                item.mark();
-                _this5.updateBalanser(balanser);
-              } else {
-                Lampa.Noty.show(Lampa.Lang.translate('lampac_nolink'));
-              }
-            } else Lampa.Noty.show(Lampa.Lang.translate('lampac_nolink'));
-          }, true);
-        },
-        onContextMenu: function onContextMenu(item, html, data, call) {
-          _this5.getFileUrl(item, function(stream) {
-            call({ file: stream.url, quality: item.qualitys });
-          }, true);
-        }
-      });
-      
-      this.filter({
-        season: filter_find.season.map(function(s) { return s.title; }),
-        voice: filter_find.voice.map(function(b) { return b.title; })
-      }, this.getChoice());
-    };
+
+              component.loading(false);
+            } else component.emptyForQuery(select_title);
+          } else if (error_message) component.empty(error_message);else component.emptyForQuery(select_title);
+        };
 
         var query_search = function query_search(query, data, callback) {
           var postdata = 'q=' + encodeURIComponent(query);
@@ -12005,6 +11993,7 @@
         stype: 'quality'
       };
       var contextmenu_all = [];
+      var images = [];
 
       if (last_bls[object.movie.id]) {
         balanser = last_bls[object.movie.id];
@@ -13051,6 +13040,7 @@
         scroll.render().find('.empty').remove();
         scroll.clear();
         scroll.reset();
+        this.clearImages();
       };
 
       this.inActivity = function () {
@@ -13448,6 +13438,17 @@
         });
         if (this.inActivity()) Lampa.Controller.toggle('content');
       };
+      /**
+       * Очистить загруженные изображения
+       */
+      this.clearImages = function() {
+        images.forEach(function(img) {
+          img.onerror = function() {};
+          img.onload = function() {};
+          img.src = '';
+        });
+        images = [];
+      };
 
       this.render = function () {
         return files.render();
@@ -13465,6 +13466,7 @@
         network.clear();
         files.destroy();
         scroll.destroy();
+        this.clearImages();
         network = null;
         all_sources.forEach(function (s) {
           s.source.destroy();
@@ -14093,8 +14095,9 @@
     }
 
     function resetTemplates() {
-      Lampa.Template.add('online_mod', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <circle cx=\"64\" cy=\"64\" r=\"56\" stroke=\"white\" stroke-width=\"16\"/>\n                    <path d=\"M90.5 64.3827L50 87.7654L50 41L90.5 64.3827Z\" fill=\"white\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
-      Lampa.Template.add('online_mod_folder', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 112\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect y=\"20\" width=\"128\" height=\"92\" rx=\"13\" fill=\"white\"/>\n                    <path d=\"M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z\" fill=\"white\" fill-opacity=\"0.23\"/>\n                    <rect x=\"11\" y=\"8\" width=\"106\" height=\"76\" rx=\"13\" fill=\"white\" fill-opacity=\"0.51\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
+        Lampa.Template.add('online_mod', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <circle cx=\"64\" cy=\"64\" r=\"56\" stroke=\"white\" stroke-width=\"16\"/>\n                    <path d=\"M90.5 64.3827L50 87.7654L50 41L90.5 64.3827Z\" fill=\"white\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
+        Lampa.Template.add('online_mod_folder', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 112\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect y=\"20\" width=\"128\" height=\"92\" rx=\"13\" fill=\"white\"/>\n                    <path d=\"M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z\" fill=\"white\" fill-opacity=\"0.23\"/>\n                    <rect x=\"11\" y=\"8\" width=\"106\" height=\"76\" rx=\"13\" fill=\"white\" fill-opacity=\"0.51\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
+        Lampa.Template.add('online_mod_prestige_full', "<div class=\"online-prestige online-prestige--full selector\">\n            <div class=\"online-prestige__img\">\n                <img alt=\"\">\n                <div class=\"online-prestige__loader\"></div>\n            </div>\n            <div class=\"online-prestige__body\">\n                <div class=\"online-prestige__head\">\n                    <div class=\"online-prestige__title\">{title}</div>\n                    <div class=\"online-prestige__time\">{time}</div>\n                </div>\n\n                <div class=\"online-prestige__timeline\"></div>\n\n                <div class=\"online-prestige__footer\">\n                    <div class=\"online-prestige__info\">{info}</div>\n                    <div class=\"online-prestige__quality\">{quality}</div>\n                </div>\n            </div>\n        </div>");
     }
 
     function checkMyIp(onComplite) {
