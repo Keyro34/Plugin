@@ -1813,40 +1813,12 @@
         };
 
         var display = function display(links, have_more, query) {
-            if (!links || !links.length || !links.forEach) {
+            if (!links || !links.length) {
                 component.emptyForQuery(select_title);
                 return;
             }
 
-            // ==================== НОРМАЛИЗАЦИЯ ====================
-            const normalize = (str) => {
-                if (!str) return '';
-                return str
-                    .toLowerCase()
-                    .replace(/сериал|фильм|сезон|сез\.|s\d+|season|episode|сезоны|серии/gi, '')
-                    .replace(/\(\d{4}.*?\)/g, '')
-                    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
-                    .replace(/\s+/g, ' ')
-                    .trim();
-            };
-
-            const words = (str) => normalize(str).split(/\s+/).filter(Boolean);
-
-            // Jaccard similarity (очень хорошо работает для названий)
-            const jaccard = (a, b) => {
-                const setA = new Set(words(a));
-                const setB = new Set(words(b));
-                if (!setA.size || !setB.size) return 0;
-                const inter = new Set([...setA].filter(x => setB.has(x)));
-                return inter.size / (setA.size + setB.size - inter.size);
-            };
-
-            // ==================== ВХОДНЫЕ ДАННЫЕ ====================
-            const inputTitle = normalize(select_title || object.movie.title || object.movie.name || '');
-            const inputOrig  = normalize(object.movie.original_title || object.movie.original_name || '');
-            const inputYear  = object.movie.release_date ? parseInt(object.movie.release_date) :
-                               object.movie.year ? parseInt(object.movie.year) : null;
-
+            // ====================== ДАННЫЕ ИЗ КАРТОЧКИ ======================
             const isSeries = !!(
                 object.movie.number_of_seasons > 1 ||
                 object.movie.first_air_date ||
@@ -1855,99 +1827,114 @@
                 (object.movie.original_name && !object.movie.original_title)
             );
 
-            const items = links.map(l => {
+            const targetYear = parseInt(
+                (object.movie.release_date || object.movie.first_air_date || object.movie.year || '0000').slice(0, 4)
+            );
+
+            const targetTitle = (select_title || object.movie.title || object.movie.name || '').toLowerCase().trim();
+            const targetOrig  = (object.movie.original_title || object.movie.original_name || '').toLowerCase().trim();
+
+            // ====================== ПАРСИНГ РЕЗУЛЬТАТОВ ======================
+            let items = links.map(l => {
                 const li = $(l);
-                const linkEl = $('a', li);
-                const enty = $('.enty', linkEl);
-                const rating = $('.rating', linkEl);
+                const a = $('a', li);
+                const enty = $('.enty', a);
+                const rating = $('.rating', a);
 
                 let title = enty.text().trim() || '';
                 enty.remove();
                 rating.remove();
 
-                const fullTitle = linkEl.text().trim() || '';
-                const yearMatch = fullTitle.match(/\((?:.*?,?\s*)?(\d{4})(?:\s*-\s*[\d.]*)?\)/);
+                const fullText = a.text().trim() || '';
+                const yearMatch = fullText.match(/\(\D*?(\d{4})\D*?\)/);
                 const year = yearMatch ? parseInt(yearMatch[1]) : null;
 
-                const isSeriesGuess = /сериал|сезон|сез\./i.test(fullTitle) ||
+                // Определяем тип
+                const isSeriesGuess = /сериал|сезон|сез\./i.test(fullText) || 
                                       /сериал|сезон|сез\./i.test(title) ||
-                                      (year && fullTitle.includes('сезон'));
+                                      (year && fullText.includes('сезон'));
 
                 return {
                     year,
                     title,
-                    fullTitle,
-                    link: linkEl.attr('href') || '',
+                    fullText,
+                    link: a.attr('href') || '',
                     is_series: isSeriesGuess
                 };
             });
 
-            // ==================== ОБРАБОТКА РЕЗУЛЬТАТОВ ====================
-            let bestMatch = null;
-            let bestScore = -1;
-            let goodMatches = [];
+            // ====================== ЖЁСТКИЙ ФИЛЬТР ======================
+            // 1. Фильтр по типу (фильм / сериал)
+            items = items.filter(item => item.is_series === isSeries);
 
-            items.forEach(item => {
-                const name = normalize(item.title || item.fullTitle);   
-                let score = 0;
-                
-                score += jaccard(inputTitle, name) * 130;
-                if (inputOrig) score += jaccard(inputOrig, name) * 100;
+            // 2. Фильтр по году (±1 год)
+            if (targetYear && targetYear > 1900) {
+                items = items.filter(item => {
+                    if (!item.year) return true;                    // год неизвестен — оставляем
+                    return Math.abs(item.year - targetYear) <= 1;
+                });
+            }
 
-                const exactWords = words(inputTitle).filter(w => words(name).includes(w)).length;
-                score += exactWords * 40;
+            console.log(`[Rezka2 Filter] После фильтра (тип + год): ${items.length} результатов`);
 
-                if (inputYear && item.year) {
-                    const diff = Math.abs(inputYear - item.year);
-                    if (diff === 0) score += 240;
-                    else if (diff === 1) score += 150;
-                    else if (diff <= 2) score += 70;
-                    else score -= 200;
-                }
+            // ====================== РЕШЕНИЕ ======================
+            _this.wait_similars = true;
 
-                if (isSeries === item.is_series) score += 120;
-                else score -= 170;
+            // Если остался ровно один — сразу открываем
+            if (items.length === 1) {
+                console.log(`[Rezka2] Точный матч найден: ${items[0].title} (${items[0].year})`);
+                getPage(items[0].link);
+                return;
+            }
 
-                if (name.includes(inputTitle) || inputTitle.includes(name)) score += 80;
+            // Если ничего не осталось — показываем всё
+            if (items.length === 0) {
+                items = links.map(l => { /* тот же парсинг, что выше */ 
+                    // (можно вынести в отдельную функцию, но для простоты копируем)
+                    const li = $(l);
+                    const a = $('a', li);
+                    return {
+                        title: $('.enty', a).text().trim() || a.text().trim(),
+                        link: a.attr('href') || '',
+                        is_series: false
+                    };
+                });
+            }
 
-                console.log(`[Rezka2] "${item.title}" (${item.year || '?'}) → score: ${Math.round(score)}`);
+            // Если несколько — сортируем по качеству совпадения названия
+            items.sort((a, b) => {
+                const scoreA = getTitleScore(a.title || a.fullText, targetTitle, targetOrig);
+                const scoreB = getTitleScore(b.title || b.fullText, targetTitle, targetOrig);
+                return scoreB - scoreA;
+            });
 
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMatch = item;
-                }
-                if (score >= 250) goodMatches.push({ item, score });
-             });
+            // Помечаем как similars
+            items.forEach(item => item.is_similars = true);
 
-             console.log(`[Rezka2] Лучший результат: "${bestMatch?.title}" (score: ${Math.round(bestScore)})`);
+            if (have_more) {
+                component.similars(items, search_more, { query: query });
+            } else {
+                component.similars(items);
+            }
 
-             _this.wait_similars = true;
+            component.loading(false);
+        };
 
-             if (bestMatch && bestScore >= 280) {
-                 console.log(`[Rezka2] Автооткрытие: ${bestMatch.title}`);
-                 getPage(bestMatch.link);
-                 return;
-             }
+        // Вспомогательная функция оценки названия
+        function getTitleScore(title, target, targetOrig) {
+            if (!title) return 0;
+            const t = title.toLowerCase();
+            let score = 0;
 
-             let finalItems = items;
+            if (t === target) score += 100;
+            else if (t.includes(target) || target.includes(t)) score += 60;
 
-             if (goodMatches.length >= 2) {
-                 goodMatches.sort((a, b) => b.score - a.score);
-                 finalItems = goodMatches.map(g => g.item);
-             } else if (goodMatches.length === 1) {  
-                 const top = goodMatches[0].item;
-                 finalItems = [top, ...items.filter(i => i !== top)];
-             }
+            if (targetOrig) {
+                if (t === targetOrig) score += 90;
+                else if (t.includes(targetOrig) || targetOrig.includes(t)) score += 50;
+            }
 
-             finalItems.forEach(c => c.is_similars = true);
-
-             if (have_more) {
-                 component.similars(finalItems, search_more, { query: query });
-             } else {
-                 component.similars(finalItems);
-             }
-
-             component.loading(false);
+            return score;
         };
 
         var query_search = function query_search(query, data, callback) {
