@@ -1638,6 +1638,8 @@
     }
 
     function rezka2(component, _object) {
+      var _this = this;
+
       var network = new Lampa.Reguest();
       var extract = {};
       var object = _object;
@@ -1812,192 +1814,123 @@
           });
         };
 
-        var display = function display(links, have_more, query) {
-            if (!links || !links.length || !links.forEach) {
-                component.emptyForQuery(select_title);
-                return;
-            }
-
-            var candidates = links
-                .map(function (l) {
-                    var li = $(l);
-                    var link = $('a', li);
-                    var enty = $('.enty', link);
-                    var rating = $('.rating', link);
-                    var titl = enty.text().trim() || '';
-                    enty.remove();
-                    rating.remove();
-                    var alt_titl = link.text().trim() || '';
-
-                    var orig_title = '';
-                    var year = null;
-
-                    // 2012, 2023–2025, (2021), (Original, 2020) и т.п.
-                    var found = alt_titl.match(/\((.*,\s*)?\b(\d{4})(?:\s*[-–—]\s*[\d.]+)?\)$/);
-                    if (found) {
-                        year = parseInt(found[2], 10);
-
-                        if (found[1]) {
-                            var altPart = found[1].trim();
-                            var m = altPart.match(/^([^а-яА-ЯёЁ]+),/);
-                            if (m) orig_title = m[1].trim();
-                        }
+        this.display = function(videos) {
+      var _this5 = this;
+      this.draw(videos, {
+        onEnter: function onEnter(item, html) {
+          _this5.getFileUrl(item, function(json, json_call) {
+            if (json && json.url) {
+              var playlist = [];
+              var first = _this5.toPlayElement(item);
+              first.url = json.url;
+              first.headers = json_call.headers || json.headers;
+              first.quality = json_call.quality || item.qualitys;
+              first.segments = json_call.segments || item.segments;
+              first.hls_manifest_timeout = json_call.hls_manifest_timeout || json.hls_manifest_timeout;
+              first.subtitles = json.subtitles;
+              first.subtitles_call = json_call.subtitles_call || json.subtitles_call;
+              
+              if (json.vast && json.vast.url) {
+                first.vast_url = json.vast.url;
+                first.vast_msg = json.vast.msg;
+                first.vast_region = json.vast.region;
+                first.vast_platform = json.vast.platform;
+                first.vast_screen = json.vast.screen;
+              }
+              
+              _this5.orUrlReserve(first);
+              _this5.setDefaultQuality(first);
+              
+              if (item.season) {
+                videos.forEach(function(elem) {
+                  var cell = _this5.toPlayElement(elem);
+                  if (elem == item) {
+                    cell.url = json.url;
+                  } else {
+                    if (elem.method == 'call') {
+                      if (Lampa.Storage.field('player') !== 'inner') {
+                        cell.url = elem.stream;
+                        delete cell.quality;
+                      } else {
+                        cell.url = function(call) {
+                          _this5.getFileUrl(elem, function(stream, stream_json) {
+                            if (stream.url) {
+                              cell.url = stream.url;
+                              cell.quality = stream_json.quality || elem.qualitys;
+                              cell.segments = stream_json.segments || elem.segments;
+                              cell.subtitles = stream.subtitles;
+                              _this5.orUrlReserve(cell);
+                              _this5.setDefaultQuality(cell);
+                              elem.mark();
+                            } else {
+                              cell.url = '';
+                              Lampa.Noty.show(Lampa.Lang.translate('lampac_nolink'));
+                            }
+                            call();
+                          }, function() {
+                            cell.url = '';
+                            call();
+                          });
+                        };
+                      }
+                    } else {
+                      cell.url = elem.url;
                     }
-
-                    var is_series_guess =
-                        alt_titl.toLowerCase().includes('сериал') ||
-                        titl.toLowerCase().includes('сериал') ||
-                        alt_titl.toLowerCase().includes('сезон') ||
-                        alt_titl.toLowerCase().includes('season') ||
-                        (year && alt_titl.match(/\b[1-9]\s*(?:сезон|season)\b/i));
-
-                    return {
-                        year: year,
-                        title: titl,
-                        orig_title: orig_title,
-                        alt_title: alt_titl,
-                        link: link.attr('href') || '',
-                        is_series: is_series_guess,
-                        raw: alt_titl
-                    };
-                })
-                .filter(Boolean); // на всякий случай убираем пустые
-
-            if (!candidates.length) {
-                component.emptyForQuery(select_title);
-                return;
-            }
-
-            var inputTitle = (select_title || object.movie.title || object.movie.original_title || '')
-                .toLowerCase()
-                .trim()
-                .replace(/\s+/g, ' ');
-
-            var inputYear = object.movie.release_date
-                ? parseInt(object.movie.release_date.substring(0, 4), 10)
-                : object.movie.year
-                ? parseInt(object.movie.year, 10)
-                : null;
-
-            var inputIsSeries =
-                object.movie.number_of_seasons > 1 ||
-                object.movie.first_air_date ||
-                object.movie.type === 'tv' ||
-                object.movie.media_type === 'tv' ||
-                (object.movie.original_name && !object.movie.original_title);
-            
-            let best = candidates.find(item => 
-                normalizeTitle(item.title || item.orig_title || item.alt_title) === inputTitle &&
-                item.year === inputYear &&
-                item.is_series === inputIsSeries
-            );
-
-            if (best) {
-                console.log('Точное совпадение название + год + тип');
-                getPage(best.link);
-                return;
-            }
-
-            best = candidates.find(item => 
-                normalizeTitle(item.title || item.orig_title || item.alt_title) === inputTitle &&
-                item.year === inputYear
-            );
-
-            if (best) {
-                console.log('Точное название + год');
-                getPage(best.link);
-                return;
-            }
-
-            best = candidates.find(item => 
-                normalizeTitle(item.title || item.orig_title || item.alt_title) === inputTitle &&
-                item.year && Math.abs(item.year - inputYear) <= 1
-            );
-
-            if (best && inputYear) {
-                console.log('Точное название + год ±1');
-                getPage(best.link);
-                return;
-            }
-
-            best = candidates.find(item => 
-                normalizeTitle(item.title || item.orig_title || item.alt_title) === inputTitle &&
-                item.is_series === inputIsSeries
-            );
-
-            if (best) {
-                console.log('Точное название + правильный тип');
-                getPage(best.link);
-                return;
-            }
-
-            best = candidates.find(item => 
-                (item.title || item.orig_title || item.alt_title).toLowerCase().includes(inputTitle) &&
-                item.year === inputYear &&
-                item.is_series === inputIsSeries
-            );
-
-            if (best && inputYear) {
-                console.log('Частичное название + точный год + тип');
-                getPage(best.link);
-                return;
-            }
-
-            let filtered = candidates.filter(item => 
-                item.is_series === inputIsSeries &&
-                (!inputYear || !item.year || Math.abs(item.year - inputYear) <= 1)
-            );
-
-            if (filtered.length === 1) {
-                console.log('Остался ровно один подходящий кандидат после фильтрации');
-                getPage(filtered[0].link);
-                return;
-            }
-
-            if (filtered.length > 1) {
-                // сортируем по степени похожести названия
-                filtered.sort((a, b) => {
-                    const sa = normalizeTitle(a.title || a.orig_title || a.alt_title);
-                    const sb = normalizeTitle(b.title || b.orig_title || b.alt_title);
-            
-                    const lenA = Math.abs(sa.length - inputTitle.length);
-                    const lenB = Math.abs(sb.length - inputTitle.length);
-            
-                    if (lenA !== lenB) return lenA - lenB;
-            
-                    return sb.includes(inputTitle) - sa.includes(inputTitle);
+                  }
+                  _this5.orUrlReserve(cell);
+                  _this5.setDefaultQuality(cell);
+                  playlist.push(cell);
                 });
-
-                console.log('Несколько кандидатов — берём самый похожий по длине и вхождению');
-                getPage(filtered[0].link);
-                return;
-            }
-
-            console.log('Не удалось однозначно выбрать → показываем список');
-
-            _this.wait_similars = true;
-            candidates.forEach(c => { c.is_similars = true; });
-
-            if (have_more) {
-                component.similars(candidates, search_more, { query: query });
-            } else {
-                component.similars(candidates);
-            }
-    
-            component.loading(false);
-        };
-
-        function normalizeTitle(str) {
-            if (!str) return '';
-            return str
-                .toLowerCase()
-                .trim()
-                .replace(/\s+/g, ' ')
-                .replace(/[:.,!?…]$/g, '')
-                .replace(/^\s*[«"]+|[\s»"]+$/g, '')   // кавычки
-                .replace(/[-–—−]\s*(\d{4}).*/g, '')    // убираем год в конце, если остался
-                .trim();
+              } else {
+                playlist.push(first);
+              }
+              
+              if (playlist.length > 1) first.playlist = playlist;
+              
+              if (first.url) {
+                var element = first;
+                element.isonline = true;
+                
+                if (element.url && element.isonline) {
+                  // Логика плеера
+                } else if (element.url) {
+                  if (false) {
+                    if (Platform.is('browser') && location.host.indexOf("127.0.0.1") !== -1) {
+                      Noty.show('Видео открыто в playerInner', {time: 3000});
+                      $.get('http://wtch.ch/player-inner/' + element.url);
+                      return;
+                    }
+                    Player.play(element);
+                  } else {
+                    if (true && Platform.is('browser') && location.host.indexOf("127.0.0.1") !== -1)
+                      Noty.show('Внешний плеер можно указать в init.conf (playerInner)', {time: 3000});
+                    Player.play(element);
+                  }
+                }
+                
+                Lampa.Player.play(element);
+                Lampa.Player.playlist(playlist);
+                if(element.subtitles_call) _this5.loadSubtitles(element.subtitles_call);
+                item.mark();
+                _this5.updateBalanser(balanser);
+              } else {
+                Lampa.Noty.show(Lampa.Lang.translate('lampac_nolink'));
+              }
+            } else Lampa.Noty.show(Lampa.Lang.translate('lampac_nolink'));
+          }, true);
+        },
+        onContextMenu: function onContextMenu(item, html, data, call) {
+          _this5.getFileUrl(item, function(stream) {
+            call({ file: stream.url, quality: item.qualitys });
+          }, true);
         }
+      });
+      
+      this.filter({
+        season: filter_find.season.map(function(s) { return s.title; }),
+        voice: filter_find.voice.map(function(b) { return b.title; })
+      }, this.getChoice());
+    };
 
         var query_search = function query_search(query, data, callback) {
           var postdata = 'q=' + encodeURIComponent(query);
