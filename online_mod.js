@@ -1814,186 +1814,129 @@
 
         var display = function display(links, have_more, query) {
 
-            function normalizeTitle(str) {
+            function norm(str) {
                 return (str || '')
                     .toLowerCase()
-                    .replace(/[:\-–—.,!?'"]/g, '')
+                    .replace(/[^\w\d]+/g, ' ')
                     .replace(/\s+/g, ' ')
-                    .replace(/^(the|a|an)\s+/, '')
                     .trim();
             }
 
-            function levenshtein(a, b) {
-                if (a === b) return 0;
-                if (!a.length) return b.length;
-                if (!b.length) return a.length;
+            if (links && links.length) {
 
-                var matrix = [];
-
-                for (var i = 0; i <= b.length; i++) matrix[i] = [i];
-                for (var j = 0; j <= a.length; j++) matrix[0][j] = j;
-
-                for (i = 1; i <= b.length; i++) {
-                    for (j = 1; j <= a.length; j++) {
-                        matrix[i][j] = Math.min(
-                            matrix[i - 1][j - 1] + (b[i - 1] === a[j - 1] ? 0 : 1),
-                            matrix[i][j - 1] + 1,
-                            matrix[i - 1][j] + 1
-                        );
-                    }
-                }
-
-                return matrix[b.length][a.length];
-            }
-
-            if (links && links.length && links.forEach) {
                 var items = links.map(function (l) {
+
                     var li = $(l);
                     var link = $('a', li);
-                    var enty = $('.enty', link);
-                    var rating = $('.rating', link);
 
-                    var titl = enty.text().trim() || '';
-                    enty.remove();
-                    rating.remove();
-
-                    var alt_titl = link.text().trim() || '';
-
-                    var orig_title = '';
-                    var year;
-
-                    var found = alt_titl.match(/\((.*,\s*)?\b(\d{4})(\s*-\s*[\d.]*)?\)$/);
-
-                    if (found) {
-                        if (found[1]) {
-                            var found_alt = found[1].match(/^([^а-яА-ЯёЁ]+),/);
-                            if (found_alt) orig_title = found_alt[1].trim();
-                        }
-                        year = parseInt(found[2]);
-                    }
+                    var title = link.text().trim() || '';
 
                     var href = link.attr('href') || '';
 
-                    var imdb_id = null;
-                    var tmdb_id = null;
+                    // YEAR
+                    var year = null;
+                    var y = title.match(/\b(19|20)\d{2}\b/);
+                    if (y) year = parseInt(y[0]);
 
+                    // IMDB
+                    var imdb_id = null;
                     var imdbMatch = href.match(/tt\d+/i);
                     if (imdbMatch) imdb_id = imdbMatch[0];
 
+                    // TMDB
+                    var tmdb_id = null;
                     var tmdbMatch = href.match(/\/(movie|tv)\/(\d+)/i);
                     if (tmdbMatch) tmdb_id = parseInt(tmdbMatch[2]);
 
                     return {
+                        title: title,
                         year: year,
-                        title: titl,
-                        orig_title: orig_title,
                         link: href,
                         imdb_id: imdb_id,
                         tmdb_id: tmdb_id
                     };
                 });
 
-                // ===== Лучший матч =====
-
-                var bestMatch = null;
-                var bestScore = -9999;
-
-                // ===== Входные данные =====
-                var inputTitles = [
-                    select_title,
-                    object.movie.title,
-                    object.movie.original_title,
+                var inputTitle = norm(
+                    select_title ||
+                    object.movie.title ||
+                    object.movie.original_title ||
                     object.movie.original_name
-                ].filter(Boolean).map(normalizeTitle);
+                );
 
-                var inputYear = object.movie.release_date
-                    ? parseInt(object.movie.release_date.substring(0, 4))
-                    : object.movie.year
-                    ? parseInt(object.movie.year)
-                    : null;
+                var inputYear =
+                    object.movie.release_date ?
+                    parseInt(object.movie.release_date.substr(0, 4)) :
+                    object.movie.year ?
+                    parseInt(object.movie.year) :
+                    null;
 
-                var inputIsSeries =
-                    object.movie.media_type === 'tv' ||
-                    object.movie.type === 'tv' ||
-                    !!object.movie.first_air_date ||
-                    !!object.movie.number_of_seasons;
-
-                // ===== ID из TMDB =====
                 var input_tmdb_id = object.movie.id || null;
                 var input_imdb_id = object.movie.imdb_id || null;
 
-                // ===== Главный цикл =====
+                // ===== STEP 1 ID =====
                 for (var i = 0; i < items.length; i++) {
 
-                   var item = items[i];
-
-                   // ===== Сначала проверяем ID =====
-                   if (input_imdb_id && item.imdb_id && input_imdb_id === item.imdb_id) {
-                       bestMatch = item;
-                       bestScore = 9999;
-                       break;
-                   }
-
-                   if (input_tmdb_id && item.tmdb_id && input_tmdb_id === item.tmdb_id) {
-                       bestMatch = item;
-                       bestScore = 9999;
-                       break;
-                   }
-
-                   var score = 0;
-
-                   // ===== TITLE SCORE =====
-                   var itemTitles = [
-                       item.title,
-                       item.orig_title
-                   ].filter(Boolean).map(normalizeTitle);
-
-                   var titleBest = -200;
-
-                   itemTitles.forEach(function (it) {
-                       inputTitles.forEach(function (inp) {
-                         
-                           if (it === inp) titleBest = Math.max(titleBest, 300);
-                           else if (it.includes(inp) || inp.includes(it))
-                               titleBest = Math.max(titleBest, 150);
-                           else if (levenshtein(it, inp) <= 2)
-                               titleBest = Math.max(titleBest, 80);
-
-                       });
-                   });
-
-                   score += titleBest;
-
-                   // ===== YEAR SCORE =====
-                   if (inputYear && item.year) {
-                       if (item.year === inputYear) score += 400;
-                       else if (Math.abs(item.year - inputYear) === 1) score += 200;
-                       else if (Math.abs(item.year - inputYear) <= 3) score += 50;
-                       else score -= 600;
-                   }
-
-                   // ===== TYPE SCORE (MOST IMPORTANT) =====
-                   if (inputIsSeries && item.link.includes('/tv/')) score += 600;
-                   else if (!inputIsSeries && item.link.includes('/movie/')) score += 600;
-                   else score -= 600;
-
-                   if (score > bestScore) {
-                       bestScore = score;
-                       bestMatch = item;
+                    if (input_imdb_id && items[i].imdb_id === input_imdb_id) {
+                        getPage(items[i].link);
+                        return;
                     }
-                  }
 
-                   // ===== DIRECT OPEN IF ID FOUND =====
-                   if (bestMatch && bestScore === 9999) {
-                       getPage(bestMatch.link);
-                       return;
-                   }
+                    if (input_tmdb_id && items[i].tmdb_id === input_tmdb_id) {
+                        getPage(items[i].link);
+                        return;
+                    }
+                }
 
-                   // ===== NORMAL THRESHOLD =====
-                   if (bestMatch && bestScore >= 700) {
-                       getPage(bestMatch.link);
-                       return;
-                   }
+                // ===== STEP 2 EXACT TITLE =====
+                for (var i = 0; i < items.length; i++) {
+
+                    if (norm(items[i].title) === inputTitle) {
+                        getPage(items[i].link);
+                        return;
+                    }
+                }
+
+                // ===== STEP 3 TITLE + YEAR =====
+                for (var i = 0; i < items.length; i++) {
+
+                    if (
+                        norm(items[i].title) === inputTitle &&
+                        (!inputYear || !items[i].year || items[i].year === inputYear)
+                    ) {
+                        getPage(items[i].link);
+                        return;
+                    }
+                }
+
+                // ===== STEP 4 SIMPLE SCORE =====
+                var best = null;
+                var bestScore = -999;
+
+                items.forEach(function (item) {
+
+                    var score = 0;
+                    var name = norm(item.title);
+
+                    if (name === inputTitle) score += 100;
+                    else if (name.includes(inputTitle)) score += 40;
+                    else if (inputTitle.includes(name)) score += 30;
+
+                    if (inputYear && item.year) {
+                        if (item.year === inputYear) score += 80;
+                        else if (Math.abs(item.year - inputYear) === 1) score += 40;
+                    }
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        best = item;
+                    }
+                });
+
+                if (best && bestScore >= 120) {
+                    getPage(best.link);
+                    return;
+                }
 
                 console.log('Слишком низкий score (' + (bestScore || 0) + '), показываем список результатов');
 
