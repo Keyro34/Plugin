@@ -1864,6 +1864,11 @@
                     object.movie.original_name
                 );
 
+                var inputOriginalTitle = norm(
+                    object.movie.original_title ||
+                    object.movie.original_name
+                );
+
                 var inputYear =
                     object.movie.release_date ?
                     parseInt(object.movie.release_date.substr(0, 4)) :
@@ -1891,7 +1896,15 @@
                 // ===== STEP 2 EXACT TITLE =====
                 for (var i = 0; i < items.length; i++) {
 
-                    if (norm(items[i].title) === inputTitle) {
+                    var name = norm(items[i].title);
+
+                    if (
+                        inputOriginalTitle &&
+                        name === inputOriginalTitle &&
+                        inputYear &&
+                        items[i].year &&
+                        items[i].year === inputYear
+                    ) {
                         getPage(items[i].link);
                         return;
                     }
@@ -1900,9 +1913,13 @@
                 // ===== STEP 3 TITLE + YEAR =====
                 for (var i = 0; i < items.length; i++) {
 
+                    var name = norm(items[i].title);
+
                     if (
-                        norm(items[i].title) === inputTitle &&
-                        (!inputYear || !items[i].year || items[i].year === inputYear)
+                        name === inputTitle &&
+                        inputYear &&
+                        items[i].year &&
+                        items[i].year === inputYear
                     ) {
                         getPage(items[i].link);
                         return;
@@ -1910,53 +1927,49 @@
                 }
 
                 // ===== STEP 4 SIMPLE SCORE =====
-                var best = null;
-                var bestScore = -999;
-
                 items.forEach(function (item) {
 
                     var score = 0;
                     var name = norm(item.title);
 
-                    if (name === inputTitle) score += 100;
-                    else if (name.includes(inputTitle)) score += 40;
-                    else if (inputTitle.includes(name)) score += 30;
+                    // TITLE
+                    if (name === inputTitle) score += 120;
+                    else if (name.includes(inputTitle)) score += 50;
+                    else if (inputTitle.includes(name)) score += 40;
 
+                    // ORIGINAL TITLE BONUS
+                    if (inputOriginalTitle && name === inputOriginalTitle) score += 180;
+                    else if (inputOriginalTitle && name.includes(inputOriginalTitle)) score += 90;
+
+                    // YEAR
                     if (inputYear && item.year) {
-                        if (item.year === inputYear) score += 80;
-                        else if (Math.abs(item.year - inputYear) === 1) score += 40;
+                        if (item.year === inputYear) score += 100;
+                        else if (Math.abs(item.year - inputYear) === 1) score += 50;
                     }
 
-                    if (score > bestScore) {
-                        bestScore = score;
-                        best = item;
-                    }
+                    item.score = score;
                 });
 
-                items.sort(function(a, b){
+                items.sort(function (a, b) {
                     return (b.score || 0) - (a.score || 0);
                 });
 
                 var best = items[0];
                 var second = items[1];
 
-                // ===== Если нашли уверенного лидера — открываем =====
                 if (best) {
 
-                    // если второго нет — открываем
                     if (!second) {
                         getPage(best.link);
                         return;
                     }
 
-                    // если лучший сильно лучше второго — открываем
-                    if ((best.score || 0) - (second.score || 0) >= 40) {
+                    if ((best.score || 0) - (second.score || 0) >= 25) {
                         getPage(best.link);
                         return;
                     }
 
-                    // если score вообще высокий — открываем
-                    if ((best.score || 0) >= 120) {
+                    if ((best.score || 0) >= 100) {
                         getPage(best.link);
                         return;
                     }
