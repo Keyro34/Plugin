@@ -1933,9 +1933,33 @@
                     }
                 });
 
-                if (best && bestScore >= 120) {
-                    getPage(best.link);
-                    return;
+                items.sort(function(a, b){
+                    return (b.score || 0) - (a.score || 0);
+                });
+
+                var best = items[0];
+                var second = items[1];
+
+                // ===== Если нашли уверенного лидера — открываем =====
+                if (best) {
+
+                    // если второго нет — открываем
+                    if (!second) {
+                        getPage(best.link);
+                        return;
+                    }
+
+                    // если лучший сильно лучше второго — открываем
+                    if ((best.score || 0) - (second.score || 0) >= 40) {
+                        getPage(best.link);
+                        return;
+                    }
+
+                    // если score вообще высокий — открываем
+                    if ((best.score || 0) >= 120) {
+                        getPage(best.link);
+                        return;
+                    }
                 }
 
                 console.log('Слишком низкий score (' + (bestScore || 0) + '), показываем список результатов');
