@@ -1968,14 +1968,14 @@
                 inputTitles.forEach(function(t){
                     var words = t.split(' ').map(w => w.trim()).filter(Boolean);
                     words.forEach(function(w){
-                        if(w.length > 2 && itemTitle.includes(w)) score += 60; // очки за совпадение слова
+                        if(w.length > 2 && itemTitle.includes(w)) score += 50;
                     });
                 });
 
                 inputOriginals.forEach(function(t){
                     var words = t.split(' ').map(w => w.trim()).filter(Boolean);
                     words.forEach(function(w){
-                        if(w.length > 2 && itemTitle.includes(w)) score += 70;
+                        if(w.length > 2 && itemTitle.includes(w)) score += 80;
                     });
                 });
 
@@ -1990,10 +1990,11 @@
                 // YEAR
                 if(inputYear && item.year){
                     var diff = Math.abs(item.year - inputYear);
-                    if(diff === 0) score += 320;
-                    else if(diff === 1) score += 200;
-                    else if(diff <= 3) score += 80;
-                    else score -= 180;
+                    if(diff === 0) score += 400;        // точный год — максимум
+                    else if(diff === 1) score += 200;   // ±1 год — среднее
+                    else score -= 400;                   // все остальные — большой минус
+                } else if(inputYear && !item.year){
+                    score -= 200; // если года нет — небольшое наказание
                 }
 
                 // LENGTH LOGIC
