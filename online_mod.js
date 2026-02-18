@@ -1966,11 +1966,17 @@
 
                 // MULTI VARIANT
                 inputTitles.forEach(function(t){
-                    if(itemTitle === t) score += 240;
+                    var words = t.split(' ').map(w => w.trim()).filter(Boolean);
+                    words.forEach(function(w){
+                        if(w.length > 2 && itemTitle.includes(w)) score += 60; // очки за совпадение слова
+                    });
                 });
 
                 inputOriginals.forEach(function(t){
-                    if(itemTitle === t) score += 260;
+                    var words = t.split(' ').map(w => w.trim()).filter(Boolean);
+                    words.forEach(function(w){
+                        if(w.length > 2 && itemTitle.includes(w)) score += 70;
+                    });
                 });
 
                 // CONTAINS
@@ -2050,20 +2056,7 @@
 
             // ================= FALLBACK =================
 
-            // FALLBACK — показываем все ссылки
-            var container = $('#all-links'); // создаём <div id="all-links"></div> в HTML
-            container.empty(); // очищаем старые записи
-
-            items.forEach(function(item){
-                var el = $('<div></div>').append(
-                    $('<a></a>')
-                        .attr('href', item.link)
-                        .attr('target', '_blank') // открывать в новой вкладке
-                        .text(item.title)
-                );
-                container.append(el);
-            });
-            
+            component.similars(items);
             component.loading(false);
          };
 
