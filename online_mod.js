@@ -1856,9 +1856,7 @@
 
             function splitVariants(str){
                 if(!str) return [];
-                return str.split(/[:\-|\/]/).map(function(s){
-                    return s.trim();
-                });
+                return str.split(/[:\-|\/]/).map(function(s){ return s.trim(); });
             }
 
             function norm(str){
@@ -1872,7 +1870,6 @@
                 if(!a || !b) return false;
                 if(Math.abs(a.length - b.length) > 2) return false;
                 if(a.length < 5 || b.length < 5) return false;
-
                 var diff = 0;
                 for(var i=0;i<Math.min(a.length,b.length);i++){
                     if(a[i] !== b[i]) diff++;
@@ -1897,7 +1894,6 @@
             // ================= PARSE ITEMS =================
 
             var items = links.map(function(l){
-
                 var li = $(l);
                 var link = $('a', li);
 
@@ -1939,14 +1935,11 @@
             // ================= STEP 2 — HARD EXACT =================
 
             for(var i=0;i<items.length;i++){
-
                 var itemNorm = norm(items[i].title);
-
                 if(mainOriginal && itemNorm === mainOriginal && inputYear && items[i].year === inputYear){
                     getPage(items[i].link);
                     return;
                 }
-
                 if(mainInput && itemNorm === mainInput && inputYear && items[i].year === inputYear){
                     getPage(items[i].link);
                     return;
@@ -1956,7 +1949,6 @@
             // ================= STEP 3 — ABSOLUTE SCORING =================
 
             items.forEach(function(item){
-
                 var score = 0;
                 var itemTitle = norm(item.title);
 
@@ -1965,13 +1957,8 @@
                 if(itemTitle === mainOriginal) score += 450;
 
                 // MULTI VARIANT
-                inputTitles.forEach(function(t){
-                    if(itemTitle === t) score += 240;
-                });
-
-                inputOriginals.forEach(function(t){
-                    if(itemTitle === t) score += 260;
-                });
+                inputTitles.forEach(function(t){ if(itemTitle === t) score += 240; });
+                inputOriginals.forEach(function(t){ if(itemTitle === t) score += 260; });
 
                 // CONTAINS
                 if(mainInput.length > 3 && itemTitle.includes(mainInput)) score += 180;
@@ -2008,58 +1995,47 @@
 
             // ================= STEP 4 — SMART PICK =================
 
-            items.sort(function(a,b){
-                return (b.score||0) - (a.score||0);
-            });
+            items.sort(function(a,b){ return (b.score||0) - (a.score||0); });
 
             var best = items[0];
             var second = items[1];
             var third = items[2];
 
-            if(best){
+            var selected = false;
 
+            if(best){
                 if(!second){
                     getPage(best.link);
-                    return;
-                }
+                    selected = true;
+                } else {
+                    var diff12 = (best.score||0) - (second.score||0);
+                    var autoThreshold = 300;
+                    if(inputYear) autoThreshold += 40;
+                    if(mainOriginal) autoThreshold += 30;
 
-                var diff12 = (best.score||0) - (second.score||0);
-
-                // динамический порог
-                var autoThreshold = 300;
-                if(inputYear) autoThreshold += 40;
-                if(mainOriginal) autoThreshold += 30;
-
-                if(diff12 >= 25){
-                    getPage(best.link);
-                    return;
-                }
-
-                if(best.score >= autoThreshold){
-                    getPage(best.link);
-                    return;
-                }
-
-                if(third){
-                    if(best.score > second.score && second.score > third.score && best.score >= 260){
+                    if(diff12 >= 25 || best.score >= autoThreshold){
                         getPage(best.link);
-                        return;
+                        selected = true;
+                    } else if(third && best.score > second.score && second.score > third.score && best.score >= 260){
+                        getPage(best.link);
+                        selected = true;
                     }
                 }
             }
 
-            // ================= FALLBACK =================
+            // ================= FALLBACK — SHOW ALL =================
 
-            component.similars(items.map(function(item) {
-                return {
-                    title: item.title + ' (score: ' + item.score + ', year: ' + (item.year || 'N/A') + ')',
-                    link: item.link,
-                    year: item.year,
-                    imdb: item.imdb,
-                    tmdb: item.tmdb
-                };
-            }));
-            component.loading(false);
+            if(!selected){
+                // показываем весь список, отсортированный по очкам
+                component.similars(items);
+                component.loading(false);
+
+                // дополнительный лог в консоль (по желанию)
+                console.log("Автоматический выбор не сработал. Показываем все варианты:");
+                items.forEach(function(item){
+                    console.log(item.title, item.link);
+                });
+            }
          };
 
         var query_search = function query_search(query, data, callback) {
