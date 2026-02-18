@@ -1868,7 +1868,7 @@
                     .trim();
             }
 
-            // ================= PREP INPUT =================
+            // ================= INPUT NORMALIZATION =================
 
             var inputTitles = splitVariants(inputTitleRaw).map(norm);
             var inputOriginals = splitVariants(inputOriginalRaw).map(norm);
@@ -1876,12 +1876,10 @@
             var mainInput = inputTitles[0] || '';
             var mainOriginal = inputOriginals[0] || '';
 
-            // слова для жесткого поиска
             var allWords = [];
-
             inputTitles.concat(inputOriginals).forEach(function(t){
-                t.split(/\s+/).forEach(function(w){
-                    if(w && w.length > 2) allWords.push(w);
+                t.split(' ').forEach(function(w){
+                    if(w.length > 2) allWords.push(w);
                 });
             });
 
@@ -1914,7 +1912,20 @@
                 };
             });
 
-            // ================= HARD FILTER YEAR + TITLE =================
+            // ================= STEP 1 — ID MATCH =================
+
+            for(var i=0;i<items.length;i++){
+                if(inputIMDB && items[i].imdb === inputIMDB){
+                    getPage(items[i].link);
+                    return;
+                }
+                if(inputTMDB && items[i].tmdb === inputTMDB){
+                    getPage(items[i].link);
+                    return;
+                }
+            }
+
+            // ================= HARD FILTER YEAR + TITLE + TYPE =================
 
             if(inputYear){
 
@@ -1928,56 +1939,73 @@
 
                         var n = norm(it.title);
 
-                        return allWords.some(function(w){
+                        var wordMatch = allWords.some(function(w){
                             return n.includes(w);
                         });
+
+                        if(isSearchingSeries){
+                            var seriesMatch =
+                                /season|сезон|series|серия|s\d+/i.test(it.title);
+                            return wordMatch && seriesMatch;
+                        } else {
+                            return wordMatch;
+                        }
 
                     });
 
                     if(titleFiltered.length){
                         items = titleFiltered;
-                    }else{
+                    } else {
                         items = yearFiltered;
                     }
                 }
             }
 
-            // ================= ID MATCH =================
-
-            for(var i=0;i<items.length;i++){
-                if(inputIMDB && items[i].imdb === inputIMDB){
-                    getPage(items[i].link);
-                    return;
-                }
-                if(inputTMDB && items[i].tmdb === inputTMDB){
-                    getPage(items[i].link);
-                    return;
-                }
-            }
-
-            // ================= SIMPLE SCORING =================
+            // ================= SCORING =================
 
             items.forEach(function(item){
 
                 var score = 0;
                 var itemTitle = norm(item.title);
 
+                if(itemTitle === mainInput) score += 400;
+                if(itemTitle === mainOriginal) score += 450;
+
                 if(itemTitle.includes(mainInput)) score += 200;
-                if(mainOriginal && itemTitle.includes(mainOriginal)) score += 250;
+                if(mainOriginal && itemTitle.includes(mainOriginal)) score += 240;
+
+                allWords.forEach(function(w){
+                    if(itemTitle.includes(w)) score += 60;
+                });
 
                 if(inputYear && item.year === inputYear) score += 400;
 
+                if(isSearchingSeries){
+                    if(/season|сезон|s\d+/i.test(item.title)) score += 120;
+                }
+
                 item.score = score;
             });
+
+            // ================= SORT =================
 
             items.sort(function(a,b){
                 return (b.score||0) - (a.score||0);
             });
 
-            if(items[0]){
-                getPage(items[0].link);
-                return;
+            // ================= AUTO OPEN IF CLEAR WINNER =================
+
+            var best = items[0];
+            var second = items[1];
+
+            if(best){
+                if(!second || best.score - second.score > 200){
+                    getPage(best.link);
+                    return;
+                }
             }
+
+            // ================= SHOW ALL IF NOT SURE =================
 
             component.similars(items);
             component.loading(false);
