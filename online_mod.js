@@ -14211,6 +14211,58 @@
       });
     }
 
+    function pilotCard(object, element, view){
+        var movie = object.movie || {};
+
+        // 🔥 получаем постер безопасно для всех версий Lampa
+        var poster = '';
+
+        if(element.img){
+            poster = element.img;
+        }
+        else if(movie.poster_path){
+            poster = Lampa.Utils.protocol() + 'image.tmdb.org/t/p/w300' + movie.poster_path;
+        }
+        else if(movie.img){
+            poster = movie.img;
+        }
+        else if(object && object.poster){
+            poster = object.poster;
+        }
+
+        if(!poster) poster = './img/img_broken.svg';
+
+        console.log('poster', poster, element);  // Тест
+
+        var title = element.title || movie.title || movie.name || '';
+
+        var rating = movie.vote_average ? movie.vote_average.toFixed(1) : '';
+
+        var date = movie.release_date || movie.first_air_date || '';
+        if(date) date = Lampa.Utils.parseTime(date, 'dd mmmm yyyy');
+
+        var episode = element.episode
+            ? (element.episode < 10 ? '0' + element.episode : element.episode)
+            : '';
+
+        var progress = view.percent || 0;
+        var time = view.time ? Lampa.Utils.secondsToTime(view.time) : '';
+
+        var item = Lampa.Template.get('pilot_auto',{
+            poster: poster,
+            title: title,
+            rating: rating,
+            date: date,
+            episode: episode,
+            progress: progress,
+            time: time
+        });
+
+        item.append(Lampa.Timeline.render(view));
+
+        return item;
+    }
+
     function resetTemplates() {
       Lampa.Template.add('pilot_auto', `
       <div class="pilot-card selector">
@@ -14264,50 +14316,6 @@
       Lampa.Template.add('online_mod_folder', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 112\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect y=\"20\" width=\"128\" height=\"92\" rx=\"13\" fill=\"white\"/>\n                    <path d=\"M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z\" fill=\"white\" fill-opacity=\"0.23\"/>\n                    <rect x=\"11\" y=\"8\" width=\"106\" height=\"76\" rx=\"13\" fill=\"white\" fill-opacity=\"0.51\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
     }
 
-    function pilotCard(object, element, view){
-        var movie = object.movie || {};
-
-        // 🔥 получаем постер безопасно для всех версий Lampa
-        var poster = '';
-
-        if(movie.poster_path){
-            poster = Lampa.Utils.protocol() + 'image.tmdb.org/t/p/w300' + movie.poster_path;
-        }
-        else if(movie.img){
-            poster = movie.img;
-        }
-        else if(element.img){
-            poster = element.img;
-        }
-
-        var title = element.title || movie.title || movie.name || '';
-
-        var rating = movie.vote_average ? movie.vote_average.toFixed(1) : '';
-
-        var date = movie.release_date || movie.first_air_date || '';
-        if(date) date = Lampa.Utils.parseTime(date, 'dd mmmm yyyy');
-
-        var episode = element.episode
-            ? (element.episode < 10 ? '0' + element.episode : element.episode)
-            : '';
-
-        var progress = view.percent || 0;
-        var time = view.time ? Lampa.Utils.secondsToTime(view.time) : '';
-
-        var item = Lampa.Template.get('pilot_auto',{
-            poster: poster,
-            title: title,
-            rating: rating,
-            date: date,
-            episode: episode,
-            progress: progress,
-            time: time
-        });
-
-        item.append(Lampa.Timeline.render(view));
-
-        return item;
-    }
     function checkMyIp(onComplite) {
       if (Lampa.Storage.field('online_mod_proxy_find_ip') !== true) {
         onComplite();
