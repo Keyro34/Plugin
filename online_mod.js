@@ -1816,10 +1816,12 @@
             
             if (!links || !links.length) return;
 
-            // ===== INPUT =====
+            // ================= INPUT =================
+
             var inputTitleRaw =
                 select_title ||
                 object.movie.title ||
+                object.movie.name ||
                 object.movie.original_title ||
                 object.movie.original_name ||
                 '';
@@ -1832,6 +1834,8 @@
             var inputYear =
                 object.movie.release_date ?
                 parseInt(object.movie.release_date.substr(0,4)) :
+                object.movie.first_air_date ?
+                parseInt(object.movie.first_air_date.substr(0,4)) :
                 object.movie.year ?
                 parseInt(object.movie.year) :
                 null;
@@ -1839,13 +1843,20 @@
             var inputTMDB = object.movie.id || null;
             var inputIMDB = object.movie.imdb_id || null;
 
-            // ===== HELPERS =====
+            // ================= HELPERS =================
 
             function cleanTrash(str){
                 return (str || '')
                     .replace(/\b(1080p|720p|2160p|hdrip|webrip|bluray|bdrip|x264|x265|hevc|h264|4k)\b/ig,'')
                     .replace(/\b(сезон|season|серия|episode)\b.*$/ig,'')
                     .trim();
+            }
+
+            function splitVariants(str){
+                if(!str) return [];
+                return str.split(/[:\-|\/]/).map(function(s){
+                    return s.trim();
+                });
             }
 
             function norm(str){
@@ -1867,10 +1878,20 @@
                 return diff <= 2;
             }
 
-            var inputTitle = norm(inputTitleRaw);
-            var inputOriginal = norm(inputOriginalRaw);
+            function isGenericShort(title){
+                if(!title) return false;
+                if(title.length > 3) return false;
+                return true;
+            }
 
-            // ===== ITEMS =====
+            var inputTitles = splitVariants(inputTitleRaw).map(norm);
+            var inputOriginals = splitVariants(inputOriginalRaw).map(norm);
+
+            var mainInput = inputTitles[0] || '';
+            var mainOriginal = inputOriginals[0] || '';
+
+            // ================= PARSE ITEMS =================
+
             var items = links.map(function(l){
 
                 var li = $(l);
@@ -1898,33 +1919,38 @@
                 };
             });
 
-            // =====================================================
-            // STEP 1 — ID INSTANT OPEN
-            // =====================================================
+            // ================= STEP 1 — ID MATCH =================
 
             for(var i=0;i<items.length;i++){
-
                 if(inputIMDB && items[i].imdb === inputIMDB){
                     getPage(items[i].link);
                     return;
                 }
-
                 if(inputTMDB && items[i].tmdb === inputTMDB){
                     getPage(items[i].link);
                     return;
                 }
             }
 
-            // =====================================================
-            // STEP 2 — EXACT ORIGINAL + YEAR
-            // =====================================================
+            // ================= STEP 2 — HARD EXACT =================
 
             for(var i=0;i<items.length;i++){
-                var name = norm(items[i].title);
+
+                var itemNorm = norm(items[i].title);
 
                 if(
-                    inputOriginal &&
-                    name === inputOriginal &&
+                    mainOriginal &&
+                    itemNorm === mainOriginal &&
+                    inputYear &&
+                    items[i].year === inputYear
+                ){
+                    getPage(items[i].link);
+                    return;
+                }
+
+                if(
+                    mainInput &&
+                    itemNorm === mainInput &&
                     inputYear &&
                     items[i].year === inputYear
                 ){
@@ -1933,62 +1959,57 @@
                 }
             }
 
-            // =====================================================
-            // STEP 3 — EXACT TITLE + YEAR
-            // =====================================================
-
-            for(var i=0;i<items.length;i++){
-                var name = norm(items[i].title);
-
-                if(
-                    name === inputTitle &&
-                    inputYear &&
-                    items[i].year === inputYear
-                ){
-                    getPage(items[i].link);
-                    return;
-                }
-            }
-
-            // =====================================================
-            // STEP 4 — SCORING
-            // =====================================================
+            // ================= STEP 3 — ULTRA SCORING =================
 
             items.forEach(function(item){
 
                 var score = 0;
-
                 var itemTitle = norm(item.title);
 
-                // EXACT
-                if(itemTitle === inputTitle) score += 300;
-                if(inputOriginal && itemTitle === inputOriginal) score += 320;
+                // ---- EXACT ----
+                if(itemTitle === mainInput) score += 350;
+                if(itemTitle === mainOriginal) score += 400;
 
-                // CONTAINS
-                if(itemTitle.includes(inputTitle) && inputTitle.length > 3) score += 140;
-                if(inputTitle.includes(itemTitle) && itemTitle.length > 3) score += 120;
+                // ---- MULTI VARIANT ----
+                inputTitles.forEach(function(t){
+                    if(itemTitle === t) score += 200;
+                });
 
-                // SAFE FUZZY
-                if(safeFuzzy(itemTitle,inputTitle)) score += 90;
-                if(safeFuzzy(itemTitle,inputOriginal)) score += 100;
+                inputOriginals.forEach(function(t){
+                    if(itemTitle === t) score += 220;
+                });
 
-                // YEAR
+                // ---- CONTAINS ----
+                if(mainInput.length > 3 && itemTitle.includes(mainInput)) score += 150;
+                if(mainOriginal && itemTitle.includes(mainOriginal)) score += 180;
+
+                // ---- SAFE FUZZY ----
+                if(safeFuzzy(itemTitle, mainInput)) score += 120;
+                if(safeFuzzy(itemTitle, mainOriginal)) score += 140;
+
+                // ---- YEAR LOGIC ----
                 if(inputYear && item.year){
-                    if(item.year === inputYear) score += 260;
-                    else if(Math.abs(item.year - inputYear) === 1) score += 140;
-                    else if(Math.abs(item.year - inputYear) <= 3) score += 60;
-                    else score -= 120;
+                    var diff = Math.abs(item.year - inputYear);
+                    if(diff === 0) score += 300;
+                    else if(diff === 1) score += 160;
+                    else if(diff <= 3) score += 60;
+                    else score -= 140;
                 }
 
-                // SHORT TITLE PROTECT
-                if(inputTitle.length <= 3 && itemTitle !== inputTitle) score -= 200;
+                // ---- GENERIC SHORT PROTECTION ----
+                if(isGenericShort(mainInput) && itemTitle !== mainInput){
+                    score -= 250;
+                }
+
+                // ---- SERIES PENALTY (если ищем фильм) ----
+                if(!object.movie.first_air_date){
+                    if(/season|сезон/i.test(item.title)) score -= 180;
+                }
 
                 item.score = score;
             });
 
-            // =====================================================
-            // STEP 5 — AUTO PICK BEST
-            // =====================================================
+            // ================= STEP 4 — SMART PICK =================
 
             items.sort(function(a,b){
                 return (b.score||0) - (a.score||0);
@@ -1996,6 +2017,7 @@
 
             var best = items[0];
             var second = items[1];
+            var third = items[2];
 
             if(best){
 
@@ -2004,20 +2026,27 @@
                     return;
                 }
 
-                if((best.score||0)-(second.score||0) >= 25){
+                var diff12 = (best.score||0) - (second.score||0);
+
+                if(diff12 >= 25){
                     getPage(best.link);
                     return;
                 }
 
-                if((best.score||0) >= 260){
+                if(best.score >= 300){
                     getPage(best.link);
                     return;
+                }
+
+                if(third && best.score > second.score && second.score > third.score){
+                    if(best.score >= 240){
+                        getPage(best.link);
+                        return;
+                    }
                 }
             }
 
-            // =====================================================
-            // FALLBACK LIST
-            // =====================================================
+            // ================= FALLBACK =================
 
             component.similars(items);
             component.loading(false);
