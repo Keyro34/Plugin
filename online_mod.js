@@ -14230,8 +14230,10 @@
             poster = object.poster;
         }
 
-        // 🔥 пропускаем через прокси Lampa
-        if(poster) poster = Lampa.Utils.imgProxy(poster);
+        // 🔥 прокси для старой Lampa
+        if(poster && poster.indexOf('http') === 0){
+            poster = '/proxy/' + encodeURIComponent(poster);
+        }
 
         // fallback
         if(!poster) poster = './img/img_broken.svg';
