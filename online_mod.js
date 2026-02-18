@@ -2051,13 +2051,13 @@
             // ================= FALLBACK =================
 
             component.similars(items.map(function(item) {
-            return {
-                title: item.title + ' (score: ' + item.score + ')',
-                link: item.link,
-                year: item.year,
-                imdb: item.imdb,
-                tmdb: item.tmdb
-              };
+                return {
+                    title: item.title + ' (score: ' + item.score + ', year: ' + (item.year || 'N/A') + ')',
+                    link: item.link,
+                    year: item.year,
+                    imdb: item.imdb,
+                    tmdb: item.tmdb
+                };
             }));
             component.loading(false);
          };
