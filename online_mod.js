@@ -2049,6 +2049,8 @@
             }
 
             // ================= FALLBACK =================
+
+            component.similars(items, search_more, { query: query });
             component.loading(false);
          };
 
