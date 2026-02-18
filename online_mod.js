@@ -1868,22 +1868,31 @@
                     .trim();
             }
 
-            // ================= PREP INPUT =================
+            function safeFuzzy(a,b){
+                if(!a || !b) return false;
+                if(Math.abs(a.length - b.length) > 2) return false;
+                if(a.length < 5 || b.length < 5) return false;
+
+                var diff = 0;
+                for(var i=0;i<Math.min(a.length,b.length);i++){
+                    if(a[i] !== b[i]) diff++;
+                }
+                return diff <= 2;
+            }
+
+            function titleLengthPenalty(item, input){
+                if(!item || !input) return 0;
+                var diff = Math.abs(item.length - input.length);
+                if(diff > 10) return -120;
+                if(diff > 6) return -60;
+                return 0;
+            }
 
             var inputTitles = splitVariants(inputTitleRaw).map(norm);
             var inputOriginals = splitVariants(inputOriginalRaw).map(norm);
 
             var mainInput = inputTitles[0] || '';
             var mainOriginal = inputOriginals[0] || '';
-
-            // слова для жесткого поиска
-            var allWords = [];
-
-            inputTitles.concat(inputOriginals).forEach(function(t){
-                t.split(/\s+/).forEach(function(w){
-                    if(w && w.length > 2) allWords.push(w);
-                });
-            });
 
             // ================= PARSE ITEMS =================
 
@@ -1914,48 +1923,7 @@
                 };
             });
 
-            // ================= HARD FILTER YEAR + TITLE =================
-
-            if(inputYear){
-
-            var yearFiltered = items.filter(function(it){
-                return it.year === inputYear;
-            });
-
-            if(yearFiltered.length){
-
-                var titleFiltered = yearFiltered.filter(function(it){
-
-                    var n = norm(it.title);
-
-                    var wordMatch = allWords.some(function(w){
-                        return n.includes(w);
-                    });
-
-                    if(isSearchingSeries){
-
-                        // season — бонус, но не обязателен
-                        var looksLikeMovie =
-                            /фильм|movie/i.test(it.title);
-
-                        return wordMatch && !looksLikeMovie;
-
-                    } else {
-
-                        return wordMatch;
-                    }
-
-                });
-
-                if(titleFiltered.length){
-                    items = titleFiltered;
-                } else {
-                    items = yearFiltered;
-                }
-            }
-        }
-
-            // ================= ID MATCH =================
+            // ================= STEP 1 — ID MATCH =================
 
             for(var i=0;i<items.length;i++){
                 if(inputIMDB && items[i].imdb === inputIMDB){
@@ -1968,29 +1936,119 @@
                 }
             }
 
-            // ================= SIMPLE SCORING =================
+            // ================= STEP 2 — HARD EXACT =================
+
+            for(var i=0;i<items.length;i++){
+
+                var itemNorm = norm(items[i].title);
+
+                if(mainOriginal && itemNorm === mainOriginal && inputYear && items[i].year === inputYear){
+                    getPage(items[i].link);
+                    return;
+                }
+
+                if(mainInput && itemNorm === mainInput && inputYear && items[i].year === inputYear){
+                    getPage(items[i].link);
+                    return;
+                }
+            }
+
+            // ================= STEP 3 — ABSOLUTE SCORING =================
 
             items.forEach(function(item){
 
                 var score = 0;
                 var itemTitle = norm(item.title);
 
-                if(itemTitle.includes(mainInput)) score += 200;
-                if(mainOriginal && itemTitle.includes(mainOriginal)) score += 250;
+                // EXACT
+                if(itemTitle === mainInput) score += 400;
+                if(itemTitle === mainOriginal) score += 450;
 
-                if(inputYear && item.year === inputYear) score += 400;
+                // MULTI VARIANT
+                inputTitles.forEach(function(t){
+                    if(itemTitle === t) score += 240;
+                });
+
+                inputOriginals.forEach(function(t){
+                    if(itemTitle === t) score += 260;
+                });
+
+                // CONTAINS
+                if(mainInput.length > 3 && itemTitle.includes(mainInput)) score += 180;
+                if(mainOriginal && itemTitle.includes(mainOriginal)) score += 200;
+
+                // SAFE FUZZY
+                if(safeFuzzy(itemTitle, mainInput)) score += 140;
+                if(safeFuzzy(itemTitle, mainOriginal)) score += 160;
+
+                // YEAR
+                if(inputYear && item.year){
+                    var diff = Math.abs(item.year - inputYear);
+                    if(diff === 0) score += 320;
+                    else if(diff === 1) score += 200;
+                    else if(diff <= 3) score += 80;
+                    else score -= 180;
+                }
+
+                // LENGTH LOGIC
+                score += titleLengthPenalty(itemTitle, mainInput);
+
+                // SERIES PROTECTION
+                if(isSearchingSeries){
+                    if(/season|сезон/i.test(item.title)) score += 60;
+                } else {
+                    if(/season|сезон/i.test(item.title)) score -= 200;
+                }
+
+                // QUALITY TRASH PENALTY
+                if(/camrip|ts|telesync/i.test(item.title)) score -= 220;
 
                 item.score = score;
             });
+
+            // ================= STEP 4 — SMART PICK =================
 
             items.sort(function(a,b){
                 return (b.score||0) - (a.score||0);
             });
 
-            if(items[0]){
-                getPage(items[0].link);
-                return;
+            var best = items[0];
+            var second = items[1];
+            var third = items[2];
+
+            if(best){
+
+                if(!second){
+                    getPage(best.link);
+                    return;
+                }
+
+                var diff12 = (best.score||0) - (second.score||0);
+
+                // динамический порог
+                var autoThreshold = 300;
+                if(inputYear) autoThreshold += 40;
+                if(mainOriginal) autoThreshold += 30;
+
+                if(diff12 >= 25){
+                    getPage(best.link);
+                    return;
+                }
+
+                if(best.score >= autoThreshold){
+                    getPage(best.link);
+                    return;
+                }
+
+                if(third){
+                    if(best.score > second.score && second.score > third.score && best.score >= 260){
+                        getPage(best.link);
+                        return;
+                    }
+                }
             }
+
+            // ================= FALLBACK =================
 
             component.similars(items);
             component.loading(false);
