@@ -1992,8 +1992,6 @@
                     }
                 }
 
-                console.log('Слишком низкий score (' + (bestScore || 0) + '), показываем список результатов');
-
                 if (items.length) {
                     _this.wait_similars = true;
                     items.forEach(function (c) {
