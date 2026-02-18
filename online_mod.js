@@ -1813,202 +1813,214 @@
         };
 
         var display = function display(links, have_more, query) {
+            
+            if (!links || !links.length) return;
 
-            function norm(str) {
+            // ===== INPUT =====
+            var inputTitleRaw =
+                select_title ||
+                object.movie.title ||
+                object.movie.original_title ||
+                object.movie.original_name ||
+                '';
+
+            var inputOriginalRaw =
+                object.movie.original_title ||
+                object.movie.original_name ||
+                '';
+
+            var inputYear =
+                object.movie.release_date ?
+                parseInt(object.movie.release_date.substr(0,4)) :
+                object.movie.year ?
+                parseInt(object.movie.year) :
+                null;
+
+            var inputTMDB = object.movie.id || null;
+            var inputIMDB = object.movie.imdb_id || null;
+
+            // ===== HELPERS =====
+
+            function cleanTrash(str){
                 return (str || '')
-                    .toLowerCase()
-                    .replace(/[^\w\d]+/g, ' ')
-                    .replace(/\s+/g, ' ')
+                    .replace(/\b(1080p|720p|2160p|hdrip|webrip|bluray|bdrip|x264|x265|hevc|h264|4k)\b/ig,'')
+                    .replace(/\b(сезон|season|серия|episode)\b.*$/ig,'')
                     .trim();
             }
 
-            if (links && links.length) {
+            function norm(str){
+                return cleanTrash(str)
+                    .toLowerCase()
+                    .replace(/[^a-z0-9а-яё]/gi,'')
+                    .trim();
+            }
 
-                var items = links.map(function (l) {
+            function safeFuzzy(a,b){
+                if(!a || !b) return false;
+                if(Math.abs(a.length - b.length) > 2) return false;
+                if(a.length < 5 || b.length < 5) return false;
 
-                    var li = $(l);
-                    var link = $('a', li);
+                var diff = 0;
+                for(var i=0;i<Math.min(a.length,b.length);i++){
+                    if(a[i] !== b[i]) diff++;
+                }
+                return diff <= 2;
+            }
 
-                    var title = link.text().trim() || '';
-                    var href = link.attr('href') || '';
+            var inputTitle = norm(inputTitleRaw);
+            var inputOriginal = norm(inputOriginalRaw);
 
-                    // YEAR
-                    var year = null;
-                    var y = title.match(/\b(19|20)\d{2}\b/);
-                    if (y) year = parseInt(y[0]);
+            // ===== ITEMS =====
+            var items = links.map(function(l){
 
-                    // IMDB
-                    var imdb_id = null;
-                    var imdbMatch = href.match(/tt\d+/i);
-                    if (imdbMatch) imdb_id = imdbMatch[0];
+                var li = $(l);
+                var link = $('a', li);
 
-                    // TMDB
-                    var tmdb_id = null;
-                    var tmdbMatch = href.match(/\/(movie|tv)\/(\d+)/i);
-                    if (tmdbMatch) tmdb_id = parseInt(tmdbMatch[2]);
+                var text = link.text().trim();
+                var href = link.attr('href') || '';
 
-                    return {
-                        title: title,
-                        year: year,
-                        link: href,
-                        imdb_id: imdb_id,
-                        tmdb_id: tmdb_id,
-                        score: 0
-                    };
-                });
+                var yearMatch = text.match(/\b(19|20)\d{2}\b/);
+                var year = yearMatch ? parseInt(yearMatch[0]) : null;
 
-                // ================= INPUT =================
+                var imdbMatch = href.match(/tt\d+/i);
+                var imdb = imdbMatch ? imdbMatch[0] : null;
 
-                var inputTitle = norm(
-                    select_title ||
-                    object.movie.title ||
-                    object.movie.original_title ||
-                    object.movie.original_name
-                );
+                var tmdbMatch = href.match(/\/(movie|tv)\/(\d+)/i);
+                var tmdb = tmdbMatch ? parseInt(tmdbMatch[2]) : null;
 
-                var inputOriginalTitle = norm(
-                    object.movie.original_title ||
-                    object.movie.original_name
-                );
+                return {
+                    title: text,
+                    link: href,
+                    year: year,
+                    imdb: imdb,
+                    tmdb: tmdb,
+                    score: 0
+                };
+            });
 
-                var inputYear =
-                    object.movie.release_date ?
-                    parseInt(object.movie.release_date.substr(0, 4)) :
-                    object.movie.year ?
-                    parseInt(object.movie.year) :
-                    null;
+            // =====================================================
+            // STEP 1 — ID INSTANT OPEN
+            // =====================================================
 
-                var input_tmdb_id = object.movie.id || null;
-                var input_imdb_id = object.movie.imdb_id || null;
+            for(var i=0;i<items.length;i++){
 
-                // ================= STEP 1 — ID =================
-
-                for (var i = 0; i < items.length; i++) {
-
-                    if (input_imdb_id && items[i].imdb_id === input_imdb_id) {
-                        getPage(items[i].link);
-                        return;
-                    }
-
-                    if (input_tmdb_id && items[i].tmdb_id === input_tmdb_id) {
-                        getPage(items[i].link);
-                        return;
-                    }
+                if(inputIMDB && items[i].imdb === inputIMDB){
+                    getPage(items[i].link);
+                    return;
                 }
 
-                // ================= STEP 2 — ORIGINAL + YEAR =================
+                if(inputTMDB && items[i].tmdb === inputTMDB){
+                    getPage(items[i].link);
+                    return;
+                }
+            }
 
-                for (var i = 0; i < items.length; i++) {
+            // =====================================================
+            // STEP 2 — EXACT ORIGINAL + YEAR
+            // =====================================================
 
-                    var name = norm(items[i].title);
+            for(var i=0;i<items.length;i++){
+                var name = norm(items[i].title);
 
-                    if (
-                        inputOriginalTitle &&
-                        name === inputOriginalTitle &&
-                        inputYear &&
-                        items[i].year &&
-                        items[i].year === inputYear
-                    ) {
-                        getPage(items[i].link);
-                        return;
-                    }
+                if(
+                    inputOriginal &&
+                    name === inputOriginal &&
+                    inputYear &&
+                    items[i].year === inputYear
+                ){
+                    getPage(items[i].link);
+                    return;
+                }
+            }
+
+            // =====================================================
+            // STEP 3 — EXACT TITLE + YEAR
+            // =====================================================
+
+            for(var i=0;i<items.length;i++){
+                var name = norm(items[i].title);
+
+                if(
+                    name === inputTitle &&
+                    inputYear &&
+                    items[i].year === inputYear
+                ){
+                    getPage(items[i].link);
+                    return;
+                }
+            }
+
+            // =====================================================
+            // STEP 4 — SCORING
+            // =====================================================
+
+            items.forEach(function(item){
+
+                var score = 0;
+
+                var itemTitle = norm(item.title);
+
+                // EXACT
+                if(itemTitle === inputTitle) score += 300;
+                if(inputOriginal && itemTitle === inputOriginal) score += 320;
+
+                // CONTAINS
+                if(itemTitle.includes(inputTitle) && inputTitle.length > 3) score += 140;
+                if(inputTitle.includes(itemTitle) && itemTitle.length > 3) score += 120;
+
+                // SAFE FUZZY
+                if(safeFuzzy(itemTitle,inputTitle)) score += 90;
+                if(safeFuzzy(itemTitle,inputOriginal)) score += 100;
+
+                // YEAR
+                if(inputYear && item.year){
+                    if(item.year === inputYear) score += 260;
+                    else if(Math.abs(item.year - inputYear) === 1) score += 140;
+                    else if(Math.abs(item.year - inputYear) <= 3) score += 60;
+                    else score -= 120;
                 }
 
-                // ================= STEP 3 — TITLE + YEAR =================
+                // SHORT TITLE PROTECT
+                if(inputTitle.length <= 3 && itemTitle !== inputTitle) score -= 200;
 
-                for (var i = 0; i < items.length; i++) {
+                item.score = score;
+            });
 
-                    var name = norm(items[i].title);
+            // =====================================================
+            // STEP 5 — AUTO PICK BEST
+            // =====================================================
 
-                    if (
-                        name === inputTitle &&
-                        inputYear &&
-                        items[i].year &&
-                        items[i].year === inputYear
-                    ) {
-                        getPage(items[i].link);
-                        return;
-                    }
+            items.sort(function(a,b){
+                return (b.score||0) - (a.score||0);
+            });
+
+            var best = items[0];
+            var second = items[1];
+
+            if(best){
+
+                if(!second){
+                    getPage(best.link);
+                    return;
                 }
 
-                // ================= STEP 4 — SCORING =================
-
-                items.forEach(function (item) {
-
-                    var score = 0;
-                    var name = norm(item.title);
-
-                    // TITLE
-                    if (name === inputTitle) score += 140;
-                    else if (name.includes(inputTitle)) score += 60;
-                    else if (inputTitle.includes(name)) score += 50;
-
-                    // ORIGINAL BONUS
-                    if (inputOriginalTitle && name === inputOriginalTitle)
-                        score += 200;
-                    else if (inputOriginalTitle && name.includes(inputOriginalTitle))
-                        score += 120;
-
-                    // YEAR
-                    if (inputYear && item.year) {
-
-                        if (item.year === inputYear) score += 140;
-                        else if (Math.abs(item.year - inputYear) === 1) score += 70;
-                        else if (Math.abs(item.year - inputYear) <= 3) score += 30;
-                        else score -= 100;
-                    }
-
-                    // SHORT TITLE PROTECTION
-                    if (inputTitle.length <= 3 && name !== inputTitle)
-                        score -= 120;
-
-                    item.score = score;
-                });
-
-                // ================= STEP 5 — AUTO PICK =================
-
-                items.sort(function (a, b) {
-                    return (b.score || 0) - (a.score || 0);
-                });
-
-                var best = items[0];
-                var second = items[1];
-
-                if (best) {
-
-                    if (!second) {
-                        getPage(best.link);
-                        return;
-                    }
-
-                    if ((best.score || 0) - (second.score || 0) >= 25) {
-                        getPage(best.link);
-                        return;
-                    }
-
-                    if ((best.score || 0) >= 110) {
-                        getPage(best.link);
-                        return;
-                    }
+                if((best.score||0)-(second.score||0) >= 25){
+                    getPage(best.link);
+                    return;
                 }
 
-                if (items.length) {
-                    _this.wait_similars = true;
-                    items.forEach(function (c) {
-                        c.is_similars = true;
-                    });
-
-                    if (have_more) {
-                        component.similars(items, search_more, { query: query });
-                    } else {
-                        component.similars(items);
-                    }  
-                    
-                    component.loading(false);
-                } else {
-                    component.emptyForQuery(select_title);
+                if((best.score||0) >= 260){
+                    getPage(best.link);
+                    return;
                 }
-             }
+            }
+
+            // =====================================================
+            // FALLBACK LIST
+            // =====================================================
+
+            component.similars(items);
+            component.loading(false);
          };
 
         var query_search = function query_search(query, data, callback) {
