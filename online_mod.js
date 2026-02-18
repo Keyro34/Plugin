@@ -14221,7 +14221,7 @@
             poster = element.img;
         }
         else if(movie.poster_path){
-            poster = Lampa.Utils.protocol() + 'image.tmdb.org/t/p/w300' + movie.poster_path;
+            poster = 'https://image.tmdb.org/t/p/w300' + movie.poster_path;
         }
         else if(movie.img){
             poster = movie.img;
@@ -14230,10 +14230,14 @@
             poster = object.poster;
         }
 
+        // 🔥 пропускаем через прокси Lampa
+        if(poster) poster = Lampa.Utils.imgProxy(poster);
+
+        // fallback
         if(!poster) poster = './img/img_broken.svg';
 
-        console.log('poster', poster, element);  // Тест
-
+        console.log('poster', poster, element);
+        
         var title = element.title || movie.title || movie.name || '';
 
         var rating = movie.vote_average ? movie.vote_average.toFixed(1) : '';
