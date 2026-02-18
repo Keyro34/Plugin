@@ -1918,42 +1918,42 @@
 
             if(inputYear){
 
-              var yearFiltered = items.filter(function(it){
-                  return it.year === inputYear;
-              });
+            var yearFiltered = items.filter(function(it){
+                return it.year === inputYear;
+            });
 
-              if(yearFiltered.length){
+            if(yearFiltered.length){
 
-                  var titleFiltered = yearFiltered.filter(function(it){
+                var titleFiltered = yearFiltered.filter(function(it){
 
-                      var n = norm(it.title);
+                    var n = norm(it.title);
 
-                      var wordMatch = allWords.some(function(w){
-                          return n.includes(w);
-                      });
+                    var wordMatch = allWords.some(function(w){
+                        return n.includes(w);
+                    });
 
-                      if(isSearchingSeries){
+                    if(isSearchingSeries){
 
-                          // season — бонус, но не обязателен
-                          var looksLikeMovie =
-                              /фильм|movie/i.test(it.title);
+                        // season — бонус, но не обязателен
+                        var looksLikeMovie =
+                            /фильм|movie/i.test(it.title);
 
-                          return wordMatch && !looksLikeMovie;
+                        return wordMatch && !looksLikeMovie;
 
-                      } else {
+                    } else {
 
-                          return wordMatch;
-                      }
+                        return wordMatch;
+                    }
 
-                  });
+                });
 
-                  if(titleFiltered.length){
-                      items = titleFiltered;
-                  } else {
-                      items = yearFiltered;
-                  }
-              }
-          }
+                if(titleFiltered.length){
+                    items = titleFiltered;
+                } else {
+                    items = yearFiltered;
+                }
+            }
+        }
 
             // ================= ID MATCH =================
 
