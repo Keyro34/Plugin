@@ -1923,16 +1923,15 @@
                 };
             });
 
-            // ================= ЖЁСТКАЯ ФИЛЬТРАЦИЯ ПО ГОДУ =================
+            // ================= HARD YEAR FILTER =================
 
             if(inputYear){
-                var filtered = items.filter(function(item){
-                    if(!item.year) return true; // если года нет — оставляем
-                    return Math.abs(item.year - inputYear) <= 1; // только +-1 год
+                var yearFiltered = items.filter(function(it){
+                    return it.year === inputYear;
                 });
 
-                if(filtered.length){
-                    items = filtered;
+                if(yearFiltered.length){
+                    items = yearFiltered;
                 }
             }
 
@@ -1966,7 +1965,7 @@
                 }
             }
 
-            // ================= STEP 3 — ABSOLUTE SCORING =================
+            // ================= STEP 3 — SCORING =================
 
             items.forEach(function(item){
 
@@ -1977,11 +1976,17 @@
                 if(itemTitle === mainOriginal) score += 450;
 
                 inputTitles.forEach(function(t){
-                    if(itemTitle === t) score += 240;
+                    var words = t.split(' ').filter(Boolean);
+                    words.forEach(function(w){
+                        if(w.length > 2 && itemTitle.includes(w)) score += 50;
+                    });
                 });
 
                 inputOriginals.forEach(function(t){
-                    if(itemTitle === t) score += 260;
+                    var words = t.split(' ').filter(Boolean);
+                    words.forEach(function(w){
+                        if(w.length > 2 && itemTitle.includes(w)) score += 80;
+                    });
                 });
 
                 if(mainInput.length > 3 && itemTitle.includes(mainInput)) score += 180;
@@ -1992,9 +1997,11 @@
 
                 if(inputYear && item.year){
                     var diff = Math.abs(item.year - inputYear);
-                    if(diff === 0) score += 320;
+                    if(diff === 0) score += 400;
                     else if(diff === 1) score += 200;
                     else score -= 400;
+                } else if(inputYear && !item.year){
+                    score -= 200;
                 }
 
                 score += titleLengthPenalty(itemTitle, mainInput);
@@ -2010,11 +2017,46 @@
                 item.score = score;
             });
 
-            // ================= SORT =================
+            // ================= STEP 4 — PICK =================
 
             items.sort(function(a,b){
                 return (b.score||0) - (a.score||0);
             });
+
+            var best = items[0];
+            var second = items[1];
+            var third = items[2];
+
+            if(best){
+
+                if(!second){
+                    getPage(best.link);
+                    return;
+                }
+
+                var diff12 = (best.score||0) - (second.score||0);
+
+                var autoThreshold = 300;
+                if(inputYear) autoThreshold += 40;
+                if(mainOriginal) autoThreshold += 30;
+
+                if(diff12 >= 25){
+                    getPage(best.link);
+                    return;
+                }
+
+                if(best.score >= autoThreshold){
+                    getPage(best.link);
+                    return;
+                }
+
+                if(third){
+                    if(best.score > second.score && second.score > third.score && best.score >= 260){
+                        getPage(best.link);
+                        return;
+                    }
+                }
+            }
 
             // ================= FALLBACK =================
 
