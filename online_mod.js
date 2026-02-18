@@ -1830,7 +1830,6 @@
                     var link = $('a', li);
 
                     var title = link.text().trim() || '';
-
                     var href = link.attr('href') || '';
 
                     // YEAR
@@ -1853,9 +1852,12 @@
                         year: year,
                         link: href,
                         imdb_id: imdb_id,
-                        tmdb_id: tmdb_id
+                        tmdb_id: tmdb_id,
+                        score: 0
                     };
                 });
+
+                // ================= INPUT =================
 
                 var inputTitle = norm(
                     select_title ||
@@ -1879,7 +1881,8 @@
                 var input_tmdb_id = object.movie.id || null;
                 var input_imdb_id = object.movie.imdb_id || null;
 
-                // ===== STEP 1 ID =====
+                // ================= STEP 1 — ID =================
+
                 for (var i = 0; i < items.length; i++) {
 
                     if (input_imdb_id && items[i].imdb_id === input_imdb_id) {
@@ -1893,7 +1896,8 @@
                     }
                 }
 
-                // ===== STEP 2 EXACT TITLE =====
+                // ================= STEP 2 — ORIGINAL + YEAR =================
+
                 for (var i = 0; i < items.length; i++) {
 
                     var name = norm(items[i].title);
@@ -1910,7 +1914,8 @@
                     }
                 }
 
-                // ===== STEP 3 TITLE + YEAR =====
+                // ================= STEP 3 — TITLE + YEAR =================
+
                 for (var i = 0; i < items.length; i++) {
 
                     var name = norm(items[i].title);
@@ -1926,83 +1931,66 @@
                     }
                 }
 
-                // ===== STEP 4 SIMPLE SCORE =====
+                // ================= STEP 4 — SCORING =================
+
                 items.forEach(function (item) {
 
                     var score = 0;
+                    var name = norm(item.title);
 
-                    var itemTitles = [
-                        norm(item.title)
-                    ];
+                    // TITLE
+                    if (name === inputTitle) score += 140;
+                    else if (name.includes(inputTitle)) score += 60;
+                    else if (inputTitle.includes(name)) score += 50;
 
-                    var inputTitles = [
-                        inputTitle,
-                        inputOriginalTitle
-                    ].filter(Boolean);
+                    // ORIGINAL BONUS
+                    if (inputOriginalTitle && name === inputOriginalTitle)
+                        score += 200;
+                    else if (inputOriginalTitle && name.includes(inputOriginalTitle))
+                        score += 120;
 
-                    // ===== MULTI TITLE CROSS MATCH =====
-                    itemTitles.forEach(function (it) {
-
-                        inputTitles.forEach(function (inp) {
-
-                            if (it === inp) score += 220;
-
-                            else if (it.includes(inp) && inp.length > 3)
-                                score += 90;
-
-                            else if (inp.includes(it) && it.length > 3)
-                                score += 80;
-
-                            // SAFE FUZZY (только если длинные строки)
-                            else if (
-                                it.length >= 5 &&
-                                inp.length >= 5 &&
-                                Math.abs(it.length - inp.length) <= 2
-                            ) {
-
-                                var diff = 0;
-
-                                for (var i = 0; i < Math.min(it.length, inp.length); i++) {
-                                    if (it[i] !== inp[i]) diff++;
-                                }
-
-                                if (diff <= 2) score += 60;
-                            }
-
-                        });
-
-                    });
-
-                    // ===== YEAR =====
+                    // YEAR
                     if (inputYear && item.year) {
 
-                        if (item.year === inputYear) score += 160;
-
-                        else if (Math.abs(item.year - inputYear) === 1)
-                            score += 80;
-
-                        else if (Math.abs(item.year - inputYear) <= 3)
-                            score += 20;
-
-                        else
-                            score -= 120;
+                        if (item.year === inputYear) score += 140;
+                        else if (Math.abs(item.year - inputYear) === 1) score += 70;
+                        else if (Math.abs(item.year - inputYear) <= 3) score += 30;
+                        else score -= 100;
                     }
 
-                    // ===== SHORT TITLE PROTECTION =====
-                    inputTitles.forEach(function (inp) {
-
-                        if (inp.length <= 3) {
-
-                            if (norm(item.title) === inp && item.year === inputYear)
-                                score += 300;
-                            else
-                                score -= 100;
-                        }
-
-                    });
+                    // SHORT TITLE PROTECTION
+                    if (inputTitle.length <= 3 && name !== inputTitle)
+                        score -= 120;
 
                     item.score = score;
                 });
+
+                // ================= STEP 5 — AUTO PICK =================
+
+                items.sort(function (a, b) {
+                    return (b.score || 0) - (a.score || 0);
+                });
+
+                var best = items[0];
+                var second = items[1];
+
+                if (best) {
+
+                    if (!second) {
+                        getPage(best.link);
+                        return;
+                    }
+
+                    if ((best.score || 0) - (second.score || 0) >= 25) {
+                        getPage(best.link);
+                        return;
+                    }
+
+                    if ((best.score || 0) >= 110) {
+                        getPage(best.link);
+                        return;
+                    }
+                }
 
                 console.log('Слишком низкий score (' + (bestScore || 0) + '), показываем список результатов');
 
