@@ -1930,50 +1930,79 @@
                 items.forEach(function (item) {
 
                     var score = 0;
-                    var name = norm(item.title);
 
-                    // TITLE
-                    if (name === inputTitle) score += 120;
-                    else if (name.includes(inputTitle)) score += 50;
-                    else if (inputTitle.includes(name)) score += 40;
+                    var itemTitles = [
+                        norm(item.title)
+                    ];
 
-                    // ORIGINAL TITLE BONUS
-                    if (inputOriginalTitle && name === inputOriginalTitle) score += 180;
-                    else if (inputOriginalTitle && name.includes(inputOriginalTitle)) score += 90;
+                    var inputTitles = [
+                        inputTitle,
+                        inputOriginalTitle
+                    ].filter(Boolean);
 
-                    // YEAR
+                    // ===== MULTI TITLE CROSS MATCH =====
+                    itemTitles.forEach(function (it) {
+
+                        inputTitles.forEach(function (inp) {
+
+                            if (it === inp) score += 220;
+
+                            else if (it.includes(inp) && inp.length > 3)
+                                score += 90;
+
+                            else if (inp.includes(it) && it.length > 3)
+                                score += 80;
+
+                            // SAFE FUZZY (только если длинные строки)
+                            else if (
+                                it.length >= 5 &&
+                                inp.length >= 5 &&
+                                Math.abs(it.length - inp.length) <= 2
+                            ) {
+
+                                var diff = 0;
+
+                                for (var i = 0; i < Math.min(it.length, inp.length); i++) {
+                                    if (it[i] !== inp[i]) diff++;
+                                }
+
+                                if (diff <= 2) score += 60;
+                            }
+
+                        });
+
+                    });
+
+                    // ===== YEAR =====
                     if (inputYear && item.year) {
-                        if (item.year === inputYear) score += 100;
-                        else if (Math.abs(item.year - inputYear) === 1) score += 50;
+
+                        if (item.year === inputYear) score += 160;
+
+                        else if (Math.abs(item.year - inputYear) === 1)
+                            score += 80;
+
+                        else if (Math.abs(item.year - inputYear) <= 3)
+                            score += 20;
+
+                        else
+                            score -= 120;
                     }
+
+                    // ===== SHORT TITLE PROTECTION =====
+                    inputTitles.forEach(function (inp) {
+
+                        if (inp.length <= 3) {
+
+                            if (norm(item.title) === inp && item.year === inputYear)
+                                score += 300;
+                            else
+                                score -= 100;
+                        }
+
+                    });
 
                     item.score = score;
                 });
-
-                items.sort(function (a, b) {
-                    return (b.score || 0) - (a.score || 0);
-                });
-
-                var best = items[0];
-                var second = items[1];
-
-                if (best) {
-
-                    if (!second) {
-                        getPage(best.link);
-                        return;
-                    }
-
-                    if ((best.score || 0) - (second.score || 0) >= 25) {
-                        getPage(best.link);
-                        return;
-                    }
-
-                    if ((best.score || 0) >= 100) {
-                        getPage(best.link);
-                        return;
-                    }
-                }
 
                 console.log('Слишком низкий score (' + (bestScore || 0) + '), показываем список результатов');
 
