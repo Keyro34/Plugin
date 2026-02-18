@@ -14267,7 +14267,18 @@
     function pilotCard(object, element, view){
         var movie = object.movie || {};
 
-        var poster = Lampa.Utils.cardImg(movie);
+        // 🔥 получаем постер безопасно для всех версий Lampa
+        var poster = '';
+
+        if(movie.poster_path){
+            poster = Lampa.Utils.protocol() + 'image.tmdb.org/t/p/w300' + movie.poster_path;
+        }
+        else if(movie.img){
+            poster = movie.img;
+        }
+        else if(element.img){
+            poster = element.img;
+        }
 
         var title = element.title || movie.title || movie.name || '';
 
