@@ -1147,7 +1147,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -1546,7 +1546,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -2636,7 +2636,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -3325,7 +3325,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title, 'kinobase'].join('') : object.movie.original_title + element.quality + 'kinobase');
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -3682,7 +3682,7 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title].join('') : object.movie.original_title + 'collaps');
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -4187,7 +4187,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -4868,7 +4868,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -5242,7 +5242,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -5886,7 +5886,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -6380,7 +6380,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -6847,7 +6847,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -7385,7 +7385,7 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -8012,7 +8012,7 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -8438,7 +8438,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -8894,7 +8894,7 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -9299,7 +9299,7 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.data_id);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -9589,7 +9589,6 @@
        * @returns array
        */
 
-
       function extractItems(host, hls) {
         var items = [];
 
@@ -9702,7 +9701,7 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -10082,7 +10081,7 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -10622,7 +10621,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           element.template = item;
@@ -11282,7 +11281,7 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -12033,7 +12032,7 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
-          var item = Lampa.Template.get('online_mod', element);
+          var item = pilotCard(object, element, view);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           item.append(Lampa.Timeline.render(view));
@@ -14213,10 +14212,91 @@
     }
 
     function resetTemplates() {
+      Lampa.Template.add('pilot_auto', `
+      <div class="pilot-card selector">
+          <div class="pilot-card__left">
+              <div class="pilot-card__poster" style="background-image:url({{poster}})">
+                  <div class="pilot-card__episode">{{episode}}</div>
+              </div>
+          </div>
+
+          <div class="pilot-card__content">
+              <div class="pilot-card__title">{{title}}</div>
+
+              <div class="pilot-card__meta">
+                  <span>★ {{rating}}</span>
+                  <span>•</span>
+                  <span>{{date}}</span>
+              </div>
+
+              <div class="pilot-card__progress">
+                  <div class="pilot-card__progress-bar" style="width:{{progress}}%"></div>
+              </div>
+          </div>
+
+          <div class="pilot-card__time">{{time}}</div>
+      </div>
+      `);
+
+      // 👉 CSS (добавится один раз)
+      if(!window.pilot_card_style){
+          window.pilot_card_style = true;
+
+          Lampa.Utils.putStyle(`
+          .pilot-card{position:relative;display:flex;gap:1.4em;padding:1.3em;border-radius:1.3em;
+          background:linear-gradient(90deg, rgba(80,55,20,.9), rgba(30,20,10,.95));}
+
+          .pilot-card__left{width:8em;flex-shrink:0;}
+          .pilot-card__poster{width:100%;aspect-ratio:1/1;background-size:cover;background-position:center;border-radius:1em;position:relative;}
+          .pilot-card__episode{position:absolute;bottom:.3em;left:.4em;font-size:2em;font-weight:700;}
+
+          .pilot-card__title{font-size:2em;font-weight:600;margin-bottom:.3em;}
+          .pilot-card__meta{font-size:1.2em;opacity:.85;display:flex;gap:.5em;}
+
+          .pilot-card__progress{margin-top:.8em;height:.35em;background:rgba(255,255,255,.15);border-radius:.3em;overflow:hidden;}
+          .pilot-card__progress-bar{height:100%;background:#fff;}
+
+          .pilot-card__time{position:absolute;right:1.2em;top:1.1em;font-size:1.2em;opacity:.9;}
+          `);
+      }
+
       Lampa.Template.add('online_mod', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <circle cx=\"64\" cy=\"64\" r=\"56\" stroke=\"white\" stroke-width=\"16\"/>\n                    <path d=\"M90.5 64.3827L50 87.7654L50 41L90.5 64.3827Z\" fill=\"white\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
       Lampa.Template.add('online_mod_folder', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 112\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect y=\"20\" width=\"128\" height=\"92\" rx=\"13\" fill=\"white\"/>\n                    <path d=\"M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z\" fill=\"white\" fill-opacity=\"0.23\"/>\n                    <rect x=\"11\" y=\"8\" width=\"106\" height=\"76\" rx=\"13\" fill=\"white\" fill-opacity=\"0.51\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
     }
 
+    function pilotCard(object, element, view){
+        var movie = object.movie || {};
+
+        var poster = Lampa.Utils.cardImg(movie);
+
+        var title = element.title || movie.title || movie.name || '';
+
+        var rating = movie.vote_average ? movie.vote_average.toFixed(1) : '';
+
+        var date = movie.release_date || movie.first_air_date || '';
+        if(date) date = Lampa.Utils.parseTime(date, 'dd mmmm yyyy');
+
+        var episode = element.episode
+            ? (element.episode < 10 ? '0' + element.episode : element.episode)
+            : '';
+
+        var progress = view.percent || 0;
+        var time = view.time ? Lampa.Utils.secondsToTime(view.time) : '';
+
+        var item = Lampa.Template.get('pilot_auto',{
+            poster: poster,
+            title: title,
+            rating: rating,
+            date: date,
+            episode: episode,
+            progress: progress,
+            time: time
+        });
+
+        item.append(Lampa.Timeline.render(view));
+
+        return item;
+    }
     function checkMyIp(onComplite) {
       if (Lampa.Storage.field('online_mod_proxy_find_ip') !== true) {
         onComplite();
