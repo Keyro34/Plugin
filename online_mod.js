@@ -1831,6 +1831,7 @@
                 object.movie.original_name ||
                 '';
 
+            // Используем данные из TMDB карточки
             var inputYear =
                 object.movie.release_date ?
                 parseInt(object.movie.release_date.substr(0,4)) :
@@ -1840,8 +1841,16 @@
                 parseInt(object.movie.year) :
                 null;
 
-            var inputTMDB = object.movie.id || null;
-            var inputIMDB = object.movie.imdb_id || null;
+            var inputTMDB = object.movie.id || null; // TMDB ID из карточки
+            var inputIMDB = object.movie.imdb_id || null; // Может быть получен через TMDB API
+
+            // Альтернативные названия из TMDB
+            var alternativeTitles = [];
+            if (object.movie.alternative_titles && object.movie.alternative_titles.results) {
+                alternativeTitles = object.movie.alternative_titles.results.map(function(t) {
+                    return t.title;
+                });
+            }
 
             var isSearchingSeries = !!object.movie.first_air_date;
 
@@ -1888,8 +1897,13 @@
                 return 0;
             }
 
+            // Добавляем альтернативные названия к вариантам поиска
             var inputTitles = splitVariants(inputTitleRaw).map(norm);
             var inputOriginals = splitVariants(inputOriginalRaw).map(norm);
+            var inputAlternatives = alternativeTitles.map(norm);
+
+            // Объединяем все варианты названий
+            var allTitleVariants = inputTitles.concat(inputOriginals).concat(inputAlternatives);
 
             var mainInput = inputTitles[0] || '';
             var mainOriginal = inputOriginals[0] || '';
@@ -1897,8 +1911,7 @@
             // ================= PARSE ITEMS =================
 
             var items = links.map(function(l){
-                // Парсинг ссылок в зависимости от формата вашего плагина
-                // Адаптируйте эту часть под структуру ваших данных
+                // Адаптируйте под формат вашего источника
                 var li = $(l + '</div>');
                 var link = $('a', li);
                 
@@ -1908,11 +1921,13 @@
                 var yearMatch = text.match(/\b(19|20)\d{2}\b/);
                 var year = yearMatch ? parseInt(yearMatch[0]) : null;
 
-                var imdbMatch = href.match(/tt\d+/i);
-                var imdb = imdbMatch ? imdbMatch[0] : null;
-
+                // Ищем TMDB ID в ссылке (если есть)
                 var tmdbMatch = href.match(/\/(movie|tv)\/(\d+)/i);
                 var tmdb = tmdbMatch ? parseInt(tmdbMatch[2]) : null;
+
+                // Ищем IMDB ID
+                var imdbMatch = href.match(/tt\d+/i);
+                var imdb = imdbMatch ? imdbMatch[0] : null;
 
                 return {
                     title: text,
@@ -1926,12 +1941,17 @@
 
             // ================= STEP 1 — ID MATCH =================
 
+            // Сначала проверяем по TMDB ID
             for(var i=0;i<items.length;i++){
-                if(inputIMDB && items[i].imdb === inputIMDB){
+                if(inputTMDB && items[i].tmdb === inputTMDB){
                     getPage(items[i].link);
                     return;
                 }
-                if(inputTMDB && items[i].tmdb === inputTMDB){
+            }
+
+            // Потом по IMDB ID
+            for(var i=0;i<items.length;i++){
+                if(inputIMDB && items[i].imdb === inputIMDB){
                     getPage(items[i].link);
                     return;
                 }
@@ -1943,14 +1963,24 @@
 
                 var itemNorm = norm(items[i].title);
 
+                // Точное совпадение с оригинальным названием + год
                 if(mainOriginal && itemNorm === mainOriginal && inputYear && items[i].year === inputYear){
                     getPage(items[i].link);
                     return;
                 }
 
+                // Точное совпадение с русским названием + год
                 if(mainInput && itemNorm === mainInput && inputYear && items[i].year === inputYear){
                     getPage(items[i].link);
                     return;
+                }
+
+                // Проверяем альтернативные названия
+                for(var j=0; j<allTitleVariants.length; j++) {
+                    if(allTitleVariants[j] && itemNorm === allTitleVariants[j] && inputYear && items[i].year === inputYear){
+                        getPage(items[i].link);
+                        return;
+                    }
                 }
             }
 
@@ -1961,11 +1991,16 @@
                 var score = 0;
                 var itemTitle = norm(item.title);
 
-                // EXACT
+                // EXACT MATCHES (высокие баллы)
                 if(itemTitle === mainInput) score += 400;
                 if(itemTitle === mainOriginal) score += 450;
+                
+                // Проверка по всем вариантам названий
+                allTitleVariants.forEach(function(variant){
+                    if(itemTitle === variant) score += 300;
+                });
 
-                // MULTI VARIANT
+                // MULTI VARIANT (средние баллы)
                 inputTitles.forEach(function(t){
                     if(itemTitle === t) score += 240;
                 });
@@ -1974,15 +2009,23 @@
                     if(itemTitle === t) score += 260;
                 });
 
-                // CONTAINS
+                alternativeTitles.forEach(function(t){
+                    if(itemTitle === norm(t)) score += 200;
+                });
+
+                // CONTAINS (низкие баллы)
                 if(mainInput.length > 3 && itemTitle.includes(mainInput)) score += 180;
                 if(mainOriginal && itemTitle.includes(mainOriginal)) score += 200;
+                
+                allTitleVariants.forEach(function(variant){
+                    if(variant && variant.length > 3 && itemTitle.includes(variant)) score += 150;
+                });
 
-                // SAFE FUZZY
+                // SAFE FUZZY (для опечаток)
                 if(safeFuzzy(itemTitle, mainInput)) score += 140;
                 if(safeFuzzy(itemTitle, mainOriginal)) score += 160;
 
-                // YEAR
+                // YEAR (очень важно)
                 if(inputYear && item.year){
                     var diff = Math.abs(item.year - inputYear);
                     if(diff === 0) score += 320;
@@ -2026,10 +2069,11 @@
 
                 var diff12 = (best.score||0) - (second.score||0);
 
-                // динамический порог
+                // Динамический порог на основе качества данных
                 var autoThreshold = 300;
                 if(inputYear) autoThreshold += 40;
                 if(mainOriginal) autoThreshold += 30;
+                if(alternativeTitles.length > 0) autoThreshold += 20; // Больше данных = выше порог
 
                 if(diff12 >= 25){
                     getPage(best.link);
@@ -2051,6 +2095,7 @@
 
             // ================= FALLBACK =================
 
+            // Если не нашли точного совпадения, показываем похожие
             component.similars(items);
             component.loading(false);
          };
