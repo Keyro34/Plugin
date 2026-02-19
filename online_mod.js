@@ -2031,6 +2031,11 @@
                 component.loading(false);
             }
 
+            console.log("=== DEBUG SCORES ===");
+            items.forEach(i => {
+                console.log(i.title, i.score);
+            });
+
             run();
          };
 
