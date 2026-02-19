@@ -1237,11 +1237,6 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
-
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -1803,11 +1798,6 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
-
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -3106,11 +3096,6 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
-
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -3162,7 +3147,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -3963,11 +3948,6 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
-
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -4514,11 +4494,6 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
-
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -5202,11 +5177,6 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
-
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -6052,11 +6022,6 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
-
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -6616,11 +6581,6 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
-
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -7452,11 +7412,6 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
-
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -8114,11 +8069,6 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
-
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -8748,11 +8698,6 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
-
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -9460,11 +9405,6 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
-
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -10284,11 +10224,6 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
-
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -10899,11 +10834,6 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
-
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -11530,11 +11460,6 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
-
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -12131,11 +12056,6 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
-
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -12710,11 +12630,6 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
-
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -13287,11 +13202,6 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
-
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -14019,11 +13929,6 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
-
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -14846,11 +14751,6 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
-
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -15773,11 +15673,6 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
-
-                  if (img) {
-                      img.crossOrigin = 'anonymous';
-                      img.setAttribute('referrerpolicy', 'no-referrer');
-                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
