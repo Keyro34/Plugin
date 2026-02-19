@@ -1816,17 +1816,15 @@
             
             if (!links || !links.length) return;
 
-            // ================= INPUT =================
+            var TMDB_API_KEY = '1cb9850f33545701ea79d76bec69a1e2';
 
-            var inputTitleRaw =
+            var isSeries = !!object.movie.first_air_date;
+            var tmdbType = isSeries ? 'tv' : 'movie';
+
+            var inputTitle =
                 select_title ||
                 object.movie.title ||
                 object.movie.name ||
-                object.movie.original_title ||
-                object.movie.original_name ||
-                '';
-
-            var inputOriginalRaw =
                 object.movie.original_title ||
                 object.movie.original_name ||
                 '';
@@ -1840,61 +1838,15 @@
                 parseInt(object.movie.year) :
                 null;
 
-            var inputTMDB = object.movie.id || null;
             var inputIMDB = object.movie.imdb_id || null;
-
-            var isSearchingSeries = !!object.movie.first_air_date;
-
-            // ================= HELPERS =================
-
-            function cleanTrash(str){
-                return (str || '')
-                    .replace(/\b(1080p|720p|2160p|hdrip|webrip|bluray|bdrip|x264|x265|hevc|h264|4k)\b/ig,'')
-                    .replace(/\b(сезон|season|серия|episode)\b.*$/ig,'')
-                    .trim();
-            }
-
-            function splitVariants(str){
-                if(!str) return [];
-                return str.split(/[:\-|\/]/).map(function(s){
-                    return s.trim();
-                });
-            }
+            var inputTMDB = object.movie.id || null;
 
             function norm(str){
-                return cleanTrash(str)
+                return (str || '')
                     .toLowerCase()
                     .replace(/[^a-z0-9а-яё]/gi,'')
                     .trim();
             }
-
-            function safeFuzzy(a,b){
-                if(!a || !b) return false;
-                if(Math.abs(a.length - b.length) > 2) return false;
-                if(a.length < 5 || b.length < 5) return false;
-
-                var diff = 0;
-                for(var i=0;i<Math.min(a.length,b.length);i++){
-                    if(a[i] !== b[i]) diff++;
-                }
-                return diff <= 2;
-            }
-
-            function titleLengthPenalty(item, input){
-                if(!item || !input) return 0;
-                var diff = Math.abs(item.length - input.length);
-                if(diff > 10) return -120;
-                if(diff > 6) return -60;
-                return 0;
-            }
-
-            var inputTitles = splitVariants(inputTitleRaw).map(norm);
-            var inputOriginals = splitVariants(inputOriginalRaw).map(norm);
-
-            var mainInput = inputTitles[0] || '';
-            var mainOriginal = inputOriginals[0] || '';
-
-            // ================= PARSE ITEMS =================
 
             var items = links.map(function(l){
 
@@ -1910,148 +1862,141 @@
                 var imdbMatch = href.match(/tt\d+/i);
                 var imdb = imdbMatch ? imdbMatch[0] : null;
 
-                var tmdbMatch = href.match(/\/(movie|tv)\/(\d+)/i);
-                var tmdb = tmdbMatch ? parseInt(tmdbMatch[2]) : null;
-
                 return {
                     title: text,
                     link: href,
                     year: year,
                     imdb: imdb,
-                    tmdb: tmdb,
                     score: 0
                 };
             });
 
-            // ================= STEP 1 — ID MATCH =================
+            // ================= IMDB DIRECT MATCH =================
 
-            for(var i=0;i<items.length;i++){
-                if(inputIMDB && items[i].imdb === inputIMDB){
-                    getPage(items[i].link);
-                    return;
-                }
-                if(inputTMDB && items[i].tmdb === inputTMDB){
-                    getPage(items[i].link);
-                    return;
-                }
-            }
-
-            // ================= STEP 2 — HARD EXACT =================
-
-            for(var i=0;i<items.length;i++){
-
-                var itemNorm = norm(items[i].title);
-
-                if(mainOriginal && itemNorm === mainOriginal && inputYear && items[i].year === inputYear){
-                    getPage(items[i].link);
-                    return;
-                }
-
-                if(mainInput && itemNorm === mainInput && inputYear && items[i].year === inputYear){
-                    getPage(items[i].link);
-                    return;
-                }
-            }
-
-            // ================= STEP 3 — ABSOLUTE SCORING =================
-
-            items.forEach(function(item){
-
-                var score = 0;
-                var itemTitle = norm(item.title);
-
-                // EXACT
-                if(itemTitle === mainInput) score += 400;
-                if(itemTitle === mainOriginal) score += 450;
-
-                // MULTI VARIANT
-                inputTitles.forEach(function(t){
-                    if(itemTitle === t) score += 240;
-                });
-
-                inputOriginals.forEach(function(t){
-                    if(itemTitle === t) score += 260;
-                });
-
-                // CONTAINS
-                if(mainInput.length > 3 && itemTitle.includes(mainInput)) score += 180;
-                if(mainOriginal && itemTitle.includes(mainOriginal)) score += 200;
-
-                // SAFE FUZZY
-                if(safeFuzzy(itemTitle, mainInput)) score += 140;
-                if(safeFuzzy(itemTitle, mainOriginal)) score += 160;
-
-                // YEAR
-                if(inputYear && item.year){
-                    var diff = Math.abs(item.year - inputYear);
-                    if(diff === 0) score += 320;
-                    else if(diff === 1) score += 200;
-                    else if(diff <= 3) score += 80;
-                    else score -= 180;
-                }
-
-                // LENGTH LOGIC
-                score += titleLengthPenalty(itemTitle, mainInput);
-
-                // SERIES PROTECTION
-                if(isSearchingSeries){
-                    if(/season|сезон/i.test(item.title)) score += 60;
-                } else {
-                    if(/season|сезон/i.test(item.title)) score -= 200;
-                }
-
-                // QUALITY TRASH PENALTY
-                if(/camrip|ts|telesync/i.test(item.title)) score -= 220;
-
-                item.score = score;
-            });
-
-            // ================= STEP 4 — SMART PICK =================
-
-            items.sort(function(a,b){
-                return (b.score||0) - (a.score||0);
-            });
-
-            var best = items[0];
-            var second = items[1];
-            var third = items[2];
-
-            if(best){
-
-                if(!second){
-                    getPage(best.link);
-                    return;
-                }
-
-                var diff12 = (best.score||0) - (second.score||0);
-
-                // динамический порог
-                var autoThreshold = 300;
-                if(inputYear) autoThreshold += 40;
-                if(mainOriginal) autoThreshold += 30;
-
-                if(diff12 >= 25){
-                    getPage(best.link);
-                    return;
-                }
-
-                if(best.score >= autoThreshold){
-                    getPage(best.link);
-                    return;
-                }
-
-                if(third){
-                    if(best.score > second.score && second.score > third.score && best.score >= 260){
-                        getPage(best.link);
+            if(inputIMDB){
+                for(var i=0;i<items.length;i++){
+                    if(items[i].imdb === inputIMDB){
+                        getPage(items[i].link);
                         return;
                     }
                 }
             }
 
-            // ================= FALLBACK =================
+            // ================= EXACT TITLE + YEAR =================
 
-            component.similars(items);
-            component.loading(false);
+            for(var i=0;i<items.length;i++){
+                if(norm(items[i].title) === norm(inputTitle) &&
+                  inputYear &&
+                  items[i].year === inputYear){
+                    getPage(items[i].link);
+                    return;
+                }
+            }
+
+            // ================= TMDB REQUEST =================
+
+            if(!inputTMDB){
+                component.similars(items);
+                component.loading(false);
+                return;
+            }
+
+            var url =
+                'https://api.themoviedb.org/3/' + tmdbType + '/' + inputTMDB +
+                '?api_key=' + TMDB_API_KEY +
+                '&append_to_response=alternative_titles,external_ids';
+
+            $.getJSON(url, function(data){
+
+                var altTitles = [];
+                var original = data.original_title || data.original_name || '';
+                var imdbFromTMDB = data.external_ids ? data.external_ids.imdb_id : null;
+
+                if(tmdbType === 'movie' &&
+                  data.alternative_titles &&
+                  data.alternative_titles.titles){
+
+                    data.alternative_titles.titles.forEach(function(t){
+                        altTitles.push(t.title);
+                    });
+                }
+
+                if(tmdbType === 'tv' &&
+                  data.alternative_titles &&
+                  data.alternative_titles.results){
+
+                    data.alternative_titles.results.forEach(function(t){
+                        altTitles.push(t.title);
+                    });
+                }
+
+                var allTitles = [original].concat(altTitles).map(norm);
+
+                // ===== IMDB FROM TMDB =====
+                if(imdbFromTMDB){
+                    for(var i=0;i<items.length;i++){
+                        if(items[i].imdb === imdbFromTMDB){
+                            getPage(items[i].link);
+                            return;
+                        }
+                    }
+                }
+
+                // ===== EXACT ALT TITLE + YEAR =====
+                for(var i=0;i<items.length;i++){
+
+                    var itemNorm = norm(items[i].title);
+
+                    for(var j=0;j<allTitles.length;j++){
+                        if(itemNorm === allTitles[j] &&
+                          inputYear &&
+                          items[i].year === inputYear){
+
+                            getPage(items[i].link);
+                            return;
+                        }
+                    }
+                }
+
+                // ===== SCORING =====
+                items.forEach(function(item){
+
+                    var score = 0;
+                    var itemNorm = norm(item.title);
+
+                    allTitles.forEach(function(t){
+
+                        if(itemNorm === t) score += 500;
+                        if(itemNorm.includes(t)) score += 250;
+
+                        if(Math.abs(itemNorm.length - t.length) <= 2)
+                            score += 120;
+                    });
+
+                    if(inputYear && item.year){
+                        if(item.year === inputYear) score += 350;
+                    }
+
+                    item.score = score;
+                });
+
+                items.sort(function(a,b){
+                    return b.score - a.score;
+                });
+
+                if(items[0] && items[0].score >= 300){
+                    getPage(items[0].link);
+                    return;
+                }
+
+                component.similars(items);
+                component.loading(false);
+
+            }).fail(function(){
+
+                component.similars(items);
+                component.loading(false);
+            });
          };
 
         var query_search = function query_search(query, data, callback) {
