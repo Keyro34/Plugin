@@ -1288,7 +1288,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -1850,7 +1850,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -3999,7 +3999,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -4546,7 +4546,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -5229,7 +5229,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -6073,7 +6073,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -6633,7 +6633,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -7463,7 +7463,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -8120,7 +8120,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -8750,7 +8750,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -9457,7 +9457,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -10275,7 +10275,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -10886,7 +10886,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -11511,7 +11511,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -12107,7 +12107,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -12681,7 +12681,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -13254,7 +13254,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -13981,7 +13981,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -14803,7 +14803,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -15725,7 +15725,7 @@
                       };
 
                       if (imagePath) {
-                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + imagePath;
                           img.src = imageUrl;
                           console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
@@ -15917,7 +15917,7 @@
               return;
           }
           
-          var imageUrl = 'https://image.tmdb.org/t/p/w300' + path;
+          var imageUrl = 'https://images.weserv.nl/?url=image.tmdb.org/t/p/w300' + path;
           Lampa.Utils.imgLoad($(imgElement), imageUrl);
       };
 
