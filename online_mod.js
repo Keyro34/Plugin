@@ -2893,12 +2893,19 @@
               var duration = element.duration || object.movie.runtime || 0;
               var timeFormatted = duration ? Lampa.Utils.secondsToTime(duration * 60, true) : '';
               
-              // Формируем информацию (озвучка, etc)
+              // Формируем информацию (озвучка, рейтинг и т.д.)
               var infoText = '';
               if (element.info) {
                   infoText = element.info;
               } else if (element.season && element.translate_voice) {
-                  infoText = ' / ' + element.translate_voice;
+                  infoText = element.translate_voice;
+              }
+
+              // Добавляем рейтинг если есть
+              var rating = element.rating || (object.movie.vote_average ? object.movie.vote_average.toFixed(1) : null);
+              var ratingHtml = '';
+              if (rating) {
+                  ratingHtml = '<span class="online-prestige-rate">⭐ ' + rating + '</span>';
               }
 
               // Создаем hash для timeline и отметок
@@ -2913,75 +2920,67 @@
               var view = Lampa.Timeline.view(hash);
               element.timeline = view;
 
-              // Данные для карточки
+              // Данные для карточки в стиле второго изображения
               var cardData = {
                   title: element.season ? element.title : (select_title + (element.title == select_title ? '' : ' / ' + element.title)),
                   time: timeFormatted,
                   info: infoText,
                   quality: element.quality || 'HD',
+                  rating: ratingHtml,
                   season_num: season_num,
-                  episode_num: episode_num
+                  episode_num: episode_num,
+                  has_poster: !!(element.poster_path || element.still_path || object.movie.poster_path || object.movie.backdrop_path)
               };
 
-              // Получаем шаблон карточки
-              var item = Lampa.Template.get('online_mod_prestige_full', cardData);
+              // Получаем шаблон карточки (используем новый шаблон)
+              var item = Lampa.Template.get('online_mod_card', cardData);
               
               // Находим элементы для изображения
-              var loader = item.find('.online-prestige__loader');
-              var imageDiv = item.find('.online-prestige__img');
+              var loader = item.find('.online-card__loader');
+              var imageDiv = item.find('.online-card__image');
               var img = item.find('img')[0];
 
               // Добавляем timeline
-              item.find('.online-prestige__timeline').append(Lampa.Timeline.render(view));
+              item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
               // Загружаем изображение из TMDB
               if (img) {
-                  // Путь к изображению (постер эпизода или фон фильма)
-                  var imagePath = element.still_path || element.poster_path || object.movie.backdrop_path;
-                  
-                  // Функция для добавления номера эпизода
-                  function addEpisodeNumber() {
-                      if (element.season && !imageDiv.find('.online-prestige__episode-number').length) {
-                          imageDiv.append('<div class="online-prestige__episode-number">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-                  }
+                  // Путь к изображению (постер или фон)
+                  var imagePath = element.poster_path || element.still_path || object.movie.poster_path || object.movie.backdrop_path;
                   
                   // Обработчик успешной загрузки
                   img.onload = function() {
-                      imageDiv.addClass('online-prestige__img--loaded');
+                      imageDiv.addClass('online-card__image--loaded');
                       loader.remove();
-                      addEpisodeNumber();
-                      // Принудительно обновляем отображение
-                      imageDiv.css('opacity', '1');
                   };
                   
                   // Обработчик ошибки загрузки
                   img.onerror = function() {
-                      img.src = './img/img_broken.svg';
-                      imageDiv.addClass('online-prestige__img--loaded');
+                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
                       loader.remove();
-                      addEpisodeNumber();
+                      // Добавляем иконку-заглушку
+                      if (!imageDiv.find('.online-card__fallback-icon').length) {
+                          imageDiv.append('<div class="online-card__fallback-icon">🎬</div>');
+                      }
                   };
 
                   // Устанавливаем источник изображения
                   if (imagePath) {
-                      // Используем API TMDB для получения изображения
                       var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
                       img.src = imageUrl;
                   } else {
-                      img.src = './img/img_broken.svg';
-                      imageDiv.addClass('online-prestige__img--loaded');
+                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
                       loader.remove();
-                      addEpisodeNumber();
+                      if (!imageDiv.find('.online-card__fallback-icon').length) {
+                          imageDiv.append('<div class="online-card__fallback-icon">🎬</div>');
+                      }
                   }
               }
 
               // Добавляем отметку о просмотренном
               if (viewed.indexOf(hash_file) !== -1) {
-                  if (!imageDiv.find('.online-prestige__viewed').length) {
-                      imageDiv.append('<div class="online-prestige__viewed">' + 
-                          Lampa.Template.get('icon_viewed', {}, true) + '</div>');
+                  if (!imageDiv.find('.online-card__viewed').length) {
+                      imageDiv.append('<div class="online-card__viewed">✓</div>');
                   }
               }
 
@@ -2992,11 +2991,9 @@
                   
                   element.loading = true;
                   
-                  // Функция получения потока (зависит от источника)
                   getStream(element, function (element) {
                       element.loading = false;
                       
-                      // Создаем первый элемент для плеера
                       var first = {
                           url: component.getDefaultQuality(element.qualitys, element.stream),
                           quality: component.renameQualityMap(element.qualitys),
@@ -3005,7 +3002,6 @@
                           title: element.season ? element.title : select_title + (element.title == select_title ? '' : ' / ' + element.title)
                       };
 
-                      // Создаем плейлист для сериалов
                       if (element.season && Lampa.Platform.version) {
                           var playlist = [];
                           items.forEach(function (elem) {
@@ -3037,12 +3033,10 @@
 
                       Lampa.Player.play(first);
 
-                      // Отмечаем как просмотренное
                       if (viewed.indexOf(hash_file) == -1) {
                           viewed.push(hash_file);
-                          if (!imageDiv.find('.online-prestige__viewed').length) {
-                              imageDiv.append('<div class="online-prestige__viewed">' + 
-                                  Lampa.Template.get('icon_viewed', {}, true) + '</div>');
+                          if (!imageDiv.find('.online-card__viewed').length) {
+                              imageDiv.append('<div class="online-card__viewed">✓</div>');
                           }
                           Lampa.Storage.set('online_view', viewed);
                       }
