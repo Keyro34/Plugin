@@ -1237,6 +1237,11 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
+
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -1798,6 +1803,11 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
+
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -3096,6 +3106,11 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
+
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -3147,7 +3162,9 @@
                       };
 
                       if (imagePath) {
-                          component.loadImage(img, imagePath);
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
                       } else {
                           // Если нет изображения, показываем крупный номер серии
                           imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
@@ -3946,6 +3963,11 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
+
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -4492,6 +4514,11 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
+
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -5175,6 +5202,11 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
+
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -6020,6 +6052,11 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
+
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -6579,6 +6616,11 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
+
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -7410,6 +7452,11 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
+
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -8067,6 +8114,11 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
+
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -8696,6 +8748,11 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
+
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -9403,6 +9460,11 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
+
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -10222,6 +10284,11 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
+
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -10832,6 +10899,11 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
+
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -11458,6 +11530,11 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
+
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -12054,6 +12131,11 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
+
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -12628,6 +12710,11 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
+
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -13200,6 +13287,11 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
+
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -13927,6 +14019,11 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
+
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -14749,6 +14846,11 @@
                   var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
+
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
 
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
@@ -15672,6 +15774,11 @@
                   var imageDiv = item.find('.online-card__image');
                   var img = item.find('img')[0];
 
+                  if (img) {
+                      img.crossOrigin = 'anonymous';
+                      img.setAttribute('referrerpolicy', 'no-referrer');
+                  }
+
                   item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
                   // Загружаем изображение
@@ -15907,19 +16014,6 @@
         var srtUrl = this.processSubs(url);
         if (srtUrl !== url) return srtUrl;
         return this.proxyStream(url, name);
-      };
-
-      this.loadImage = function(imgElement, path) {
-          if (!path) {
-              imgElement.src = './img/img_broken.svg';
-              return;
-          }
-          
-          // Используем CORS прокси
-          var proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-          var imageUrl = 'https://image.tmdb.org/t/p/w300' + path;
-          
-          Lampa.Utils.imgLoad($(imgElement), proxyUrl + imageUrl);
       };
 
       this.loadImage = function(imgElement, path) {
