@@ -1816,13 +1816,22 @@
             
             if (!links || !links.length) return;
 
-            const TMDB_API_KEY = '1cb9850f33545701ea79d76bec69a1e2';
+            // ================= INPUT =================
 
-            const isSeries = !!object.movie.first_air_date;
-            const tmdbType = isSeries ? 'tv' : 'movie';
-            const tmdbId = object.movie.id || null;
+            var inputTitleRaw =
+                select_title ||
+                object.movie.title ||
+                object.movie.name ||
+                object.movie.original_title ||
+                object.movie.original_name ||
+                '';
 
-            const inputYear =
+            var inputOriginalRaw =
+                object.movie.original_title ||
+                object.movie.original_name ||
+                '';
+
+            var inputYear =
                 object.movie.release_date ?
                 parseInt(object.movie.release_date.substr(0,4)) :
                 object.movie.first_air_date ?
@@ -1831,10 +1840,29 @@
                 parseInt(object.movie.year) :
                 null;
 
-            const inputIMDB = object.movie.imdb_id || null;
+            var inputTMDB = object.movie.id || null;
+            var inputIMDB = object.movie.imdb_id || null;
+
+            var isSearchingSeries = !!object.movie.first_air_date;
+
+            // ================= HELPERS =================
+
+            function cleanTrash(str){
+                return (str || '')
+                    .replace(/\b(1080p|720p|2160p|hdrip|webrip|bluray|bdrip|x264|x265|hevc|h264|4k)\b/ig,'')
+                    .replace(/\b(сезон|season|серия|episode)\b.*$/ig,'')
+                    .trim();
+            }
+
+            function splitVariants(str){
+                if(!str) return [];
+                return str.split(/[:\-|\/]/).map(function(s){
+                    return s.trim();
+                });
+            }
 
             function norm(str){
-                return (str || '')
+                return cleanTrash(str)
                     .toLowerCase()
                     .replace(/[^a-z0-9а-яё]/gi,'')
                     .trim();
@@ -1844,199 +1872,187 @@
                 if(!a || !b) return false;
                 if(Math.abs(a.length - b.length) > 2) return false;
                 if(a.length < 5 || b.length < 5) return false;
-                let diff = 0;
-                for(let i=0;i<Math.min(a.length,b.length);i++){
+
+                var diff = 0;
+                for(var i=0;i<Math.min(a.length,b.length);i++){
                     if(a[i] !== b[i]) diff++;
                 }
                 return diff <= 2;
             }
 
-            const items = links.map(function(l){
+            function titleLengthPenalty(item, input){
+                if(!item || !input) return 0;
+                var diff = Math.abs(item.length - input.length);
+                if(diff > 10) return -120;
+                if(diff > 6) return -60;
+                return 0;
+            }
 
-                const li = $(l);
-                const link = $('a', li);
+            var inputTitles = splitVariants(inputTitleRaw).map(norm);
+            var inputOriginals = splitVariants(inputOriginalRaw).map(norm);
 
-                const text = link.text().trim();
-                const href = link.attr('href') || '';
+            var mainInput = inputTitles[0] || '';
+            var mainOriginal = inputOriginals[0] || '';
 
-                const yearMatch = text.match(/\b(19|20)\d{2}\b/);
-                const year = yearMatch ? parseInt(yearMatch[0]) : null;
+            // ================= PARSE ITEMS =================
 
-                const imdbMatch = href.match(/tt\d+/i);
-                const imdb = imdbMatch ? imdbMatch[0] : null;
+            var items = links.map(function(l){
+                // Парсинг ссылок в зависимости от формата вашего плагина
+                // Адаптируйте эту часть под структуру ваших данных
+                var li = $(l + '</div>');
+                var link = $('a', li);
+                
+                var text = link.text().trim() || '';
+                var href = link.attr('href') || '';
+
+                var yearMatch = text.match(/\b(19|20)\d{2}\b/);
+                var year = yearMatch ? parseInt(yearMatch[0]) : null;
+
+                var imdbMatch = href.match(/tt\d+/i);
+                var imdb = imdbMatch ? imdbMatch[0] : null;
+
+                var tmdbMatch = href.match(/\/(movie|tv)\/(\d+)/i);
+                var tmdb = tmdbMatch ? parseInt(tmdbMatch[2]) : null;
 
                 return {
                     title: text,
                     link: href,
                     year: year,
                     imdb: imdb,
+                    tmdb: tmdb,
                     score: 0
                 };
             });
 
-            // ================= 1️⃣ IMDB DIRECT =================
+            // ================= STEP 1 — ID MATCH =================
 
-            if(inputIMDB){
-                for(let i=0;i<items.length;i++){
-                    if(items[i].imdb === inputIMDB){
-                        getPage(items[i].link);
-                        return;
-                    }
+            for(var i=0;i<items.length;i++){
+                if(inputIMDB && items[i].imdb === inputIMDB){
+                    getPage(items[i].link);
+                    return;
+                }
+                if(inputTMDB && items[i].tmdb === inputTMDB){
+                    getPage(items[i].link);
+                    return;
                 }
             }
 
-            // ================= 2️⃣ TMDB CACHE =================
+            // ================= STEP 2 — HARD EXACT =================
 
-            const cacheKey = 'tmdb_cache_' + tmdbType + '_' + tmdbId;
+            for(var i=0;i<items.length;i++){
 
-            function getCached(){
-                try{
-                    const raw = localStorage.getItem(cacheKey);
-                    if(!raw) return null;
-                    return JSON.parse(raw);
-                }catch(e){
-                    return null;
+                var itemNorm = norm(items[i].title);
+
+                if(mainOriginal && itemNorm === mainOriginal && inputYear && items[i].year === inputYear){
+                    getPage(items[i].link);
+                    return;
+                }
+
+                if(mainInput && itemNorm === mainInput && inputYear && items[i].year === inputYear){
+                    getPage(items[i].link);
+                    return;
                 }
             }
 
-            function setCache(data){
-                try{
-                    localStorage.setItem(cacheKey, JSON.stringify(data));
-                }catch(e){}
-            }
+            // ================= STEP 3 — ABSOLUTE SCORING =================
 
-            async function fetchTMDB(){
+            items.forEach(function(item){
 
-                if(!tmdbId) return null;
+                var score = 0;
+                var itemTitle = norm(item.title);
 
-                const cached = getCached();
-                if(cached) return cached;
+                // EXACT
+                if(itemTitle === mainInput) score += 400;
+                if(itemTitle === mainOriginal) score += 450;
 
-                try{
-                    const res = await fetch(
-                        `https://api.themoviedb.org/3/${tmdbType}/${tmdbId}?api_key=${TMDB_API_KEY}&append_to_response=alternative_titles,external_ids`
-                    );
-
-                    if(!res.ok) return null;
-
-                    const data = await res.json();
-
-                    let altTitles = [];
-
-                    if(tmdbType === 'movie' && data.alternative_titles?.titles){
-                        data.alternative_titles.titles.forEach(t => altTitles.push(t.title));
-                    }
-
-                    if(tmdbType === 'tv' && data.alternative_titles?.results){
-                        data.alternative_titles.results.forEach(t => altTitles.push(t.title));
-                    }
-
-                    const payload = {
-                        original: data.original_title || data.original_name || '',
-                        imdb: data.external_ids?.imdb_id || null,
-                        year: (data.release_date || data.first_air_date || '').substr(0,4),
-                        alternatives: altTitles
-                    };
-
-                    setCache(payload);
-                    return payload;
-
-                }catch(e){
-                    return null;
-                }
-            }
-
-            // ================= 3️⃣ HYBRID MATCH =================
-
-            async function run(){
-
-                let tmdbData = await fetchTMDB();
-
-                let allTitles = [];
-
-                if(tmdbData){
-                    if(tmdbData.original)
-                        allTitles.push(norm(tmdbData.original));
-
-                    tmdbData.alternatives.forEach(t =>
-                        allTitles.push(norm(t))
-                    );
-
-                    // IMDB from TMDB
-                    if(tmdbData.imdb){
-                        for(let i=0;i<items.length;i++){
-                            if(items[i].imdb === tmdbData.imdb){
-                                getPage(items[i].link);
-                                return;
-                            }
-                        }
-                    }
-                }
-
-                // ===== ABSOLUTE MAX SCORING =====
-
-                items.forEach(function(item){
-
-                    let score = 0;
-                    const itemNorm = norm(item.title);
-
-                    // TMDB titles boost
-                    allTitles.forEach(function(t){
-
-                        if(itemNorm === t) score += 600;
-                        if(itemNorm.includes(t)) score += 300;
-                        if(safeFuzzy(itemNorm, t)) score += 200;
-                    });
-
-                    // Year boost
-                    if(inputYear && item.year){
-                        const diff = Math.abs(item.year - inputYear);
-                        if(diff === 0) score += 350;
-                        else if(diff === 1) score += 200;
-                        else if(diff <= 3) score += 80;
-                        else score -= 200;
-                    }
-
-                    // Series protection
-                    if(isSeries){
-                        if(/season|сезон/i.test(item.title)) score += 80;
-                    }else{
-                        if(/season|сезон/i.test(item.title)) score -= 220;
-                    }
-
-                    item.score = score;
+                // MULTI VARIANT
+                inputTitles.forEach(function(t){
+                    if(itemTitle === t) score += 240;
                 });
 
-                items.sort((a,b) => b.score - a.score);
+                inputOriginals.forEach(function(t){
+                    if(itemTitle === t) score += 260;
+                });
 
-                const best = items[0];
-                const second = items[1];
+                // CONTAINS
+                if(mainInput.length > 3 && itemTitle.includes(mainInput)) score += 180;
+                if(mainOriginal && itemTitle.includes(mainOriginal)) score += 200;
 
-                if(best){
+                // SAFE FUZZY
+                if(safeFuzzy(itemTitle, mainInput)) score += 140;
+                if(safeFuzzy(itemTitle, mainOriginal)) score += 160;
 
-                    if(!second){
-                        getPage(best.link);
-                        return;
-                    }
+                // YEAR
+                if(inputYear && item.year){
+                    var diff = Math.abs(item.year - inputYear);
+                    if(diff === 0) score += 320;
+                    else if(diff === 1) score += 200;
+                    else if(diff <= 3) score += 80;
+                    else score -= 180;
+                }
 
-                    const diff = best.score - second.score;
+                // LENGTH LOGIC
+                score += titleLengthPenalty(itemTitle, mainInput);
 
-                    if(diff >= 25 || best.score >= 400){
+                // SERIES PROTECTION
+                if(isSearchingSeries){
+                    if(/season|сезон/i.test(item.title)) score += 60;
+                } else {
+                    if(/season|сезон/i.test(item.title)) score -= 200;
+                }
+
+                // QUALITY TRASH PENALTY
+                if(/camrip|ts|telesync/i.test(item.title)) score -= 220;
+
+                item.score = score;
+            });
+
+            // ================= STEP 4 — SMART PICK =================
+
+            items.sort(function(a,b){
+                return (b.score||0) - (a.score||0);
+            });
+
+            var best = items[0];
+            var second = items[1];
+            var third = items[2];
+
+            if(best){
+
+                if(!second){
+                    getPage(best.link);
+                    return;
+                }
+
+                var diff12 = (best.score||0) - (second.score||0);
+
+                // динамический порог
+                var autoThreshold = 300;
+                if(inputYear) autoThreshold += 40;
+                if(mainOriginal) autoThreshold += 30;
+
+                if(diff12 >= 25){
+                    getPage(best.link);
+                    return;
+                }
+
+                if(best.score >= autoThreshold){
+                    getPage(best.link);
+                    return;
+                }
+
+                if(third){
+                    if(best.score > second.score && second.score > third.score && best.score >= 260){
                         getPage(best.link);
                         return;
                     }
                 }
-
-                component.similars(items);
-                component.loading(false);
             }
 
-            console.log("=== DEBUG SCORES ===");
-            items.forEach(i => {
-                console.log(i.title, i.score);
-            });
+            // ================= FALLBACK =================
 
-            run();
+            component.similars(items);
+            component.loading(false);
          };
 
         var query_search = function query_search(query, data, callback) {
