@@ -2136,57 +2136,45 @@
 
         var display = function display(links, have_more, query) {
             
-            // Исправление: проверяем наличие links и что это массив
-            if (!links || !Array.isArray(links) || !links.length) {
-                // Если нет результатов, показываем пустое состояние
-                if (typeof component !== 'undefined' && component) {
-                    component.emptyForQuery(query || select_title || '');
-                } else {
-                    console.log('Нет результатов для отображения');
-                }
-                return;
-            }
+            if (!links || !links.length) return;
 
             // ================= INPUT =================
 
             var inputTitleRaw =
                 select_title ||
-                (object && object.movie && object.movie.title) ||
-                (object && object.movie && object.movie.name) ||
-                (object && object.movie && object.movie.original_title) ||
-                (object && object.movie && object.movie.original_name) ||
+                object.movie.title ||
+                object.movie.name ||
+                object.movie.original_title ||
+                object.movie.original_name ||
                 '';
 
             var inputOriginalRaw =
-                (object && object.movie && object.movie.original_title) ||
-                (object && object.movie && object.movie.original_name) ||
+                object.movie.original_title ||
+                object.movie.original_name ||
                 '';
 
             // Используем данные из TMDB карточки
-            var inputYear = null;
-            if (object && object.movie) {
-                inputYear =
-                    object.movie.release_date ?
-                    parseInt(object.movie.release_date.substr(0,4)) :
-                    object.movie.first_air_date ?
-                    parseInt(object.movie.first_air_date.substr(0,4)) :
-                    object.movie.year ?
-                    parseInt(object.movie.year) :
-                    null;
-            }
+            var inputYear =
+                object.movie.release_date ?
+                parseInt(object.movie.release_date.substr(0,4)) :
+                object.movie.first_air_date ?
+                parseInt(object.movie.first_air_date.substr(0,4)) :
+                object.movie.year ?
+                parseInt(object.movie.year) :
+                null;
 
-            var inputTMDB = (object && object.movie && object.movie.id) || null;
-            var inputIMDB = (object && object.movie && object.movie.imdb_id) || null;
+            var inputTMDB = object.movie.id || null; // TMDB ID из карточки
+            var inputIMDB = object.movie.imdb_id || null; // Может быть получен через TMDB API
 
             // Альтернативные названия из TMDB
             var alternativeTitles = [];
-            if (object && object.movie && object.movie.alternative_titles && object.movie.alternative_titles.results) {
+            if (object.movie.alternative_titles && object.movie.alternative_titles.results) {
                 alternativeTitles = object.movie.alternative_titles.results.map(function(t) {
                     return t.title;
                 });
             }
 
-            var isSearchingSeries = !!(object && object.movie && object.movie.first_air_date);
+            var isSearchingSeries = !!object.movie.first_air_date;
 
             // ================= HELPERS =================
 
@@ -2244,68 +2232,49 @@
 
             // ================= PARSE ITEMS =================
 
-            var items = [];
-            try {
-                items = links.map(function(l) {
-                    // Адаптируйте под формат вашего источника
-                    var $l = null;
-                    try {
-                        $l = $(l + '</div>');
-                    } catch (e) {
-                        $l = $(document.createElement('div'));
-                    }
-                    
-                    var link = $l.find('a').first();
-                    
-                    var text = link.text().trim() || '';
-                    var href = link.attr('href') || '';
+            var items = links.map(function(l){
+                // Адаптируйте под формат вашего источника
+                var li = $(l + '</div>');
+                var link = $('a', li);
+                
+                var text = link.text().trim() || '';
+                var href = link.attr('href') || '';
 
-                    var yearMatch = text.match(/\b(19|20)\d{2}\b/);
-                    var year = yearMatch ? parseInt(yearMatch[0]) : null;
+                var yearMatch = text.match(/\b(19|20)\d{2}\b/);
+                var year = yearMatch ? parseInt(yearMatch[0]) : null;
 
-                    // Ищем TMDB ID в ссылке (если есть)
-                    var tmdbMatch = href.match(/\/(movie|tv)\/(\d+)/i);
-                    var tmdb = tmdbMatch ? parseInt(tmdbMatch[2]) : null;
+                // Ищем TMDB ID в ссылке (если есть)
+                var tmdbMatch = href.match(/\/(movie|tv)\/(\d+)/i);
+                var tmdb = tmdbMatch ? parseInt(tmdbMatch[2]) : null;
 
-                    // Ищем IMDB ID
-                    var imdbMatch = href.match(/tt\d+/i);
-                    var imdb = imdbMatch ? imdbMatch[0] : null;
+                // Ищем IMDB ID
+                var imdbMatch = href.match(/tt\d+/i);
+                var imdb = imdbMatch ? imdbMatch[0] : null;
 
-                    return {
-                        title: text,
-                        link: href,
-                        year: year,
-                        imdb: imdb,
-                        tmdb: tmdb,
-                        score: 0
-                    };
-                });
-            } catch (e) {
-                console.error('Ошибка парсинга элементов:', e);
-                if (typeof component !== 'undefined' && component) {
-                    component.emptyForQuery(query || select_title || '');
-                }
-                return;
-            }
+                return {
+                    title: text,
+                    link: href,
+                    year: year,
+                    imdb: imdb,
+                    tmdb: tmdb,
+                    score: 0
+                };
+            });
 
             // ================= STEP 1 — ID MATCH =================
 
             // Сначала проверяем по TMDB ID
             for(var i=0;i<items.length;i++){
-                if(inputTMDB && items[i] && items[i].tmdb === inputTMDB){
-                    if (typeof getPage === 'function') {
-                        getPage(items[i].link);
-                    }
+                if(inputTMDB && items[i].tmdb === inputTMDB){
+                    getPage(items[i].link);
                     return;
                 }
             }
 
             // Потом по IMDB ID
             for(var i=0;i<items.length;i++){
-                if(inputIMDB && items[i] && items[i].imdb === inputIMDB){
-                    if (typeof getPage === 'function') {
-                        getPage(items[i].link);
-                    }
+                if(inputIMDB && items[i].imdb === inputIMDB){
+                    getPage(items[i].link);
                     return;
                 }
             }
@@ -2313,32 +2282,25 @@
             // ================= STEP 2 — HARD EXACT =================
 
             for(var i=0;i<items.length;i++){
-                if (!items[i]) continue;
-                
+
                 var itemNorm = norm(items[i].title);
 
                 // Точное совпадение с оригинальным названием + год
                 if(mainOriginal && itemNorm === mainOriginal && inputYear && items[i].year === inputYear){
-                    if (typeof getPage === 'function') {
-                        getPage(items[i].link);
-                    }
+                    getPage(items[i].link);
                     return;
                 }
 
                 // Точное совпадение с русским названием + год
                 if(mainInput && itemNorm === mainInput && inputYear && items[i].year === inputYear){
-                    if (typeof getPage === 'function') {
-                        getPage(items[i].link);
-                    }
+                    getPage(items[i].link);
                     return;
                 }
 
                 // Проверяем альтернативные названия
                 for(var j=0; j<allTitleVariants.length; j++) {
                     if(allTitleVariants[j] && itemNorm === allTitleVariants[j] && inputYear && items[i].year === inputYear){
-                        if (typeof getPage === 'function') {
-                            getPage(items[i].link);
-                        }
+                        getPage(items[i].link);
                         return;
                     }
                 }
@@ -2347,7 +2309,6 @@
             // ================= STEP 3 — ABSOLUTE SCORING =================
 
             items.forEach(function(item){
-                if (!item) return;
 
                 var score = 0;
                 var itemTitle = norm(item.title);
@@ -2413,31 +2374,18 @@
 
             // ================= STEP 4 — SMART PICK =================
 
-            // Фильтруем элементы без score
-            var validItems = items.filter(function(item) { return item && typeof item.score !== 'undefined'; });
-            
-            if (validItems.length === 0) {
-                if (typeof component !== 'undefined' && component) {
-                    component.similars([]);
-                    component.loading(false);
-                }
-                return;
-            }
-
-            validItems.sort(function(a,b){
+            items.sort(function(a,b){
                 return (b.score||0) - (a.score||0);
             });
 
-            var best = validItems[0];
-            var second = validItems[1];
-            var third = validItems[2];
+            var best = items[0];
+            var second = items[1];
+            var third = items[2];
 
             if(best){
 
                 if(!second){
-                    if (typeof getPage === 'function') {
-                        getPage(best.link);
-                    }
+                    getPage(best.link);
                     return;
                 }
 
@@ -2447,27 +2395,21 @@
                 var autoThreshold = 300;
                 if(inputYear) autoThreshold += 40;
                 if(mainOriginal) autoThreshold += 30;
-                if(alternativeTitles.length > 0) autoThreshold += 20;
+                if(alternativeTitles.length > 0) autoThreshold += 20; // Больше данных = выше порог
 
                 if(diff12 >= 25){
-                    if (typeof getPage === 'function') {
-                        getPage(best.link);
-                    }
+                    getPage(best.link);
                     return;
                 }
 
                 if(best.score >= autoThreshold){
-                    if (typeof getPage === 'function') {
-                        getPage(best.link);
-                    }
+                    getPage(best.link);
                     return;
                 }
 
                 if(third){
                     if(best.score > second.score && second.score > third.score && best.score >= 260){
-                        if (typeof getPage === 'function') {
-                            getPage(best.link);
-                        }
+                        getPage(best.link);
                         return;
                     }
                 }
@@ -2476,21 +2418,8 @@
             // ================= FALLBACK =================
 
             // Если не нашли точного совпадения, показываем похожие
-            if (typeof component !== 'undefined' && component) {
-                // Преобразуем элементы в формат для similars
-                var similarItems = validItems.map(function(item) {
-                    return {
-                        title: item.title,
-                        link: item.link,
-                        year: item.year ? item.year.toString() : '',
-                        id: item.tmdb || item.imdb || '',
-                        // Добавляем другие поля по необходимости
-                    };
-                });
-                
-                component.similars(similarItems);
-                component.loading(false);
-            }
+            component.similars(items);
+            component.loading(false);
          };
 
         var query_search = function query_search(query, data, callback) {
@@ -16929,64 +16858,53 @@
 
 
       this.similars = function (json, search_more, more_params) {
-          // Защита от пустого json
-          if (!json || !Array.isArray(json) || !json.length) {
-              this.empty(Lampa.Lang.translate('online_mod_query_start') + ' (' + (object.search || '') + ') ' + Lampa.Lang.translate('online_mod_query_end'));
-              this.loading(false);
-              return;
-          }
-          
-          var _this5 = this;
-          
-          // Очищаем перед добавлением новых элементов
-          this.reset();
+        var _this5 = this;
 
-          json.forEach(function (elem) {
-              if (!elem) return;
-              
-              var title = elem.title || elem.ru_title || elem.nameRu || elem.en_title || elem.nameEn || elem.orig_title || elem.nameOriginal || 'Неизвестно';
-              var orig_title = elem.orig_title || elem.nameOriginal || elem.en_title || elem.nameEn;
-              var year = elem.start_date || elem.year || '';
-              
-              var info = [];
-              if (orig_title && orig_title != elem.title) info.push(orig_title);
-              if (elem.seasons_count) info.push(Lampa.Lang.translate('online_mod_seasons_count') + ': ' + elem.seasons_count);
-              if (elem.episodes_count) info.push(Lampa.Lang.translate('online_mod_episodes_count') + ': ' + elem.episodes_count);
-              
-              elem.title = title;
-              elem.quality = year ? (year + '').slice(0, 4) : '----';
-              elem.info = info.length ? ' / ' + info.join(' / ') : '';
-              
-              var item = Lampa.Template.get('online_mod_folder', elem);
-              item.on('hover:enter', function () {
-                  _this5.activity.loader(true);
-                  _this5.reset();
-                  object.search = elem.title;
-                  object.search_date = year;
-                  selected_id = elem.id;
-                  _this5.extendChoice();
-                  sources[balanser].search(object, elem.kp_id || elem.kinopoisk_id || elem.kinopoiskId || elem.filmId || elem.imdb_id, [elem]);
-              });
+        json.forEach(function (elem) {
+          var title = elem.title || elem.ru_title || elem.nameRu || elem.en_title || elem.nameEn || elem.orig_title || elem.nameOriginal;
+          var orig_title = elem.orig_title || elem.nameOriginal || elem.en_title || elem.nameEn;
+          var year = elem.start_date || elem.year || '';
+          var info = [];
+          if (orig_title && orig_title != elem.title) info.push(orig_title);
+          if (elem.seasons_count) info.push(Lampa.Lang.translate('online_mod_seasons_count') + ': ' + elem.seasons_count);
+          if (elem.episodes_count) info.push(Lampa.Lang.translate('online_mod_episodes_count') + ': ' + elem.episodes_count);
+          elem.title = title;
+          elem.quality = year ? (year + '').slice(0, 4) : '----';
+          elem.info = info.length ? ' / ' + info.join(' / ') : '';
+          var item = Lampa.Template.get('online_mod_folder', elem);
+          item.on('hover:enter', function () {
+            _this5.activity.loader(true);
 
-              _this5.append(item);
+            _this5.reset();
+
+            object.search = elem.title;
+            object.search_date = year;
+            selected_id = elem.id;
+
+            _this5.extendChoice();
+
+            sources[balanser].search(object, elem.kp_id || elem.kinopoisk_id || elem.kinopoiskId || elem.filmId || elem.imdb_id, [elem]);
           });
 
-          if (search_more) {
-              var elem = {
-                  title: Lampa.Lang.translate('online_mod_show_more'),
-                  quality: '...',
-                  info: ''
-              };
-              var item = Lampa.Template.get('online_mod_folder', elem);
-              item.on('hover:enter', function () {
-                  _this5.activity.loader(true);
-                  _this5.reset();
-                  search_more(more_params);
-              });
-              this.append(item);
-          }
-          
-          this.start(true);
+          _this5.append(item);
+        });
+
+        if (search_more) {
+          var elem = {
+            title: Lampa.Lang.translate('online_mod_show_more'),
+            quality: '...',
+            info: ''
+          };
+          var item = Lampa.Template.get('online_mod_folder', elem);
+          item.on('hover:enter', function () {
+            _this5.activity.loader(true);
+
+            _this5.reset();
+
+            search_more(more_params);
+          });
+          this.append(item);
+        }
       };
       /**
        * Очистить список файлов
@@ -19222,7 +19140,7 @@
         headers: headers,
         returnHeaders: returnHeaders
       });
-    }
+    } ///////Онлайн Мод/////////
 
 
     function addSettingsOnlineMod() {
