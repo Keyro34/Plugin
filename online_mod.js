@@ -17004,363 +17004,69 @@
     function addStyles() {
         var style = `
         <style>
-        @charset 'UTF-8';
-        .online-prestige {
-            position: relative;
-            -webkit-border-radius: .3em;
-            border-radius: .3em;
-            background-color: rgba(0,0,0,0.3);
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: flex
+        /* Основные стили для карточек */
+        .online-card {
+            display: flex;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 0.5em;
+            margin-bottom: 1em;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
-        .online-prestige__body {
-            padding: 1.2em;
-            line-height: 1.3;
-            -webkit-box-flex: 1;
-            -webkit-flex-grow: 1;
-            -moz-box-flex: 1;
-            -ms-flex-positive: 1;
-            flex-grow: 1;
-            position: relative
+        
+        .online-card.focus {
+            background: rgba(50, 50, 50, 0.98);
+            border-color: #ffd700;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
         }
-        @media screen and (max-width:480px) {
-            .online-prestige__body {
-                padding: .8em 1.2em
-            }
-        }
-        .online-prestige__img {
-            position: relative;
-            width: 13em;
-            -webkit-flex-shrink: 0;
-            -ms-flex-negative: 0;
+        
+        .online-card__image-container {
+            width: 8em;
             flex-shrink: 0;
-            min-height: 8.2em
+            position: relative;
         }
-        .online-prestige__img>img {
-            position: absolute;
-            top: 0;
-            left: 0;
+        
+        .online-card__image {
+            position: relative;
             width: 100%;
             height: 100%;
-            -o-object-fit: cover;
-            object-fit: cover;
-            -webkit-border-radius: .3em;
-            border-radius: .3em;
-            opacity: 0;
-            -webkit-transition: opacity .3s;
-            -o-transition: opacity .3s;
-            -moz-transition: opacity .3s;
-            transition: opacity .3s
-        }
-        .online-prestige__img--loaded>img {
-            opacity: 1
-        }
-        @media screen and (max-width:480px) {
-            .online-prestige__img {
-                width: 7em;
-                min-height: 6em
-            }
-        }
-        .online-prestige__folder {
-            padding: 1em;
-            -webkit-flex-shrink: 0;
-            -ms-flex-negative: 0;
-            flex-shrink: 0
-        }
-        .online-prestige__folder>svg {
-            width: 4.4em !important;
-            height: 4.4em !important
-        }
-        .online-prestige__viewed {
-            position: absolute;
-            top: 1em;
-            left: 1em;
-            background: rgba(0,0,0,0.45);
-            -webkit-border-radius: 100%;
-            border-radius: 100%;
-            padding: .25em;
-            font-size: .76em
-        }
-        .online-prestige__viewed>svg {
-            width: 1.5em !important;
-            height: 1.5em !important
-        }
-        .online-prestige__episode-number {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -moz-box-align: center;
-            -ms-flex-align: center;
-            align-items: center;
-            -webkit-box-pack: center;
-            -webkit-justify-content: center;
-            -moz-box-pack: center;
-            -ms-flex-pack: center;
-            justify-content: center;
-            font-size: 2em
-        }
-        .online-prestige__loader {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 2em;
-            height: 2em;
-            margin-left: -1em;
-            margin-top: -1em;
-            background: url(./img/loader.svg) no-repeat center center;
-            -webkit-background-size: contain;
-            -o-background-size: contain;
-            background-size: contain
-        }
-        .online-prestige__head,.online-prestige__footer {
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-pack: justify;
-            -webkit-justify-content: space-between;
-            -moz-box-pack: justify;
-            -ms-flex-pack: justify;
-            justify-content: space-between;
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -moz-box-align: center;
-            -ms-flex-align: center;
-            align-items: center
-        }
-        .online-prestige__timeline {
-            margin: .8em 0
-        }
-        .online-prestige__timeline>.time-line {
-            display: block !important
-        }
-        .online-prestige__title {
-            font-size: 1.7em;
+            min-height: 6em;
+            background: #1a1a1a;
             overflow: hidden;
-            -o-text-overflow: ellipsis;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            line-clamp: 1;
-            -webkit-box-orient: vertical
-        }
-        @media screen and (max-width:480px) {
-            .online-prestige__title {
-                font-size: 1.4em
-            }
-        }
-        .online-prestige__time {
-            padding-left: 2em
-        }
-        .online-prestige__info {
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -moz-box-align: center;
-            -ms-flex-align: center;
-            align-items: center
-        }
-        .online-prestige__info>* {
-            overflow: hidden;
-            -o-text-overflow: ellipsis;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            line-clamp: 1;
-            -webkit-box-orient: vertical
-        }
-        .online-prestige__quality {
-            padding-left: 1em;
-            white-space: nowrap
-        }
-        .online-prestige .online-prestige-split {
-            font-size: .8em;
-            margin: 0 1em;
-            -webkit-flex-shrink: 0;
-            -ms-flex-negative: 0;
-            flex-shrink: 0
-        }
-        .online-prestige.focus::after {
-            content: '';
-            position: absolute;
-            top: -0.6em;
-            left: -0.6em;
-            right: -0.6em;
-            bottom: -0.6em;
-            -webkit-border-radius: .7em;
-            border-radius: .7em;
-            border: solid .3em #fff;
-            z-index: -1;
-            pointer-events: none
-        }
-        .online-prestige+.online-prestige {
-            margin-top: 1.5em
-        }
-        .online-prestige--folder .online-prestige__footer {
-            margin-top: .8em
-        }
-        .online-prestige-watched {
-            padding: 1em
-        }
-        .online-prestige-watched__icon>svg {
-            width: 1.5em;
-            height: 1.5em
-        }
-        .online-prestige-watched__body {
-            padding-left: 1em;
-            padding-top: .1em;
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-flex-wrap: wrap;
-            -ms-flex-wrap: wrap;
-            flex-wrap: wrap
-        }
-        .online-prestige-watched__body>span+span::before {
-            content: ' ● ';
-            vertical-align: top;
-            display: inline-block;
-            margin: 0 .5em
-        }
-        .online-prestige-rate {
-            display: -webkit-inline-box;
-            display: -webkit-inline-flex;
-            display: -moz-inline-box;
-            display: -ms-inline-flexbox;
-            display: inline-flex;
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -moz-box-align: center;
-            -ms-flex-align: center;
-            align-items: center
-        }
-        .online-prestige-rate>svg {
-            width: 1.3em !important;
-            height: 1.3em !important
-        }
-        .online-prestige-rate>span {
-            font-weight: 600;
-            font-size: 1.1em;
-            padding-left: .7em
-        }
-        .online-empty {
-            line-height: 1.4
-        }
-        .online-empty__title {
-            font-size: 1.8em;
-            margin-bottom: .3em
-        }
-        .online-empty__time {
-            font-size: 1.2em;
-            font-weight: 300;
-            margin-bottom: 1.6em
-        }
-        .online-empty__buttons {
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: flex
-        }
-        .online-empty__buttons>*+* {
-            margin-left: 1em
-        }
-        .online-empty__button {
-            background: rgba(0,0,0,0.3);
-            font-size: 1.2em;
-            padding: .5em 1.2em;
-            -webkit-border-radius: .2em;
-            border-radius: .2em;
-            margin-bottom: 2.4em
-        }
-        .online-empty__button.focus {
-            background: #fff;
-            color: black
-        }
-        .online-empty__templates .online-empty-template:nth-child(2) {
-            opacity: .5
-        }
-        .online-empty__templates .online-empty-template:nth-child(3) {
-            opacity: .2
-        }
-        .online-empty-template {
-            background-color: rgba(255,255,255,0.3);
-            padding: 1em;
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -moz-box-align: center;
-            -ms-flex-align: center;
-            align-items: center;
-            -webkit-border-radius: .3em;
-            border-radius: .3em
-        }
-        .online-empty-template>* {
-            background: rgba(0,0,0,0.3);
-            -webkit-border-radius: .3em;
-            border-radius: .3em
-        }
-        .online-empty-template__ico {
-            width: 4em;
-            height: 4em;
-            margin-right: 2.4em
-        }
-        .online-empty-template__body {
-            height: 1.7em;
-            width: 70%
-        }
-        .online-empty-template+.online-empty-template {
-            margin-top: 1em
         }
         
-        .online-prestige__img {
-            position: relative;
-            width: 13em;
-            flex-shrink: 0;
-            min-height: 8.2em;
-            background-color: rgba(0,0,0,0.2); /* фон пока грузится */
-        }
-        
-        .online-prestige__img img {
+        .online-card__image img {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 0.3em;
             opacity: 0;
             transition: opacity 0.3s;
         }
         
-        .online-prestige__img--loaded img {
+        .online-card__image--loaded img {
             opacity: 1;
         }
         
-        .online-prestige__loader {
+        .online-card__image--fallback {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .online-card__fallback-icon {
+            font-size: 2.5em;
+            opacity: 0.7;
+            color: #ffd700;
+        }
+        
+        .online-card__loader {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -17368,68 +17074,21 @@
             height: 2em;
             margin-left: -1em;
             margin-top: -1em;
-            background: url(./img/loader.svg) no-repeat center center;
-            background-size: contain;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-top-color: #ffd700;
+            border-radius: 50%;
+            animation: online-card-spin 0.8s linear infinite;
             z-index: 2;
         }
         
-        .online-prestige__img--loaded .online-prestige__loader {
+        @keyframes online-card-spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .online-card__image--loaded .online-card__loader {
             display: none;
         }
         
-        .online-prestige__episode-number {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2em;
-            font-weight: bold;
-            color: white;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
-            z-index: 3;
-            pointer-events: none;
-        }
-        
-        .online-prestige__viewed {
-            position: absolute;
-            top: 0.5em;
-            left: 0.5em;
-            background: rgba(0,0,0,0.6);
-            border-radius: 50%;
-            padding: 0.2em;
-            z-index: 4;
-        }
-        
-        .online-prestige__viewed svg {
-            width: 1.2em;
-            height: 1.2em;
-            fill: gold;
-        }
-        
-        /* Убедимся, что timeline отображается */
-        .online-prestige__timeline {
-            margin: 0.8em 0;
-            width: 100%;
-        }
-        
-        .online-prestige__timeline .time-line {
-            display: block !important;
-            height: 0.3em;
-            background: rgba(255,255,255,0.2);
-            border-radius: 0.15em;
-            overflow: hidden;
-        }
-        
-        .online-prestige__timeline .time-line__progress {
-            height: 100%;
-            background: #ffd700;
-            border-radius: 0.15em;
-        }
-
         .online-card__episode-number {
             position: absolute;
             top: 0;
@@ -17442,11 +17101,169 @@
             font-size: 2em;
             font-weight: bold;
             color: white;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
             z-index: 3;
             pointer-events: none;
             background: rgba(0,0,0,0.3);
-            border-radius: 0.3em;
+            border-radius: 0.3em 0 0 0.3em;
+        }
+        
+        .online-card__viewed {
+            position: absolute;
+            top: 0.3em;
+            left: 0.3em;
+            width: 1.5em;
+            height: 1.5em;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            z-index: 4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .online-card__content {
+            flex: 1;
+            padding: 0.8em 1em;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .online-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5em;
+        }
+        
+        .online-card__title {
+            font-size: 1.2em;
+            font-weight: 500;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .online-card__time {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-left: 1em;
+            white-space: nowrap;
+        }
+        
+        .online-card__timeline {
+            margin: 0.5em 0;
+            width: 100%;
+        }
+        
+        .online-card__timeline .time-line {
+            display: block !important;
+            height: 0.2em;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.1em;
+            overflow: hidden;
+        }
+        
+        .online-card__timeline .time-line__progress {
+            height: 100%;
+            background: #ffd700;
+            border-radius: 0.1em;
+        }
+        
+        .online-card__footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+        
+        .online-card__info {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            color: #aaa;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .online-card__info .online-prestige-rate {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2em;
+            color: #ffd700;
+            font-weight: 600;
+        }
+        
+        .online-card__voice {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #888;
+        }
+        
+        .online-card__quality {
+            color: #4CAF50;
+            font-weight: 500;
+            margin-left: 1em;
+            white-space: nowrap;
+        }
+        
+        /* Стили для фильтра */
+        .torrent-filter {
+            margin-bottom: 1.5em;
+            padding: 0 1em;
+        }
+        
+        .filter--sort {
+            margin-right: 1em;
+        }
+        
+        .filter--sort span {
+            font-size: 1.1em;
+            color: #fff;
+        }
+        
+        /* Стили для пустого состояния */
+        .online-empty {
+            text-align: center;
+            padding: 3em 2em;
+            color: #aaa;
+        }
+        
+        .online-empty__title {
+            font-size: 1.5em;
+            margin-bottom: 0.5em;
+            color: #fff;
+        }
+        
+        /* Адаптация для мобильных */
+        @media screen and (max-width: 480px) {
+            .online-card__image-container {
+                width: 6em;
+            }
+            
+            .online-card__content {
+                padding: 0.6em 0.8em;
+            }
+            
+            .online-card__title {
+                font-size: 1em;
+            }
+            
+            .online-card__time {
+                font-size: 0.8em;
+            }
         }
         </style>
         `;
