@@ -18022,38 +18022,26 @@
 
       // Шаблон для карточек в стиле второго изображения
       Lampa.Template.add('online_mod_card', 
-      `<div class="order-card selector">
-          <div class="order-card__bg">
-              <img alt="" crossorigin="anonymous">
-              <div class="order-card__gradient"></div>
+      `<div class="online-card selector">
+          <div class="online-card__image-container">
+              <div class="online-card__image">
+                  <img alt="" crossorigin="anonymous">
+                  <div class="online-card__loader"></div>
+              </div>
           </div>
-
-          <div class="order-card__content">
-
-              <div class="order-card__number">
-                  {episode}
+          <div class="online-card__content">
+              <div class="online-card__header">
+                  <div class="online-card__title">{title}</div>
+                  <div class="online-card__time">{time}</div>
               </div>
-
-              <div class="order-card__right">
-
-                  <div class="order-card__title">
-                      {title}
+              <div class="online-card__timeline"></div>
+              <div class="online-card__footer">
+                  <div class="online-card__info">
+                      {rating}
+                      <span class="online-card__voice">{info}</span>
                   </div>
-
-                  <div class="order-card__progress">
-                      <div class="order-card__progress-bar"></div>
-                  </div>
-
-                  <div class="order-card__meta">
-                      {rating} {info}
-                  </div>
-
+                  <div class="online-card__quality">{quality}</div>
               </div>
-
-              <div class="order-card__time">
-                  {time}
-              </div>
-
           </div>
       </div>`);
     }
@@ -18061,102 +18049,270 @@
     function addStyles() {
         var style = `
         <style>
-
-        /* ===== НОВАЯ КАРТОЧКА ===== */
-
-        .order-card {
-            position: relative;
-            height: 190px;
-            border-radius: 18px;
-            overflow: hidden;
-            margin-bottom: 24px;
-            background: #473939;
-            transition: transform .25s ease, box-shadow .25s ease;
-        }
-
-        .order-card.focus {
-            transform: scale(1.03);
-            box-shadow: 0 0 25px rgba(255,215,0,0.35);
-        }
-
-        .order-card__bg img {
-            position: absolute;
-            vertical-align: middle;
-            max-width: 100%;
-            object-fit: cover;
-        }
-
-        .order-card__gradient {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                90deg,
-                rgba(0,0,0,0.85) 0%,
-                rgba(0,0,0,0.7) 40%,
-                rgba(0,0,0,0.4) 70%,
-                rgba(0,0,0,0.1) 100%
-            );
-        }
-
-        .order-card__content {
-            position: relative;
+        /* Основные стили для карточек */
+        .online-card {
             display: flex;
-            height: 100%;
-            padding: 24px;
-            align-items: center;
-        }
-
-        .order-card__number {
-            font-size: 70px;
-            font-weight: 700;
-            color: #fff;
-            opacity: 0.95;
-            min-width: 90px;
-        }
-
-        .order-card__right {
-            margin-left: 40px;
-            flex: 1;
-        }
-
-        .order-card__title {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 14px;
-            color: #fff;
-        }
-
-        .order-card__progress {
-            height: 4px;
-            background: rgba(255,255,255,0.25);
-            border-radius: 3px;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 0.5em;
+            margin-bottom: 1em;
             overflow: hidden;
-            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
-
-        .order-card__progress-bar {
+        
+        .online-card.focus {
+            background: rgba(50, 50, 50, 0.98);
+            border-color: #ffd700;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .online-card__image-container {
+            width: 8em;
+            flex-shrink: 0;
+            position: relative;
+        }
+        
+        .online-card__image {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 6em;
+            background: #1a1a1a;
+            overflow: hidden;
+        }
+        
+        .online-card__image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .online-card__image--loaded img {
+            opacity: 1;
+        }
+        
+        .online-card__image--fallback {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .online-card__fallback-icon {
+            font-size: 2.5em;
+            opacity: 0.7;
+            color: #ffd700;
+        }
+        
+        .online-card__loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2em;
+            height: 2em;
+            margin-left: -1em;
+            margin-top: -1em;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-top-color: #ffd700;
+            border-radius: 50%;
+            animation: online-card-spin 0.8s linear infinite;
+            z-index: 2;
+        }
+        
+        @keyframes online-card-spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .online-card__image--loaded .online-card__loader {
+            display: none;
+        }
+        
+        .online-card__episode-number {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            z-index: 3;
+            pointer-events: none;
+            background: rgba(0,0,0,0.3);
+            border-radius: 0.3em 0 0 0.3em;
+        }
+        
+        .online-card__viewed {
+            position: absolute;
+            top: 0.3em;
+            left: 0.3em;
+            width: 1.5em;
+            height: 1.5em;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            z-index: 4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .online-card__content {
+            flex: 1;
+            padding: 0.8em 1em;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .online-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5em;
+        }
+        
+        .online-card__title {
+            font-size: 1.2em;
+            font-weight: 500;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .online-card__time {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-left: 1em;
+            white-space: nowrap;
+        }
+        
+        .online-card__timeline {
+            margin: 0.5em 0;
+            width: 100%;
+        }
+        
+        .online-card__timeline .time-line {
+            display: block !important;
+            height: 0.2em;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.1em;
+            overflow: hidden;
+        }
+        
+        .online-card__timeline .time-line__progress {
             height: 100%;
             background: #ffd700;
-            transition: width .3s ease;
+            border-radius: 0.1em;
         }
-
-        .order-card__meta {
-            font-size: 15px;
-            opacity: 0.9;
-            color: #ddd;
+        
+        .online-card__footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
         }
-
-        .order-card__time {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            font-size: 16px;
-            color: #ddd;
+        
+        .online-card__info {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            color: #aaa;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
         }
-
+        
+        .online-card__info .online-prestige-rate {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2em;
+            color: #ffd700;
+            font-weight: 600;
+        }
+        
+        .online-card__voice {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #888;
+        }
+        
+        .online-card__quality {
+            color: #4CAF50;
+            font-weight: 500;
+            margin-left: 1em;
+            white-space: nowrap;
+        }
+        
+        /* Стили для фильтра */
+        .torrent-filter {
+            margin-bottom: 1.5em;
+            padding: 0 1em;
+        }
+        
+        .filter--sort {
+            margin-right: 1em;
+        }
+        
+        .filter--sort span {
+            font-size: 1.1em;
+            color: #fff;
+        }
+        
+        /* Стили для пустого состояния */
+        .online-empty {
+            text-align: center;
+            padding: 3em 2em;
+            color: #aaa;
+        }
+        
+        .online-empty__title {
+            font-size: 1.5em;
+            margin-bottom: 0.5em;
+            color: #fff;
+        }
+        
+        /* Адаптация для мобильных */
+        @media screen and (max-width: 480px) {
+            .online-card__image-container {
+                width: 6em;
+            }
+            
+            .online-card__content {
+                padding: 0.6em 0.8em;
+            }
+            
+            .online-card__title {
+                font-size: 1em;
+            }
+            
+            .online-card__time {
+                font-size: 0.8em;
+            }
+        }
         </style>
         `;
-
+        
         $('body').append(style);
     }
 
