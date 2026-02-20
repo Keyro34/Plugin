@@ -18022,29 +18022,29 @@
 
       // Шаблон для карточек в стиле второго изображения
       Lampa.Template.add('online_mod_card', 
-      `<div class="episode-card selector">
+      `<div class="online-episode selector">
 
-          <div class="episode-card__image">
+          <div class="online-episode__image">
               <img alt="" crossorigin="anonymous">
-              <div class="episode-card__number">{episode}</div>
+              <div class="online-episode__number">{episode}</div>
           </div>
 
-          <div class="episode-card__content">
+          <div class="online-episode__body">
 
-              <div class="episode-card__header">
-                  <div class="episode-card__title">{title}</div>
-                  <div class="episode-card__time">{time}</div>
+              <div class="online-episode__top">
+                  <div class="online-episode__title">{title}</div>
+                  <div class="online-episode__time">{time}</div>
               </div>
 
-              <div class="episode-card__progress">
-                  <div class="episode-card__progress-bar"></div>
+              <div class="online-episode__timeline">
+                  <div class="online-episode__progress"></div>
               </div>
 
-              <div class="episode-card__footer">
-                  <div class="episode-card__rating">
-                      {rating}
+              <div class="online-episode__bottom">
+                  <div class="online-episode__rating">
+                      ★ {rating}
                   </div>
-                  <div class="episode-card__voice">
+                  <div class="online-episode__voice">
                       {info}
                   </div>
               </div>
@@ -18058,118 +18058,112 @@
         var style = `
         <style>
 
-        /* ===== Карточка ===== */
+        /* ===== ОСНОВНАЯ КАРТОЧКА ===== */
 
-        .episode-card {
+        .online-episode {
             display: flex;
             align-items: center;
-            background: linear-gradient(
-                90deg,
-                rgba(65,50,45,0.95),
-                rgba(55,40,35,0.92)
-            );
-            border-radius: 14px;
             padding: 10px;
             margin-bottom: 18px;
+            border-radius: 14px;
+            background: rgba(60, 50, 48, 0.85);
+            backdrop-filter: blur(6px);
             transition: all .2s ease;
         }
 
-        .episode-card.focus,
-        .episode-card:hover {
+        .online-episode.focus,
+        .online-episode:hover {
+            background: rgba(80, 65, 60, 0.95);
             transform: scale(1.02);
-            background: linear-gradient(
-                90deg,
-                rgba(85,65,60,0.95),
-                rgba(65,50,45,0.92)
-            );
         }
 
-        /* ===== Картинка ===== */
+        /* ===== КАРТИНКА ===== */
 
-        .episode-card__image {
+        .online-episode__image {
             position: relative;
-            width: 100px;
-            height: 72px;
+            width: 95px;
+            height: 70px;
             flex-shrink: 0;
             border-radius: 10px;
             overflow: hidden;
         }
 
-        .episode-card__image img {
+        .online-episode__image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* Номер серии */
+        /* НОМЕР СЕРИИ ПОВЕРХ ФОТО */
 
-        .episode-card__number {
+        .online-episode__number {
             position: absolute;
             bottom: 6px;
             left: 8px;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             color: #fff;
-            text-shadow: 0 0 6px rgba(0,0,0,0.8);
+            text-shadow: 0 0 8px rgba(0,0,0,0.8);
         }
 
-        /* ===== Контент ===== */
+        /* ===== ПРАВАЯ ЧАСТЬ ===== */
 
-        .episode-card__content {
+        .online-episode__body {
             flex: 1;
             margin-left: 16px;
         }
 
-        /* Заголовок и время */
+        /* ВЕРХ (название + время) */
 
-        .episode-card__header {
+        .online-episode__top {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .episode-card__title {
+        .online-episode__title {
             font-size: 18px;
             font-weight: 500;
-            color: #fff;
+            color: #ffffff;
         }
 
-        .episode-card__time {
+        .online-episode__time {
             font-size: 14px;
-            color: #ddd;
+            color: #e0e0e0;
         }
 
-        /* ===== Прогресс ===== */
+        /* ===== ЛИНИЯ ПРОГРЕССА ===== */
 
-        .episode-card__progress {
+        .online-episode__timeline {
             height: 3px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.25);
             border-radius: 2px;
-            margin: 8px 0;
+            margin: 8px 0 6px 0;
             overflow: hidden;
         }
 
-        .episode-card__progress-bar {
+        .online-episode__progress {
             height: 100%;
             background: #ffffff;
-            border-radius: 2px;
+            width: 0%;
         }
 
-        /* ===== Низ ===== */
+        /* ===== НИЗ ===== */
 
-        .episode-card__footer {
+        .online-episode__bottom {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             font-size: 14px;
         }
 
-        .episode-card__rating {
-            color: #fff;
+        .online-episode__rating {
+            color: #ffffff;
+            font-weight: 500;
         }
 
-        .episode-card__voice {
-            color: #ccc;
+        .online-episode__voice {
+            color: #d0d0d0;
         }
 
         </style>
