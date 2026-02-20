@@ -18022,39 +18022,35 @@
 
       // Шаблон для карточек в стиле второго изображения
       Lampa.Template.add('online_mod_card', 
-      `<div class="order-card selector">
-          <div class="order-card__bg">
+      `<div class="episode-card selector">
+
+          <div class="episode-card__image">
               <img alt="" crossorigin="anonymous">
-              <div class="order-card__gradient"></div>
+              <div class="episode-card__number">{episode}</div>
           </div>
 
-          <div class="order-card__content">
+          <div class="episode-card__content">
 
-              <div class="order-card__number">
-                  {episode}
+              <div class="episode-card__header">
+                  <div class="episode-card__title">{title}</div>
+                  <div class="episode-card__time">{time}</div>
               </div>
 
-              <div class="order-card__right">
-
-                  <div class="order-card__title">
-                      {title}
-                  </div>
-
-                  <div class="order-card__progress">
-                      <div class="order-card__progress-bar"></div>
-                  </div>
-
-                  <div class="order-card__meta">
-                      {rating} {info}
-                  </div>
-
+              <div class="episode-card__progress">
+                  <div class="episode-card__progress-bar"></div>
               </div>
 
-              <div class="order-card__time">
-                  {time}
+              <div class="episode-card__footer">
+                  <div class="episode-card__rating">
+                      {rating}
+                  </div>
+                  <div class="episode-card__voice">
+                      {info}
+                  </div>
               </div>
 
           </div>
+
       </div>`);
     }
 
@@ -18062,96 +18058,118 @@
         var style = `
         <style>
 
-        /* ===== НОВАЯ КАРТОЧКА ===== */
+        /* ===== Карточка ===== */
 
-        .order-card {
+        .episode-card {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(
+                90deg,
+                rgba(65,50,45,0.95),
+                rgba(55,40,35,0.92)
+            );
+            border-radius: 14px;
+            padding: 10px;
+            margin-bottom: 18px;
+            transition: all .2s ease;
+        }
+
+        .episode-card.focus,
+        .episode-card:hover {
+            transform: scale(1.02);
+            background: linear-gradient(
+                90deg,
+                rgba(85,65,60,0.95),
+                rgba(65,50,45,0.92)
+            );
+        }
+
+        /* ===== Картинка ===== */
+
+        .episode-card__image {
             position: relative;
-            height: 190px;
-            border-radius: 18px;
+            width: 100px;
+            height: 72px;
+            flex-shrink: 0;
+            border-radius: 10px;
             overflow: hidden;
-            margin-bottom: 24px;
-            background: #111;
-            transition: transform .25s ease, box-shadow .25s ease;
         }
 
-        .order-card.focus {
-            transform: scale(1.03);
-            box-shadow: 0 0 25px rgba(255,215,0,0.35);
-        }
-
-        .order-card__bg img {
-            position: absolute;
+        .episode-card__image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .order-card__gradient {
+        /* Номер серии */
+
+        .episode-card__number {
             position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                90deg,
-                rgba(0,0,0,0.85) 0%,
-                rgba(0,0,0,0.7) 40%,
-                rgba(0,0,0,0.4) 70%,
-                rgba(0,0,0,0.1) 100%
-            );
+            bottom: 6px;
+            left: 8px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 6px rgba(0,0,0,0.8);
         }
 
-        .order-card__content {
-            position: relative;
+        /* ===== Контент ===== */
+
+        .episode-card__content {
+            flex: 1;
+            margin-left: 16px;
+        }
+
+        /* Заголовок и время */
+
+        .episode-card__header {
             display: flex;
-            height: 100%;
-            padding: 24px;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .order-card__number {
-            font-size: 70px;
-            font-weight: 700;
-            color: #fff;
-            opacity: 0.95;
-            min-width: 90px;
-        }
-
-        .order-card__right {
-            margin-left: 40px;
-            flex: 1;
-        }
-
-        .order-card__title {
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 14px;
+        .episode-card__title {
+            font-size: 18px;
+            font-weight: 500;
             color: #fff;
         }
 
-        .order-card__progress {
-            height: 4px;
-            background: rgba(255,255,255,0.25);
-            border-radius: 3px;
+        .episode-card__time {
+            font-size: 14px;
+            color: #ddd;
+        }
+
+        /* ===== Прогресс ===== */
+
+        .episode-card__progress {
+            height: 3px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            margin: 8px 0;
             overflow: hidden;
-            margin-bottom: 12px;
         }
 
-        .order-card__progress-bar {
+        .episode-card__progress-bar {
             height: 100%;
-            background: #ffd700;
-            transition: width .3s ease;
+            background: #ffffff;
+            border-radius: 2px;
         }
 
-        .order-card__meta {
-            font-size: 15px;
-            opacity: 0.9;
-            color: #ddd;
+        /* ===== Низ ===== */
+
+        .episode-card__footer {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
         }
 
-        .order-card__time {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            font-size: 16px;
-            color: #ddd;
+        .episode-card__rating {
+            color: #fff;
+        }
+
+        .episode-card__voice {
+            color: #ccc;
         }
 
         </style>
