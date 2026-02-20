@@ -17903,11 +17903,11 @@
     }
 
     function resetTemplates() {
-      // Основной шаблон для видео
-      Lampa.Template.add('online_mod_card', 
-      `<div class="online-prestige selector">
+      // Основной шаблон для видео (как в m.js)
+      Lampa.Template.add('online_mod_prestige_full', 
+      `<div class="online-prestige online-prestige--full selector">
           <div class="online-prestige__img">
-              <img alt="" crossorigin="anonymous" loading="lazy">
+              <img alt="" crossorigin="anonymous">
               <div class="online-prestige__loader"></div>
           </div>
           <div class="online-prestige__body">
@@ -17919,50 +17919,17 @@
               <div class="online-prestige__timeline"></div>
 
               <div class="online-prestige__footer">
-                  <div class="online-prestige__info">
-                      {rating}
-                      {info}
-                  </div>
+                  <div class="online-prestige__info">{info}</div>
                   <div class="online-prestige__quality">{quality}</div>
               </div>
           </div>
       </div>`);
 
-      // Шаблон для папок/похожих результатов
-      Lampa.Template.add('online_mod_folder', 
-      `<div class="online-prestige online-prestige--folder selector">
-          <div class="online-prestige__img online-prestige__img--folder">
-              <svg viewBox="0 0 128 112" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect y="20" width="128" height="92" rx="13" fill="white" fill-opacity="0.3"/>
-                  <path d="M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z" fill="white" fill-opacity="0.23"/>
-                  <rect x="11" y="8" width="106" height="76" rx="13" fill="white" fill-opacity="0.51"/>
-              </svg>
-              <div class="online-prestige__loader"></div>
-          </div>
-          <div class="online-prestige__body">
-              <div class="online-prestige__head">
-                  <div class="online-prestige__title">{title}</div>
-                  <div class="online-prestige__time">{time}</div>
-              </div>
-              <div class="online-prestige__footer">
-                  <div class="online-prestige__info">{info}</div>
-              </div>
-          </div>
-      </div>`);
-
-      // Шаблон для рейтинга
-      Lampa.Template.add('online_mod_prestige_rate', 
-      `<span class="online-prestige-rate">
-          <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M8.39409 0.192139L10.99 5.30994L16.7882 6.20387L12.5475 10.4277L13.5819 15.9311L8.39409 13.2425L3.20626 15.9311L4.24065 10.4277L0 6.20387L5.79819 5.30994L8.39409 0.192139Z" fill="currentColor"/>
-          </svg>
-          <span>{rate}</span>
-      </span>`);
-
       // Шаблон для загрузки
       Lampa.Template.add('online_mod_content_loading', 
       `<div class="online-empty">
           <div class="broadcast__scan"><div></div></div>
+          
           <div class="online-empty__templates">
               <div class="online-empty-template selector">
                   <div class="online-empty-template__ico"></div>
@@ -18007,47 +17974,116 @@
               </div>
           </div>
       </div>`);
+
+      // Шаблон для рейтинга (звезда)
+      Lampa.Template.add('online_mod_prestige_rate', 
+      `<div class="online-prestige-rate">
+          <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8.39409 0.192139L10.99 5.30994L16.7882 6.20387L12.5475 10.4277L13.5819 15.9311L8.39409 13.2425L3.20626 15.9311L4.24065 10.4277L0 6.20387L5.79819 5.30994L8.39409 0.192139Z" fill="#fff"></path>
+          </svg>
+          <span>{rate}</span>
+      </div>`);
+
+      // Шаблон для папки/похожих результатов
+      Lampa.Template.add('online_mod_prestige_folder', 
+      `<div class="online-prestige online-prestige--folder selector">
+          <div class="online-prestige__folder">
+              <svg viewBox="0 0 128 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect y="20" width="128" height="92" rx="13" fill="white"></rect>
+                  <path d="M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z" fill="white" fill-opacity="0.23"></path>
+                  <rect x="11" y="8" width="106" height="76" rx="13" fill="white" fill-opacity="0.51"></rect>
+              </svg>
+          </div>
+          <div class="online-prestige__body">
+              <div class="online-prestige__head">
+                  <div class="online-prestige__title">{title}</div>
+                  <div class="online-prestige__time">{time}</div>
+              </div>
+
+              <div class="online-prestige__footer">
+                  <div class="online-prestige__info">{info}</div>
+              </div>
+          </div>
+      </div>`);
+
+      // Шаблон для истории просмотра
+      Lampa.Template.add('online_mod_prestige_watched', 
+      `<div class="online-prestige online-prestige-watched selector">
+          <div class="online-prestige-watched__icon">
+              <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="10.5" cy="10.5" r="9" stroke="currentColor" stroke-width="3"/>
+                  <path d="M14.8477 10.5628L8.20312 14.399L8.20313 6.72656L14.8477 10.5628Z" fill="currentColor"/>
+              </svg>
+          </div>
+          <div class="online-prestige-watched__body">
+              
+          </div>
+      </div>`);
+
+      // Шаблон для карточек в стиле второго изображения
+      Lampa.Template.add('online_mod_card', 
+      `<div class="online-card selector">
+          <div class="online-card__image-container">
+              <div class="online-card__image">
+                  <img alt="" crossorigin="anonymous">
+                  <div class="online-card__loader"></div>
+              </div>
+          </div>
+          <div class="online-card__content">
+              <div class="online-card__header">
+                  <div class="online-card__title">{title}</div>
+                  <div class="online-card__time">{time}</div>
+              </div>
+              <div class="online-card__timeline"></div>
+              <div class="online-card__footer">
+                  <div class="online-card__info">
+                      {rating}
+                      <span class="online-card__voice">{info}</span>
+                  </div>
+                  <div class="online-card__quality">{quality}</div>
+              </div>
+          </div>
+      </div>`);
     }
 
     function addStyles() {
         var style = `
         <style>
-        /* Основные стили для карточек (Prestige) */
-        .online-prestige {
-            position: relative;
-            -webkit-border-radius: .3em;
-            border-radius: .3em;
-            background-color: rgba(0, 0, 0, 0.3);
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -ms-flexbox;
+        /* Основные стили для карточек */
+        .online-card {
             display: flex;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 0.5em;
             margin-bottom: 1em;
+            overflow: hidden;
             transition: all 0.2s ease;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
-
-        .online-prestige.focus {
-            background-color: rgba(30, 30, 30, 0.9);
+        
+        .online-card.focus {
+            background: rgba(50, 50, 50, 0.98);
             border-color: #ffd700;
             transform: scale(1.02);
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
         }
-
-        .online-prestige__img {
-            position: relative;
-            width: 13em;
-            -webkit-flex-shrink: 0;
-            -ms-flex-negative: 0;
+        
+        .online-card__image-container {
+            width: 8em;
             flex-shrink: 0;
-            min-height: 8.2em;
-            overflow: hidden;
-            -webkit-border-radius: 0.3em 0 0 0.3em;
-            border-radius: 0.3em 0 0 0.3em;
-            background: #1a1a1a;
+            position: relative;
         }
-
-        .online-prestige__img img {
+        
+        .online-card__image {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 6em;
+            background: #1a1a1a;
+            overflow: hidden;
+        }
+        
+        .online-card__image img {
             position: absolute;
             top: 0;
             left: 0;
@@ -18057,12 +18093,25 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
-
-        .online-prestige__img--loaded img {
+        
+        .online-card__image--loaded img {
             opacity: 1;
         }
-
-        .online-prestige__loader {
+        
+        .online-card__image--fallback {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .online-card__fallback-icon {
+            font-size: 2.5em;
+            opacity: 0.7;
+            color: #ffd700;
+        }
+        
+        .online-card__loader {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -18073,35 +18122,26 @@
             border: 2px solid rgba(255, 215, 0, 0.2);
             border-top-color: #ffd700;
             border-radius: 50%;
-            animation: online-prestige-spin 0.8s linear infinite;
+            animation: online-card-spin 0.8s linear infinite;
             z-index: 2;
         }
-
-        @keyframes online-prestige-spin {
+        
+        @keyframes online-card-spin {
             to { transform: rotate(360deg); }
         }
-
-        .online-prestige__img--loaded .online-prestige__loader {
+        
+        .online-card__image--loaded .online-card__loader {
             display: none;
         }
-
-        .online-prestige__episode-number {
+        
+        .online-card__episode-number {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -ms-flexbox;
             display: flex;
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             align-items: center;
-            -webkit-box-pack: center;
-            -webkit-justify-content: center;
-            -ms-flex-pack: center;
             justify-content: center;
             font-size: 2em;
             font-weight: bold;
@@ -18110,231 +18150,175 @@
             z-index: 3;
             pointer-events: none;
             background: rgba(0,0,0,0.3);
-            -webkit-border-radius: 0.3em 0 0 0.3em;
             border-radius: 0.3em 0 0 0.3em;
         }
-
-        .online-prestige__viewed {
+        
+        .online-card__viewed {
             position: absolute;
-            top: 0.5em;
-            left: 0.5em;
-            width: 1.8em;
-            height: 1.8em;
+            top: 0.3em;
+            left: 0.3em;
+            width: 1.5em;
+            height: 1.5em;
             background: #4CAF50;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9em;
+            font-size: 0.8em;
             font-weight: bold;
             color: white;
             z-index: 4;
             box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
-
-        .online-prestige__body {
-            padding: 1.2em;
-            line-height: 1.3;
-            -webkit-box-flex: 1;
-            -webkit-flex-grow: 1;
-            -ms-flex-positive: 1;
-            flex-grow: 1;
-            position: relative;
+        
+        .online-card__content {
+            flex: 1;
+            padding: 0.8em 1em;
+            display: flex;
+            flex-direction: column;
             min-width: 0;
         }
-
-        .online-prestige__head {
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -ms-flexbox;
+        
+        .online-card__header {
             display: flex;
-            -webkit-box-pack: justify;
-            -webkit-justify-content: space-between;
-            -ms-flex-pack: justify;
             justify-content: space-between;
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             align-items: center;
+            margin-bottom: 0.5em;
         }
-
-        .online-prestige__title {
-            font-size: 1.7em;
+        
+        .online-card__title {
+            font-size: 1.2em;
             font-weight: 500;
             color: #fff;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
-            -webkit-box-flex: 1;
-            -webkit-flex: 1;
-            -ms-flex: 1;
             flex: 1;
             min-width: 0;
         }
-
-        .online-prestige__time {
-            padding-left: 2em;
+        
+        .online-card__time {
             font-size: 0.9em;
             color: #aaa;
+            margin-left: 1em;
             white-space: nowrap;
         }
-
-        .online-prestige__timeline {
-            margin: .8em 0;
+        
+        .online-card__timeline {
+            margin: 0.5em 0;
+            width: 100%;
         }
-
-        .online-prestige__timeline .time-line {
+        
+        .online-card__timeline .time-line {
             display: block !important;
-            height: 0.3em;
-            background-color: rgba(255, 255, 255, 0.3);
-            -webkit-border-radius: 3em;
-            border-radius: 3em;
+            height: 0.2em;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.1em;
             overflow: hidden;
         }
-
-        .online-prestige__timeline .time-line > div {
+        
+        .online-card__timeline .time-line__progress {
             height: 100%;
-            background-color: #ffd700;
-            -webkit-border-radius: 3em;
-            border-radius: 3em;
+            background: #ffd700;
+            border-radius: 0.1em;
         }
-
-        .online-prestige__footer {
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -ms-flexbox;
+        
+        .online-card__footer {
             display: flex;
-            -webkit-box-pack: justify;
-            -webkit-justify-content: space-between;
-            -ms-flex-pack: justify;
             justify-content: space-between;
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             align-items: center;
             font-size: 0.9em;
         }
-
-        .online-prestige__info {
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -ms-flexbox;
+        
+        .online-card__info {
             display: flex;
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             align-items: center;
+            gap: 0.5em;
             color: #aaa;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
+            flex: 1;
             min-width: 0;
         }
-
-        .online-prestige__info > * {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .online-prestige-rate {
-            display: -webkit-inline-box;
-            display: -webkit-inline-flex;
-            display: -ms-inline-flexbox;
+        
+        .online-card__info .online-prestige-rate {
             display: inline-flex;
-            -webkit-box-align: center;
-            -webkit-align-items: center;
-            -ms-flex-align: center;
             align-items: center;
             gap: 0.2em;
             color: #ffd700;
             font-weight: 600;
         }
-
-        .online-prestige-rate svg {
-            width: 17px;
-            height: 16px;
-            flex-shrink: 0;
+        
+        .online-card__voice {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #888;
         }
-
-        .online-prestige-rate svg path {
-            fill: #ffd700;
+        
+        .online-card__quality {
+            color: #4CAF50;
+            font-weight: 500;
+            margin-left: 1em;
+            white-space: nowrap;
         }
-
-        .online-prestige-split {
-            font-size: .8em;
-            margin: 0 1em;
-            -webkit-flex-shrink: 0;
-            -ms-flex-negative: 0;
-            flex-shrink: 0;
-            color: #666;
-        }
-
-        .online-prestige__quality {
-            display: none !important; /* Скрыто, как в вашем CSS */
-        }
-
+        
         /* Стили для фильтра */
         .torrent-filter {
             margin-bottom: 1.5em;
             padding: 0 1em;
         }
-
+        
         .filter--sort {
             margin-right: 1em;
         }
-
+        
         .filter--sort span {
             font-size: 1.1em;
             color: #fff;
         }
-
+        
         /* Стили для пустого состояния */
         .online-empty {
             text-align: center;
             padding: 3em 2em;
             color: #aaa;
         }
-
+        
         .online-empty__title {
             font-size: 1.5em;
             margin-bottom: 0.5em;
             color: #fff;
         }
-
+        
         /* Адаптация для мобильных */
         @media screen and (max-width: 480px) {
-            .online-prestige__img {
+            .online-card__image-container {
                 width: 6em;
-                min-height: 4.5em;
             }
-
-            .online-prestige__body {
-                padding: 0.8em;
+            
+            .online-card__content {
+                padding: 0.6em 0.8em;
             }
-
-            .online-prestige__title {
-                font-size: 1.2em;
+            
+            .online-card__title {
+                font-size: 1em;
             }
-
-            .online-prestige__episode-number {
-                font-size: 1.5em;
-            }
-
-            .online-prestige__time {
+            
+            .online-card__time {
                 font-size: 0.8em;
-                padding-left: 1em;
             }
         }
         </style>
         `;
-
+        
         $('body').append(style);
     }
 
     function drawPrestigeCards(items, options) {
         var _this = this;
-        var scroll = this.scroll;
+        var scroll = this.scroll; // предпологаем, что scroll доступен
         
         scroll.clear();
         
@@ -18346,32 +18330,25 @@
             var cardData = {
                 title: element.title || select_title,
                 time: element.duration ? Lampa.Utils.secondsToTime(element.duration, true) : '',
-                rating: element.rating ? Lampa.Template.get('online_mod_prestige_rate', {rate: element.rating}) : '',
                 info: element.info || '',
                 quality: element.quality || 'HD'
             };
             
-            var html = Lampa.Template.get('online_mod_card', cardData);
+            var html = Lampa.Template.get('online_mod_prestige_full', cardData);
             var loader = html.find('.online-prestige__loader');
-            var imageDiv = html.find('.online-prestige__img');
-            var img = html.find('img')[0];
+            var image = html.find('.online-prestige__img');
             
             // Загружаем изображение из TMDB
+            var img = html.find('img')[0];
             if (img) {
                 img.onerror = function() {
-                    imageDiv.addClass('online-prestige__img--loaded');
-                    loader.remove();
-                    if (element.season) {
-                        imageDiv.append('<div class="online-prestige__episode-number">' + 
-                            ('0' + episode).slice(-2) + '</div>');
-                    }
+                    img.src = './img/img_broken.svg';
                 };
-                
                 img.onload = function() {
-                    imageDiv.addClass('online-prestige__img--loaded');
+                    image.addClass('online-prestige__img--loaded');
                     loader.remove();
                     if (element.season) {
-                        imageDiv.append('<div class="online-prestige__episode-number">' + 
+                        image.append('<div class="online-prestige__episode-number">' + 
                             ('0' + episode).slice(-2) + '</div>');
                     }
                 };
@@ -18394,7 +18371,10 @@
             var viewed = Lampa.Storage.cache('online_view', 5000, []);
             var hash_file = Lampa.Utils.hash(season + ':' + episode + object.movie.original_title + element.title);
             if (viewed.indexOf(hash_file) !== -1) {
-                imageDiv.append('<div class="online-prestige__viewed">✓</div>');
+                html.find('.online-prestige__img').append(
+                    '<div class="online-prestige__viewed">' + 
+                    Lampa.Template.get('icon_viewed', {}, true) + '</div>'
+                );
             }
             
             // Обработчик выбора
