@@ -18079,17 +18079,11 @@
             box-shadow: 0 0 25px rgba(255,215,0,0.35);
         }
 
-        .order-card__bg{
-            width: 100%;
-            height: 100%;
-            background: #1a1a1a;
-        }
-
         .order-card__bg img {
+            position: absolute;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
         }
 
         .order-card__gradient {
@@ -18121,13 +18115,8 @@
         }
 
         .order-card__right {
-            position: absolute;
-            left: 8px;
-            bottom: 6px;
-            font-size: 26px;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+            margin-left: 40px;
+            flex: 1;
         }
 
         .order-card__title {
@@ -18164,6 +18153,7 @@
             font-size: 16px;
             color: #ddd;
         }
+
         </style>
         `;
 
