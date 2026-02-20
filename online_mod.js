@@ -18081,8 +18081,8 @@
 
         .order-card__bg img {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            vertical-align: middle;
+            max-width: 100%;
             object-fit: cover;
         }
 
