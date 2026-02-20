@@ -2138,6 +2138,9 @@
             
             if (!links || !links.length) return;
 
+            // Флаг - найден ли точный результат
+            var exactMatch = false;
+
             // ================= INPUT =================
 
             var inputTitleRaw =
@@ -2266,6 +2269,7 @@
             // Сначала проверяем по TMDB ID
             for(var i=0;i<items.length;i++){
                 if(inputTMDB && items[i].tmdb === inputTMDB){
+                    exactMatch = true;
                     getPage(items[i].link);
                     return;
                 }
@@ -2274,6 +2278,7 @@
             // Потом по IMDB ID
             for(var i=0;i<items.length;i++){
                 if(inputIMDB && items[i].imdb === inputIMDB){
+                    exactMatch = true;
                     getPage(items[i].link);
                     return;
                 }
@@ -2287,12 +2292,14 @@
 
                 // Точное совпадение с оригинальным названием + год
                 if(mainOriginal && itemNorm === mainOriginal && inputYear && items[i].year === inputYear){
+                    exactMatch = true;
                     getPage(items[i].link);
                     return;
                 }
 
                 // Точное совпадение с русским названием + год
                 if(mainInput && itemNorm === mainInput && inputYear && items[i].year === inputYear){
+                    exactMatch = true;
                     getPage(items[i].link);
                     return;
                 }
@@ -2300,6 +2307,7 @@
                 // Проверяем альтернативные названия
                 for(var j=0; j<allTitleVariants.length; j++) {
                     if(allTitleVariants[j] && itemNorm === allTitleVariants[j] && inputYear && items[i].year === inputYear){
+                        exactMatch = true;
                         getPage(items[i].link);
                         return;
                     }
@@ -2385,6 +2393,7 @@
             if(best){
 
                 if(!second){
+                    exactMatch = true;
                     getPage(best.link);
                     return;
                 }
@@ -2398,17 +2407,20 @@
                 if(alternativeTitles.length > 0) autoThreshold += 20; // Больше данных = выше порог
 
                 if(diff12 >= 25){
+                    exactMatch = true;
                     getPage(best.link);
                     return;
                 }
 
                 if(best.score >= autoThreshold){
+                    exactMatch = true;
                     getPage(best.link);
                     return;
                 }
 
                 if(third){
                     if(best.score > second.score && second.score > third.score && best.score >= 260){
+                        exactMatch = true;
                         getPage(best.link);
                         return;
                     }
@@ -2418,7 +2430,8 @@
             // ================= FALLBACK =================
 
             // Если не нашли точного совпадения, показываем похожие
-            component.similars(items);
+            // НО без загрузки изображений!
+            component.similars(items, null, null, true); // Добавляем флаг для отключения изображений
             component.loading(false);
          };
 
@@ -16861,49 +16874,74 @@
         var _this5 = this;
 
         json.forEach(function (elem) {
-          var title = elem.title || elem.ru_title || elem.nameRu || elem.en_title || elem.nameEn || elem.orig_title || elem.nameOriginal;
-          var orig_title = elem.orig_title || elem.nameOriginal || elem.en_title || elem.nameEn;
-          var year = elem.start_date || elem.year || '';
-          var info = [];
-          if (orig_title && orig_title != elem.title) info.push(orig_title);
-          if (elem.seasons_count) info.push(Lampa.Lang.translate('online_mod_seasons_count') + ': ' + elem.seasons_count);
-          if (elem.episodes_count) info.push(Lampa.Lang.translate('online_mod_episodes_count') + ': ' + elem.episodes_count);
-          elem.title = title;
-          elem.quality = year ? (year + '').slice(0, 4) : '----';
-          elem.info = info.length ? ' / ' + info.join(' / ') : '';
-          var item = Lampa.Template.get('online_mod_folder', elem);
-          item.on('hover:enter', function () {
-            _this5.activity.loader(true);
+            var title = elem.title || elem.ru_title || elem.nameRu || elem.en_title || elem.nameEn || elem.orig_title || elem.nameOriginal;
+            var orig_title = elem.orig_title || elem.nameOriginal || elem.en_title || elem.nameEn;
+            var year = elem.start_date || elem.year || '';
+            var info = [];
+            if (orig_title && orig_title != elem.title) info.push(orig_title);
+            if (elem.seasons_count) info.push(Lampa.Lang.translate('online_mod_seasons_count') + ': ' + elem.seasons_count);
+            if (elem.episodes_count) info.push(Lampa.Lang.translate('online_mod_episodes_count') + ': ' + elem.episodes_count);
+            elem.title = title;
+            elem.quality = year ? (year + '').slice(0, 4) : '----';
+            elem.info = info.length ? ' / ' + info.join(' / ') : '';
+            
+            // Используем шаблон без изображения, если skipImages = true
+            var item;
+            if (skipImages) {
+                // Упрощенный шаблон без изображения
+                item = $(`<div class="online-folder-simple selector">
+                    <div class="online-folder-simple__title">${elem.title}</div>
+                    <div class="online-folder-simple__year">${elem.quality}</div>
+                    <div class="online-folder-simple__info">${elem.info}</div>
+                </div>`);
+            } else {
+                item = Lampa.Template.get('online_mod_folder', elem);
+            }
+            
+            item.on('hover:enter', function () {
+                _this5.activity.loader(true);
 
-            _this5.reset();
+                _this5.reset();
 
-            object.search = elem.title;
-            object.search_date = year;
-            selected_id = elem.id;
+                object.search = elem.title;
+                object.search_date = year;
+                selected_id = elem.id;
 
-            _this5.extendChoice();
+                _this5.extendChoice();
 
-            sources[balanser].search(object, elem.kp_id || elem.kinopoisk_id || elem.kinopoiskId || elem.filmId || elem.imdb_id, [elem]);
-          });
+                sources[balanser].search(object, elem.kp_id || elem.kinopoisk_id || elem.kinopoiskId || elem.filmId || elem.imdb_id, [elem]);
+            });
 
-          _this5.append(item);
+            _this5.append(item);
         });
 
         if (search_more) {
-          var elem = {
-            title: Lampa.Lang.translate('online_mod_show_more'),
-            quality: '...',
-            info: ''
-          };
-          var item = Lampa.Template.get('online_mod_folder', elem);
-          item.on('hover:enter', function () {
-            _this5.activity.loader(true);
+            var elem = {
+                title: Lampa.Lang.translate('online_mod_show_more'),
+                quality: '...',
+                info: ''
+            };
+            
+            var item;
+            if (skipImages) {
+                item = $(`<div class="online-folder-simple selector">
+                    <div class="online-folder-simple__title">${elem.title}</div>
+                    <div class="online-folder-simple__year">${elem.quality}</div>
+                    <div class="online-folder-simple__info">${elem.info}</div>
+                </div>`);
+            } else {
+                item = Lampa.Template.get('online_mod_folder', elem);
+            }
+            
+            item.on('hover:enter', function () {
+                _this5.activity.loader(true);
 
-            _this5.reset();
+                _this5.reset();
 
-            search_more(more_params);
-          });
-          this.append(item);
+                search_more(more_params);
+            });
+            
+            this.append(item);
         }
       };
       /**
@@ -18365,6 +18403,35 @@
             .online-card__time {
                 font-size: 0.8em;
             }
+        }
+        .online-folder-simple {
+            padding: 15px 20px;
+            margin-bottom: 5px;
+            background: rgba(30,30,30,0.9);
+            border-radius: 5px;
+            border-left: 3px solid #ffd700;
+            transition: all 0.2s;
+        }
+        .online-folder-simple.focus {
+            background: rgba(50,50,50,0.95);
+            transform: scale(1.01);
+            box-shadow: 0 0 15px rgba(255,215,0,0.3);
+        }
+        .online-folder-simple__title {
+            font-size: 1.2em;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        .online-folder-simple__year {
+            font-size: 0.9em;
+            color: #ffd700;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .online-folder-simple__info {
+            font-size: 0.9em;
+            color: #888;
+            display: inline-block;
         }
         </style>
         `;
