@@ -18153,6 +18153,38 @@
             font-size: 16px;
             color: #ddd;
         }
+        
+        .online-card__image-container {
+            width: 110px;
+            height: 80px;
+            flex-shrink: 0;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .online-card__image {
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+        }
+
+        .online-card__image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .online-card__episode-number {
+            position: absolute;
+            left: 8px;
+            bottom: 6px;
+            font-size: 26px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+        }
 
         </style>
         `;
