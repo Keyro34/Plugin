@@ -18022,35 +18022,39 @@
 
       // Шаблон для карточек в стиле второго изображения
       Lampa.Template.add('online_mod_card', 
-      `<div class="online-episode selector">
-
-          <div class="online-episode__image">
+      `<div class="order-card selector">
+          <div class="order-card__bg">
               <img alt="" crossorigin="anonymous">
-              <div class="online-episode__number">{episode}</div>
+              <div class="order-card__gradient"></div>
           </div>
 
-          <div class="online-episode__body">
+          <div class="order-card__content">
 
-              <div class="online-episode__top">
-                  <div class="online-episode__title">{title}</div>
-                  <div class="online-episode__time">{time}</div>
+              <div class="order-card__number">
+                  {episode}
               </div>
 
-              <div class="online-episode__timeline">
-                  <div class="online-episode__progress"></div>
+              <div class="order-card__right">
+
+                  <div class="order-card__title">
+                      {title}
+                  </div>
+
+                  <div class="order-card__progress">
+                      <div class="order-card__progress-bar"></div>
+                  </div>
+
+                  <div class="order-card__meta">
+                      {rating} {info}
+                  </div>
+
               </div>
 
-              <div class="online-episode__bottom">
-                  <div class="online-episode__rating">
-                      ★ {rating}
-                  </div>
-                  <div class="online-episode__voice">
-                      {info}
-                  </div>
+              <div class="order-card__time">
+                  {time}
               </div>
 
           </div>
-
       </div>`);
     }
 
@@ -18058,112 +18062,96 @@
         var style = `
         <style>
 
-        /* ===== ОСНОВНАЯ КАРТОЧКА ===== */
+        /* ===== НОВАЯ КАРТОЧКА ===== */
 
-        .online-episode {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            margin-bottom: 18px;
-            border-radius: 14px;
-            background: rgba(60, 50, 48, 0.85);
-            backdrop-filter: blur(6px);
-            transition: all .2s ease;
-        }
-
-        .online-episode.focus,
-        .online-episode:hover {
-            background: rgba(80, 65, 60, 0.95);
-            transform: scale(1.02);
-        }
-
-        /* ===== КАРТИНКА ===== */
-
-        .online-episode__image {
+        .order-card {
             position: relative;
-            width: 95px;
-            height: 70px;
-            flex-shrink: 0;
-            border-radius: 10px;
+            height: 190px;
+            border-radius: 18px;
             overflow: hidden;
+            margin-bottom: 24px;
+            background: #473939;
+            transition: transform .25s ease, box-shadow .25s ease;
         }
 
-        .online-episode__image img {
+        .order-card.focus {
+            transform: scale(1.03);
+            box-shadow: 0 0 25px rgba(255,215,0,0.35);
+        }
+
+        .order-card__bg img {
+            position: absolute;
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* НОМЕР СЕРИИ ПОВЕРХ ФОТО */
-
-        .online-episode__number {
+        .order-card__gradient {
             position: absolute;
-            bottom: 6px;
-            left: 8px;
-            font-size: 22px;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(0,0,0,0.85) 0%,
+                rgba(0,0,0,0.7) 40%,
+                rgba(0,0,0,0.4) 70%,
+                rgba(0,0,0,0.1) 100%
+            );
+        }
+
+        .order-card__content {
+            position: relative;
+            display: flex;
+            height: 100%;
+            padding: 24px;
+            align-items: center;
+        }
+
+        .order-card__number {
+            font-size: 70px;
             font-weight: 700;
             color: #fff;
-            text-shadow: 0 0 8px rgba(0,0,0,0.8);
+            opacity: 0.95;
+            min-width: 90px;
         }
 
-        /* ===== ПРАВАЯ ЧАСТЬ ===== */
-
-        .online-episode__body {
+        .order-card__right {
+            margin-left: 40px;
             flex: 1;
-            margin-left: 16px;
         }
 
-        /* ВЕРХ (название + время) */
-
-        .online-episode__top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .order-card__title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: #fff;
         }
 
-        .online-episode__title {
-            font-size: 18px;
-            font-weight: 500;
-            color: #ffffff;
-        }
-
-        .online-episode__time {
-            font-size: 14px;
-            color: #e0e0e0;
-        }
-
-        /* ===== ЛИНИЯ ПРОГРЕССА ===== */
-
-        .online-episode__timeline {
-            height: 3px;
+        .order-card__progress {
+            height: 4px;
             background: rgba(255,255,255,0.25);
-            border-radius: 2px;
-            margin: 8px 0 6px 0;
+            border-radius: 3px;
             overflow: hidden;
+            margin-bottom: 12px;
         }
 
-        .online-episode__progress {
+        .order-card__progress-bar {
             height: 100%;
-            background: #ffffff;
-            width: 0%;
+            background: #ffd700;
+            transition: width .3s ease;
         }
 
-        /* ===== НИЗ ===== */
-
-        .online-episode__bottom {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
+        .order-card__meta {
+            font-size: 15px;
+            opacity: 0.9;
+            color: #ddd;
         }
 
-        .online-episode__rating {
-            color: #ffffff;
-            font-weight: 500;
-        }
-
-        .online-episode__voice {
-            color: #d0d0d0;
+        .order-card__time {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            font-size: 16px;
+            color: #ddd;
         }
 
         </style>
