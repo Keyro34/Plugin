@@ -1287,26 +1287,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -1857,26 +1849,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -3162,36 +3146,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -3322,119 +3288,153 @@
        */
 
       this.search = function (_object, kinopoisk_id, data) {
-        var _this = this;
-
-        object = _object;
-        select_title = object.search || object.movie.title;
-        if (this.wait_similars && data && data[0].is_similars) return getPage(data[0].link);
-        var url = embed + 'search?query=' + encodeURIComponent(component.cleanTitle(select_title));
-        var cookie = check_cookie;
-        var headers = Lampa.Platform.is('android') ? {
-          'Origin': host,
-          'Referer': ref,
-          'User-Agent': user_agent,
-          'Cookie': cookie
-        } : {};
-        var prox_enc_page = '';
-
-        if (prox) {
-          prox_enc_page += 'param/Origin=' + encodeURIComponent(host) + '/';
-          prox_enc_page += 'param/Referer=' + encodeURIComponent(ref) + '/';
-          prox_enc_page += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
-          prox_enc_stream = prox_enc_page;
-          prox_enc_page += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
-        }
-
-        network.clear();
-        network.timeout(1000 * 10);
-        network["native"](component.proxyLink(url, prox, prox_enc_page), function (str) {
-          str = (str || '').replace(/\n/g, '');
-          var links = object.movie.number_of_seasons ? str.match(/<div class="title"><a href="\/(serial|tv_show)\/([^"]*)"[^>]*>(.*?)<\/a><\/div>/g) : str.match(/<div class="title"><a href="\/film\/([^"]*)"[^>]*>(.*?)<\/a><\/div>/g);
-          var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
-          var search_year = parseInt((search_date + '').slice(0, 4));
-
-          if (links) {
-            var is_sure = false;
-            var items = links.map(function (l) {
-              var div = $(l),
-                  link = $('a', div),
-                  titl = link.attr('title') || link.text() || '';
-              var year;
-              var found = titl.match(/^(.*)\((\d{4})\)$/);
-
-              if (found) {
-                year = parseInt(found[2]);
-                titl = found[1].trim();
+          var _this = this;
+    
+          object = _object;
+          select_title = object.search || object.movie.title;
+          
+          console.log('🔍 Поиск фильма:', select_title);
+          
+          if (this.wait_similars && data && data[0].is_similars) {
+              return getPage(data[0].link);
+          }
+          
+          error_message = '';
+          
+          // Определяем тип контента (фильм или сериал)
+          var mediaType = object.movie.first_air_date ? 'tv' : 'movie';
+          var searchYear = object.movie.release_date || object.movie.first_air_date || '';
+          searchYear = searchYear ? parseInt(searchYear.substr(0,4)) : null;
+          
+          // TMDB API ключ
+          var TMDB_API_KEY = '4ef0d7355d9ffb5151e987764708ce96';
+          
+          // Функция поиска в TMDB
+          function searchInTMDB(query, callback) {
+              var searchUrl = 'https://api.themoviedb.org/3/search/' + mediaType + 
+                            '?api_key=' + TMDB_API_KEY + 
+                            '&query=' + encodeURIComponent(query) + 
+                            '&language=ru-RU';
+              
+              if (searchYear) {
+                  searchUrl += '&year=' + searchYear;
               }
-
-              return {
-                year: year,
-                title: titl,
-                link: link.attr('href') || ''
-              };
-            });
-            var cards = items;
-
-            if (cards.length) {
-              if (select_title) {
-                var tmp = cards.filter(function (c) {
-                  return component.containsTitle(c.title, select_title);
-                });
-
-                if (tmp.length) {
-                  cards = tmp;
-                  is_sure = true;
-                }
-              }
-
-              if (cards.length > 1 && search_year) {
-                var _tmp = cards.filter(function (c) {
-                  return c.year == search_year;
-                });
-
-                if (!_tmp.length) _tmp = cards.filter(function (c) {
-                  return c.year && c.year > search_year - 2 && c.year < search_year + 2;
-                });
-                if (_tmp.length) cards = _tmp;
-              }
-            }
-
-            if (cards.length == 1 && is_sure) {
-              if (search_year && cards[0].year) {
-                is_sure = cards[0].year > search_year - 2 && cards[0].year < search_year + 2;
-              }
-
-              if (is_sure) {
-                is_sure = false;
-
-                if (select_title) {
-                  is_sure |= component.equalTitle(cards[0].title, select_title);
-                }
-              }
-            }
-
-            if (cards.length == 1 && is_sure) getPage(cards[0].link);else if (items.length) {
-              _this.wait_similars = true;
-              items.forEach(function (c) {
-                c.is_similars = true;
+              
+              console.log('TMDB запрос:', searchUrl);
+              
+              network.clear();
+              network.timeout(10000);
+              network.silent(searchUrl, function(json) {
+                  if (json && json.results && json.results.length > 0) {
+                      callback(json.results[0]);
+                  } else {
+                      callback(null);
+                  }
+              }, function(a, c) {
+                  console.log('TMDB ошибка:', a);
+                  callback(null);
               });
-              component.similars(items);
-              component.loading(false);
-            } else component.emptyForQuery(select_title);
-          } else if (str.indexOf('/recaptcha/api.js') !== -1 || str.indexOf('form action="/check?') !== -1) {
-            if (prox) {
-              component.empty(Lampa.Lang.translate('online_mod_captcha_proxy'));
-            } else {
-              component.empty(Lampa.Lang.translate('online_mod_captcha_address') + embed);
-            }
-          } else component.emptyForQuery(select_title);
-        }, function (a, c) {
-          component.empty(network.errorDecode(a, c));
-        }, false, {
-          dataType: 'text',
-          withCredentials: logged_in,
-          headers: headers
-        });
+          }
+          
+          // Функция поиска на HDrezka
+          function searchOnRezka(query, callback) {
+              var url = embed + 'engine/ajax/search.php';
+              var postdata = 'q=' + encodeURIComponent(query);
+              
+              console.log('Rezka запрос:', query);
+              
+              network.clear();
+              network.timeout(10000);
+              network["native"](component.proxyLink(url, prox, prox_enc), function(str) {
+                  str = (str || '').replace(/\n/g, '');
+                  checkErrorForm(str);
+                  
+                  // Парсим результаты
+                  var links = str.match(/<li><a href="([^"]*)"[^>]*>([^<]*)<\/a><\/li>/g);
+                  var items = [];
+                  
+                  if (links && links.length) {
+                      links.forEach(function(l) {
+                          var hrefMatch = l.match(/href="([^"]*)"/);
+                          var titleMatch = l.match(/>([^<]*)<\/a>/);
+                          
+                          if (hrefMatch && titleMatch) {
+                              items.push({
+                                  title: titleMatch[1].trim(),
+                                  link: hrefMatch[1],
+                                  year: null
+                              });
+                          }
+                      });
+                  }
+                  
+                  callback(items);
+                  
+              }, function(a, c) {
+                  console.log('Rezka ошибка:', a);
+                  callback([]);
+              }, postdata, {
+                  dataType: 'text',
+                  withCredentials: logged_in,
+                  headers: headers
+              });
+          }
+          
+          // НАЧИНАЕМ ПОИСК
+          console.log('Шаг 1: Ищем в TMDB...');
+          
+          searchInTMDB(select_title, function(tmdbItem) {
+              if (tmdbItem) {
+                  var tmdbTitle = tmdbItem.title || tmdbItem.name;
+                  var tmdbYear = (tmdbItem.release_date || tmdbItem.first_air_date || '').substr(0,4);
+                  
+                  console.log('✅ Нашли в TMDB:', tmdbTitle, tmdbYear);
+                  
+                  // Шаг 2: Ищем на HDrezka по названию из TMDB
+                  console.log('Шаг 2: Ищем на HDrezka...');
+                  
+                  searchOnRezka(tmdbTitle, function(items) {
+                      if (items.length > 0) {
+                          console.log('✅ Нашли на HDrezka:', items.length, 'результатов');
+                          
+                          // Сначала ищем точное совпадение по году
+                          if (tmdbYear) {
+                              var exactMatch = items.filter(function(item) {
+                                  return item.title.indexOf(tmdbYear) !== -1;
+                              });
+                              
+                              if (exactMatch.length > 0) {
+                                  console.log('✅ Точное совпадение по году:', exactMatch[0].title);
+                                  getPage(component.fixLink(exactMatch[0].link, ref));
+                                  return;
+                              }
+                          }
+                          
+                          // Если нет точного, берем первый результат
+                          console.log('✅ Берем первый результат:', items[0].title);
+                          getPage(component.fixLink(items[0].link, ref));
+                          
+                      } else {
+                          // Если ничего не нашли, показываем похожие из TMDB
+                          console.log('❌ Ничего не найдено на HDrezka');
+                          component.emptyForQuery(select_title);
+                      }
+                  });
+                  
+              } else {
+                  // Если не нашли в TMDB, ищем напрямую на HDrezka
+                  console.log('❌ Не нашли в TMDB, ищем напрямую на HDrezka');
+                  
+                  searchOnRezka(select_title, function(items) {
+                      if (items.length > 0) {
+                          console.log('✅ Нашли на HDrezka напрямую:', items[0].title);
+                          getPage(component.fixLink(items[0].link, ref));
+                      } else {
+                          component.emptyForQuery(select_title);
+                      }
+                  });
+              }
+          });
       };
 
       this.extendChoice = function (saved) {
@@ -4032,26 +4032,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -4587,26 +4579,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -5278,26 +5262,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -6130,26 +6106,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -6698,26 +6666,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -7536,26 +7496,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -8201,26 +8153,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -8839,26 +8783,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -9554,26 +9490,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -10380,26 +10308,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -10999,26 +10919,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -11632,26 +11544,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -12810,26 +12714,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -13391,26 +13287,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -14126,26 +14014,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -14956,26 +14836,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
@@ -15886,26 +15758,18 @@
                           }
                       };
 
-                      // Всегда показываем номер серии (как заглушку)
-                      imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
-                      loader.remove();
-
-                      // Добавляем номер серии крупно
-                      if (!imageDiv.find('.online-card__episode-number-large').length) {
-                          imageDiv.append('<div class="online-card__episode-number-large">' + 
-                              ('0' + episode_num).slice(-2) + '</div>');
-                      }
-
-                      // Пытаемся загрузить картинку фоном (если получится)
                       if (imagePath) {
-                          var imgLoad = new Image();
-                          imgLoad.onload = function() {
-                              imageDiv.removeClass('online-card__image--fallback');
-                              imageDiv.find('.online-card__episode-number-large').hide();
-                              img.src = this.src;
-                              imageDiv.addClass('online-card__image--loaded');
-                          };
-                          imgLoad.src = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
                       }
                   }
 
