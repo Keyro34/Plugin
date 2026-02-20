@@ -16865,9 +16865,12 @@
         Lampa.Storage.set('online_mod_choice_' + balanser, data);
       };
       /**
-       * Есть похожие карточки
-       * @param {Object} json
-       */
+     * Есть похожие карточки
+     * @param {Object} json
+     * @param {Function} search_more
+     * @param {Object} more_params
+     * @param {Boolean} skipImages - флаг для отключения изображений
+     */
 
 
       this.similars = function (json, search_more, more_params) {
@@ -18386,24 +18389,7 @@
             color: #fff;
         }
         
-        /* Адаптация для мобильных */
-        @media screen and (max-width: 480px) {
-            .online-card__image-container {
-                width: 6em;
-            }
-            
-            .online-card__content {
-                padding: 0.6em 0.8em;
-            }
-            
-            .online-card__title {
-                font-size: 1em;
-            }
-            
-            .online-card__time {
-                font-size: 0.8em;
-            }
-        }
+        /* Стили для упрощенных карточек похожих результатов */
         .online-folder-simple {
             padding: 15px 20px;
             margin-bottom: 5px;
@@ -18432,6 +18418,25 @@
             font-size: 0.9em;
             color: #888;
             display: inline-block;
+        }
+        
+        /* Адаптация для мобильных */
+        @media screen and (max-width: 480px) {
+            .online-card__image-container {
+                width: 6em;
+            }
+            
+            .online-card__content {
+                padding: 0.6em 0.8em;
+            }
+            
+            .online-card__title {
+                font-size: 1em;
+            }
+            
+            .online-card__time {
+                font-size: 0.8em;
+            }
         }
         </style>
         `;
