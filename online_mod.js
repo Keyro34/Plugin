@@ -18021,36 +18021,34 @@
       </div>`);
 
       // Шаблон для карточек в стиле второго изображения
-      Lampa.Template.add('online_mod_card', 
-      `<div class="online-episode selector">
+      Lampa.Template.add('online_mod_card', `
+      <div class="online-card">
+        
+        <div class="online-card__image">
+          <div class="online-card__loader"></div>
+          <img src="" alt="">
+        </div>
 
-          <div class="online-episode__image">
-              <img alt="" crossorigin="anonymous">
-              <div class="online-episode__number">{episode}</div>
+        <div class="online-card__body">
+          
+          <div class="online-card__title">{{title}}</div>
+
+          <div class="online-card__meta">
+            <div class="online-card__quality">{{quality}}</div>
+            {{rating}}
           </div>
 
-          <div class="online-episode__body">
+          {{#if time}}
+          <div class="online-card__time">{{time}}</div>
+          {{/if}}
 
-              <div class="online-episode__top">
-                  <div class="online-episode__title">{title}</div>
-                  <div class="online-episode__time">{time}</div>
-              </div>
+          {{#if info}}
+          <div class="online-card__info">{{info}}</div>
+          {{/if}}
 
-              <div class="online-episode__timeline">
-                  <div class="online-episode__progress"></div>
-              </div>
+          <div class="online-card__timeline"></div>
 
-              <div class="online-episode__bottom">
-                  <div class="online-episode__rating">
-                      ★ {rating}
-                  </div>
-                  <div class="online-episode__voice">
-                      {info}
-                  </div>
-              </div>
-
-          </div>
-
+        </div>
       </div>`);
     }
 
@@ -18058,112 +18056,140 @@
         var style = `
         <style>
 
-        /* ===== ОСНОВНАЯ КАРТОЧКА ===== */
-
-        .online-episode {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            margin-bottom: 18px;
-            border-radius: 14px;
-            background: rgba(60, 50, 48, 0.85);
-            backdrop-filter: blur(6px);
-            transition: all .2s ease;
+        .online-card {
+          width: 220px;
+          border-radius: 18px;
+          overflow: hidden;
+          background: #141414;
+          transition: 0.25s ease;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
 
-        .online-episode.focus,
-        .online-episode:hover {
-            background: rgba(80, 65, 60, 0.95);
-            transform: scale(1.02);
+        .online-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 12px 30px rgba(0,0,0,0.6);
         }
 
-        /* ===== КАРТИНКА ===== */
+        /* === IMAGE === */
 
-        .online-episode__image {
-            position: relative;
-            width: 95px;
-            height: 70px;
-            flex-shrink: 0;
-            border-radius: 10px;
-            overflow: hidden;
+        .online-card__image {
+          position: relative;
+          width: 100%;
+          padding-top: 150%;
+          background: linear-gradient(135deg, #1c1c1c, #101010);
+          overflow: hidden;
         }
 
-        .online-episode__image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .online-card__image img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0;
+          transition: opacity 0.3s ease;
         }
 
-        /* НОМЕР СЕРИИ ПОВЕРХ ФОТО */
-
-        .online-episode__number {
-            position: absolute;
-            bottom: 6px;
-            left: 8px;
-            font-size: 22px;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: 0 0 8px rgba(0,0,0,0.8);
+        .online-card__image--loaded img {
+          opacity: 1;
         }
 
-        /* ===== ПРАВАЯ ЧАСТЬ ===== */
-
-        .online-episode__body {
-            flex: 1;
-            margin-left: 16px;
+        /* Loader */
+        .online-card__loader {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(circle, #222 0%, #111 100%);
+          animation: pulse 1.5s infinite;
         }
 
-        /* ВЕРХ (название + время) */
-
-        .online-episode__top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        @keyframes pulse {
+          0% { opacity: 0.5; }
+          50% { opacity: 0.8; }
+          100% { opacity: 0.5; }
         }
 
-        .online-episode__title {
-            font-size: 18px;
-            font-weight: 500;
-            color: #ffffff;
+        /* Episode number (маленький) */
+        .online-card__episode-number {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: rgba(0,0,0,0.6);
+          backdrop-filter: blur(6px);
+          padding: 4px 8px;
+          border-radius: 10px;
+          font-weight: 600;
+          font-size: 13px;
         }
 
-        .online-episode__time {
-            font-size: 14px;
-            color: #e0e0e0;
+        /* Episode number fallback (крупный) */
+        .online-card__episode-number-large {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 56px;
+          font-weight: 700;
+          color: rgba(255,255,255,0.12);
         }
 
-        /* ===== ЛИНИЯ ПРОГРЕССА ===== */
-
-        .online-episode__timeline {
-            height: 3px;
-            background: rgba(255,255,255,0.25);
-            border-radius: 2px;
-            margin: 8px 0 6px 0;
-            overflow: hidden;
+        /* Viewed */
+        .online-card__viewed {
+          position: absolute;
+          bottom: 8px;
+          right: 8px;
+          background: #00c853;
+          color: #000;
+          font-weight: bold;
+          padding: 4px 6px;
+          border-radius: 50%;
+          font-size: 12px;
         }
 
-        .online-episode__progress {
-            height: 100%;
-            background: #ffffff;
-            width: 0%;
+        /* === BODY === */
+
+        .online-card__body {
+          padding: 12px;
         }
 
-        /* ===== НИЗ ===== */
-
-        .online-episode__bottom {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
+        .online-card__title {
+          font-size: 15px;
+          font-weight: 600;
+          margin-bottom: 6px;
+          line-height: 1.3;
+          height: 38px;
+          overflow: hidden;
         }
 
-        .online-episode__rating {
-            color: #ffffff;
-            font-weight: 500;
+        .online-card__meta {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 12px;
+          margin-bottom: 4px;
         }
 
-        .online-episode__voice {
-            color: #d0d0d0;
+        .online-card__quality {
+          background: #2962ff;
+          padding: 2px 6px;
+          border-radius: 6px;
+          font-weight: 600;
+        }
+
+        .online-prestige-rate {
+          color: #ffc107;
+          font-weight: 600;
+        }
+
+        .online-card__info {
+          font-size: 12px;
+          opacity: 0.7;
+          margin-bottom: 6px;
+        }
+
+        /* Timeline */
+        .online-card__timeline {
+          height: 4px;
         }
 
         </style>
