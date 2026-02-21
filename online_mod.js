@@ -18021,34 +18021,40 @@
       </div>`);
 
       // Шаблон для карточек в стиле второго изображения
-      Lampa.Template.add('online_mod_card', `
-      <div class="online-card">
-        
-        <div class="online-card__image">
-          <div class="online-card__loader"></div>
-          <img src="" alt="">
-        </div>
-
-        <div class="online-card__body">
-          
-          <div class="online-card__title">{{title}}</div>
-
-          <div class="online-card__meta">
-            <div class="online-card__quality">{{quality}}</div>
-            {{rating}}
+      Lampa.Template.add('online_mod_card', 
+      `<div class="order-card selector">
+          <div class="order-card__bg">
+              <img alt="" crossorigin="anonymous">
+              <div class="order-card__gradient"></div>
           </div>
 
-          {{#if time}}
-          <div class="online-card__time">{{time}}</div>
-          {{/if}}
+          <div class="order-card__content">
 
-          {{#if info}}
-          <div class="online-card__info">{{info}}</div>
-          {{/if}}
+              <div class="order-card__number">
+                  {episode}
+              </div>
 
-          <div class="online-card__timeline"></div>
+              <div class="order-card__right">
 
-        </div>
+                  <div class="order-card__title">
+                      {title}
+                  </div>
+
+                  <div class="order-card__progress">
+                      <div class="order-card__progress-bar"></div>
+                  </div>
+
+                  <div class="order-card__meta">
+                      {rating} {info}
+                  </div>
+
+              </div>
+
+              <div class="order-card__time">
+                  {time}
+              </div>
+
+          </div>
       </div>`);
     }
 
@@ -18056,140 +18062,96 @@
         var style = `
         <style>
 
-        .online-card {
-          width: 220px;
-          border-radius: 18px;
-          overflow: hidden;
-          background: #141414;
-          transition: 0.25s ease;
-          box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        /* ===== НОВАЯ КАРТОЧКА ===== */
+
+        .order-card {
+            position: relative;
+            height: 190px;
+            border-radius: 18px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            background: #111;
+            transition: transform .25s ease, box-shadow .25s ease;
         }
 
-        .online-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+        .order-card.focus {
+            transform: scale(1.03);
+            box-shadow: 0 0 25px rgba(255,215,0,0.35);
         }
 
-        /* === IMAGE === */
-
-        .online-card__image {
-          position: relative;
-          width: 100%;
-          padding-top: 150%;
-          background: linear-gradient(135deg, #1c1c1c, #101010);
-          overflow: hidden;
+        .order-card__bg img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .online-card__image img {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          opacity: 0;
-          transition: opacity 0.3s ease;
+        .order-card__gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(0,0,0,0.85) 0%,
+                rgba(0,0,0,0.7) 40%,
+                rgba(0,0,0,0.4) 70%,
+                rgba(0,0,0,0.1) 100%
+            );
         }
 
-        .online-card__image--loaded img {
-          opacity: 1;
+        .order-card__content {
+            position: relative;
+            display: flex;
+            height: 100%;
+            padding: 24px;
+            align-items: center;
         }
 
-        /* Loader */
-        .online-card__loader {
-          position: absolute;
-          inset: 0;
-          background: radial-gradient(circle, #222 0%, #111 100%);
-          animation: pulse 1.5s infinite;
+        .order-card__number {
+            font-size: 70px;
+            font-weight: 700;
+            color: #fff;
+            opacity: 0.95;
+            min-width: 90px;
         }
 
-        @keyframes pulse {
-          0% { opacity: 0.5; }
-          50% { opacity: 0.8; }
-          100% { opacity: 0.5; }
+        .order-card__right {
+            margin-left: 40px;
+            flex: 1;
         }
 
-        /* Episode number (маленький) */
-        .online-card__episode-number {
-          position: absolute;
-          top: 8px;
-          right: 8px;
-          background: rgba(0,0,0,0.6);
-          backdrop-filter: blur(6px);
-          padding: 4px 8px;
-          border-radius: 10px;
-          font-weight: 600;
-          font-size: 13px;
+        .order-card__title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: #fff;
         }
 
-        /* Episode number fallback (крупный) */
-        .online-card__episode-number-large {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 56px;
-          font-weight: 700;
-          color: rgba(255,255,255,0.12);
+        .order-card__progress {
+            height: 4px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 12px;
         }
 
-        /* Viewed */
-        .online-card__viewed {
-          position: absolute;
-          bottom: 8px;
-          right: 8px;
-          background: #00c853;
-          color: #000;
-          font-weight: bold;
-          padding: 4px 6px;
-          border-radius: 50%;
-          font-size: 12px;
+        .order-card__progress-bar {
+            height: 100%;
+            background: #ffd700;
+            transition: width .3s ease;
         }
 
-        /* === BODY === */
-
-        .online-card__body {
-          padding: 12px;
+        .order-card__meta {
+            font-size: 15px;
+            opacity: 0.9;
+            color: #ddd;
         }
 
-        .online-card__title {
-          font-size: 15px;
-          font-weight: 600;
-          margin-bottom: 6px;
-          line-height: 1.3;
-          height: 38px;
-          overflow: hidden;
-        }
-
-        .online-card__meta {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 12px;
-          margin-bottom: 4px;
-        }
-
-        .online-card__quality {
-          background: #2962ff;
-          padding: 2px 6px;
-          border-radius: 6px;
-          font-weight: 600;
-        }
-
-        .online-prestige-rate {
-          color: #ffc107;
-          font-weight: 600;
-        }
-
-        .online-card__info {
-          font-size: 12px;
-          opacity: 0.7;
-          margin-bottom: 6px;
-        }
-
-        /* Timeline */
-        .online-card__timeline {
-          height: 4px;
+        .order-card__time {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            font-size: 16px;
+            color: #ddd;
         }
 
         </style>
