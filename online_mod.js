@@ -18055,6 +18055,7 @@
             background: rgba(30, 30, 30, 0.95);
             border-radius: 0.5em;
             margin-bottom: 1em;
+
             overflow: hidden;
             transition: all 0.2s ease;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -18172,6 +18173,7 @@
         }
         
         .online-card__content {
+
             flex: 1;
             padding: 0.8em 1em;
             display: flex;
@@ -18215,6 +18217,7 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 0.1em;
             overflow: hidden;
+
         }
         
         .online-card__timeline .time-line__progress {
@@ -18310,6 +18313,7 @@
                 font-size: 0.8em;
             }
         }
+
         </style>
         `;
         
