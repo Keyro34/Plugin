@@ -2138,9 +2138,6 @@
             
             if (!links || !links.length) return;
 
-            // Флаг - найден ли точный результат
-            var exactMatch = false;
-
             // ================= INPUT =================
 
             var inputTitleRaw =
@@ -2156,7 +2153,6 @@
                 object.movie.original_name ||
                 '';
 
-            // Используем данные из TMDB карточки
             var inputYear =
                 object.movie.release_date ?
                 parseInt(object.movie.release_date.substr(0,4)) :
@@ -2166,10 +2162,9 @@
                 parseInt(object.movie.year) :
                 null;
 
-            var inputTMDB = object.movie.id || null; // TMDB ID из карточки
-            var inputIMDB = object.movie.imdb_id || null; // Может быть получен через TMDB API
+            var inputTMDB = object.movie.id || null;
+            var inputIMDB = object.movie.imdb_id || null;
 
-            // Альтернативные названия из TMDB
             var alternativeTitles = [];
             if (object.movie.alternative_titles && object.movie.alternative_titles.results) {
                 alternativeTitles = object.movie.alternative_titles.results.map(function(t) {
@@ -2184,51 +2179,107 @@
             function cleanTrash(str){
                 return (str || '')
                     .replace(/\b(1080p|720p|2160p|hdrip|webrip|bluray|bdrip|x264|x265|hevc|h264|4k)\b/ig,'')
+                    .replace(/\b(extended|director.?s.?cut|remastered|unrated)\b/ig,'')
                     .replace(/\b(сезон|season|серия|episode)\b.*$/ig,'')
+                    .trim();
+            }
+
+            function norm(str){
+                return cleanTrash(str)
+                    .toLowerCase()
+                    .replace(/ё/g,'е')
+                    .replace(/&/g,'and')
+                    .replace(/\b(the|a|an)\b/g,'')
+                    .replace(/[^a-z0-9а-я]/gi,'')
                     .trim();
             }
 
             function splitVariants(str){
                 if(!str) return [];
                 return str.split(/[:\-|\/]/).map(function(s){
-                    return s.trim();
+                    return norm(s);
                 });
-            }
-
-            function norm(str){
-                return cleanTrash(str)
-                    .toLowerCase()
-                    .replace(/[^a-z0-9а-яё]/gi,'')
-                    .trim();
-            }
-
-            function safeFuzzy(a,b){
-                if(!a || !b) return false;
-                if(Math.abs(a.length - b.length) > 2) return false;
-                if(a.length < 5 || b.length < 5) return false;
-
-                var diff = 0;
-                for(var i=0;i<Math.min(a.length,b.length);i++){
-                    if(a[i] !== b[i]) diff++;
-                }
-                return diff <= 2;
             }
 
             function titleLengthPenalty(item, input){
                 if(!item || !input) return 0;
                 var diff = Math.abs(item.length - input.length);
-                if(diff > 10) return -120;
-                if(diff > 6) return -60;
+                if(diff > 12) return -150;
+                if(diff > 8) return -80;
                 return 0;
             }
 
-            // Добавляем альтернативные названия к вариантам поиска
-            var inputTitles = splitVariants(inputTitleRaw).map(norm);
-            var inputOriginals = splitVariants(inputOriginalRaw).map(norm);
+            function levenshtein(a, b) {
+                if (!a || !b) return 999;
+
+                var matrix = [];
+                for (var i = 0; i <= b.length; i++) matrix[i] = [i];
+                for (var j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+                for (var i = 1; i <= b.length; i++) {
+                    for (var j = 1; j <= a.length; j++) {
+                        if (b[i-1] === a[j-1]) {
+                            matrix[i][j] = matrix[i-1][j-1];
+                        } else {
+                            matrix[i][j] = Math.min(
+                                matrix[i-1][j-1] + 1,
+                                matrix[i][j-1] + 1,
+                                matrix[i-1][j] + 1
+                            );
+                        }
+                    }
+                }
+
+                return matrix[b.length][a.length];
+            }
+
+            function fuzzyScore(a, b){
+                if(!a || !b) return 0;
+
+                var dist = levenshtein(a, b);
+                var maxLen = Math.max(a.length, b.length);
+                var ratio = 1 - (dist / maxLen);
+
+                if(ratio > 0.92) return 260;
+                if(ratio > 0.85) return 180;
+                if(ratio > 0.75) return 120;
+                return 0;
+            }
+
+            function wordScore(a, b){
+                if(!a || !b) return 0;
+
+                var wordsA = a.match(/[a-zа-я0-9]+/gi) || [];
+                var wordsB = b.match(/[a-zа-я0-9]+/gi) || [];
+
+                var matches = 0;
+
+                wordsA.forEach(function(w){
+                    if(wordsB.includes(w)) matches++;
+                });
+
+                return matches * 70;
+            }
+
+            function sequelPenalty(itemTitle, mainTitle){
+                var sequelRegex = /(2|3|4|5|ii|iii|iv|v|part2|part3)$/i;
+
+                var itemHas = sequelRegex.test(itemTitle);
+                var mainHas = sequelRegex.test(mainTitle);
+
+                if(itemHas !== mainHas) return -250;
+                return 0;
+            }
+
+            // ================= PREP INPUT VARIANTS =================
+
+            var inputTitles = splitVariants(inputTitleRaw);
+            var inputOriginals = splitVariants(inputOriginalRaw);
             var inputAlternatives = alternativeTitles.map(norm);
 
-            // Объединяем все варианты названий
-            var allTitleVariants = inputTitles.concat(inputOriginals).concat(inputAlternatives);
+            var allTitleVariants = inputTitles
+                .concat(inputOriginals)
+                .concat(inputAlternatives);
 
             var mainInput = inputTitles[0] || '';
             var mainOriginal = inputOriginals[0] || '';
@@ -2236,26 +2287,25 @@
             // ================= PARSE ITEMS =================
 
             var items = links.map(function(l){
-                // Адаптируйте под формат вашего источника
+
                 var li = $(l + '</div>');
                 var link = $('a', li);
-                
+
                 var text = link.text().trim() || '';
                 var href = link.attr('href') || '';
 
                 var yearMatch = text.match(/\b(19|20)\d{2}\b/);
                 var year = yearMatch ? parseInt(yearMatch[0]) : null;
 
-                // Ищем TMDB ID в ссылке (если есть)
                 var tmdbMatch = href.match(/\/(movie|tv)\/(\d+)/i);
                 var tmdb = tmdbMatch ? parseInt(tmdbMatch[2]) : null;
 
-                // Ищем IMDB ID
                 var imdbMatch = href.match(/tt\d+/i);
                 var imdb = imdbMatch ? imdbMatch[0] : null;
 
                 return {
                     title: text,
+                    normTitle: norm(text),
                     link: href,
                     year: year,
                     imdb: imdb,
@@ -2266,19 +2316,15 @@
 
             // ================= STEP 1 — ID MATCH =================
 
-            // Сначала проверяем по TMDB ID
             for(var i=0;i<items.length;i++){
                 if(inputTMDB && items[i].tmdb === inputTMDB){
-                    exactMatch = true;
                     getPage(items[i].link);
                     return;
                 }
             }
 
-            // Потом по IMDB ID
             for(var i=0;i<items.length;i++){
                 if(inputIMDB && items[i].imdb === inputIMDB){
-                    exactMatch = true;
                     getPage(items[i].link);
                     return;
                 }
@@ -2288,94 +2334,61 @@
 
             for(var i=0;i<items.length;i++){
 
-                var itemNorm = norm(items[i].title);
+                var itemNorm = items[i].normTitle;
 
-                // Точное совпадение с оригинальным названием + год
                 if(mainOriginal && itemNorm === mainOriginal && inputYear && items[i].year === inputYear){
-                    exactMatch = true;
                     getPage(items[i].link);
                     return;
                 }
 
-                // Точное совпадение с русским названием + год
                 if(mainInput && itemNorm === mainInput && inputYear && items[i].year === inputYear){
-                    exactMatch = true;
                     getPage(items[i].link);
                     return;
-                }
-
-                // Проверяем альтернативные названия
-                for(var j=0; j<allTitleVariants.length; j++) {
-                    if(allTitleVariants[j] && itemNorm === allTitleVariants[j] && inputYear && items[i].year === inputYear){
-                        exactMatch = true;
-                        getPage(items[i].link);
-                        return;
-                    }
                 }
             }
 
-            // ================= STEP 3 — ABSOLUTE SCORING =================
+            // ================= STEP 3 — SCORING =================
 
             items.forEach(function(item){
 
                 var score = 0;
-                var itemTitle = norm(item.title);
+                var itemTitle = item.normTitle;
 
-                // EXACT MATCHES (высокие баллы)
-                if(itemTitle === mainInput) score += 400;
-                if(itemTitle === mainOriginal) score += 450;
-                
-                // Проверка по всем вариантам названий
+                if(itemTitle === mainInput) score += 500;
+                if(itemTitle === mainOriginal) score += 550;
+
                 allTitleVariants.forEach(function(variant){
-                    if(itemTitle === variant) score += 300;
+                    if(variant && itemTitle === variant) score += 420;
                 });
 
-                // MULTI VARIANT (средние баллы)
-                inputTitles.forEach(function(t){
-                    if(itemTitle === t) score += 240;
-                });
+                if(mainInput && itemTitle.includes(mainInput)) score += 260;
+                if(mainOriginal && itemTitle.includes(mainOriginal)) score += 280;
 
-                inputOriginals.forEach(function(t){
-                    if(itemTitle === t) score += 260;
-                });
+                score += wordScore(itemTitle, mainInput);
+                score += wordScore(itemTitle, mainOriginal);
 
-                alternativeTitles.forEach(function(t){
-                    if(itemTitle === norm(t)) score += 200;
-                });
+                score += fuzzyScore(itemTitle, mainInput);
+                score += fuzzyScore(itemTitle, mainOriginal);
 
-                // CONTAINS (низкие баллы)
-                if(mainInput.length > 3 && itemTitle.includes(mainInput)) score += 180;
-                if(mainOriginal && itemTitle.includes(mainOriginal)) score += 200;
-                
-                allTitleVariants.forEach(function(variant){
-                    if(variant && variant.length > 3 && itemTitle.includes(variant)) score += 150;
-                });
-
-                // SAFE FUZZY (для опечаток)
-                if(safeFuzzy(itemTitle, mainInput)) score += 140;
-                if(safeFuzzy(itemTitle, mainOriginal)) score += 160;
-
-                // YEAR (очень важно)
                 if(inputYear && item.year){
                     var diff = Math.abs(item.year - inputYear);
-                    if(diff === 0) score += 320;
-                    else if(diff === 1) score += 200;
-                    else if(diff <= 3) score += 80;
-                    else score -= 180;
+
+                    if(diff === 0) score += 500;
+                    else if(diff === 1) score += 300;
+                    else if(diff <= 2) score += 150;
+                    else score -= 300;
                 }
 
-                // LENGTH LOGIC
                 score += titleLengthPenalty(itemTitle, mainInput);
+                score += sequelPenalty(itemTitle, mainInput);
 
-                // SERIES PROTECTION
                 if(isSearchingSeries){
-                    if(/season|сезон/i.test(item.title)) score += 60;
+                    if(/season|сезон/i.test(item.title)) score += 80;
                 } else {
-                    if(/season|сезон/i.test(item.title)) score -= 200;
+                    if(/season|сезон/i.test(item.title)) score -= 250;
                 }
 
-                // QUALITY TRASH PENALTY
-                if(/camrip|ts|telesync/i.test(item.title)) score -= 220;
+                if(/camrip|ts|telesync/i.test(item.title)) score -= 300;
 
                 item.score = score;
             });
@@ -2393,34 +2406,29 @@
             if(best){
 
                 if(!second){
-                    exactMatch = true;
                     getPage(best.link);
                     return;
                 }
 
                 var diff12 = (best.score||0) - (second.score||0);
 
-                // Динамический порог на основе качества данных
-                var autoThreshold = 300;
-                if(inputYear) autoThreshold += 40;
-                if(mainOriginal) autoThreshold += 30;
-                if(alternativeTitles.length > 0) autoThreshold += 20; // Больше данных = выше порог
+                var autoThreshold = 420;
+                if(inputYear) autoThreshold += 60;
+                if(mainOriginal) autoThreshold += 40;
+                if(alternativeTitles.length > 0) autoThreshold += 30;
 
-                if(diff12 >= 25){
-                    exactMatch = true;
+                if(diff12 >= 120){
                     getPage(best.link);
                     return;
                 }
 
                 if(best.score >= autoThreshold){
-                    exactMatch = true;
                     getPage(best.link);
                     return;
                 }
 
                 if(third){
-                    if(best.score > second.score && second.score > third.score && best.score >= 260){
-                        exactMatch = true;
+                    if(best.score > second.score && second.score > third.score && best.score >= 350){
                         getPage(best.link);
                         return;
                     }
@@ -2429,9 +2437,7 @@
 
             // ================= FALLBACK =================
 
-            // Если не нашли точного совпадения, показываем похожие
-            // НО без загрузки изображений!
-            component.similars(items, null, null, true); // Добавляем флаг для отключения изображений
+            component.similars(items);
             component.loading(false);
          };
 
@@ -16865,86 +16871,58 @@
         Lampa.Storage.set('online_mod_choice_' + balanser, data);
       };
       /**
-     * Есть похожие карточки
-     * @param {Object} json
-     * @param {Function} search_more
-     * @param {Object} more_params
-     * @param {Boolean} skipImages - флаг для отключения изображений
-     */
+       * Есть похожие карточки
+       * @param {Object} json
+       */
 
 
       this.similars = function (json, search_more, more_params) {
         var _this5 = this;
 
         json.forEach(function (elem) {
-            var title = elem.title || elem.ru_title || elem.nameRu || elem.en_title || elem.nameEn || elem.orig_title || elem.nameOriginal;
-            var orig_title = elem.orig_title || elem.nameOriginal || elem.en_title || elem.nameEn;
-            var year = elem.start_date || elem.year || '';
-            var info = [];
-            if (orig_title && orig_title != elem.title) info.push(orig_title);
-            if (elem.seasons_count) info.push(Lampa.Lang.translate('online_mod_seasons_count') + ': ' + elem.seasons_count);
-            if (elem.episodes_count) info.push(Lampa.Lang.translate('online_mod_episodes_count') + ': ' + elem.episodes_count);
-            elem.title = title;
-            elem.quality = year ? (year + '').slice(0, 4) : '----';
-            elem.info = info.length ? ' / ' + info.join(' / ') : '';
-            
-            // Используем шаблон без изображения, если skipImages = true
-            var item;
-            if (skipImages) {
-                // Упрощенный шаблон без изображения
-                item = $(`<div class="online-folder-simple selector">
-                    <div class="online-folder-simple__title">${elem.title}</div>
-                    <div class="online-folder-simple__year">${elem.quality}</div>
-                    <div class="online-folder-simple__info">${elem.info}</div>
-                </div>`);
-            } else {
-                item = Lampa.Template.get('online_mod_folder', elem);
-            }
-            
-            item.on('hover:enter', function () {
-                _this5.activity.loader(true);
+          var title = elem.title || elem.ru_title || elem.nameRu || elem.en_title || elem.nameEn || elem.orig_title || elem.nameOriginal;
+          var orig_title = elem.orig_title || elem.nameOriginal || elem.en_title || elem.nameEn;
+          var year = elem.start_date || elem.year || '';
+          var info = [];
+          if (orig_title && orig_title != elem.title) info.push(orig_title);
+          if (elem.seasons_count) info.push(Lampa.Lang.translate('online_mod_seasons_count') + ': ' + elem.seasons_count);
+          if (elem.episodes_count) info.push(Lampa.Lang.translate('online_mod_episodes_count') + ': ' + elem.episodes_count);
+          elem.title = title;
+          elem.quality = year ? (year + '').slice(0, 4) : '----';
+          elem.info = info.length ? ' / ' + info.join(' / ') : '';
+          var item = Lampa.Template.get('online_mod_folder', elem);
+          item.on('hover:enter', function () {
+            _this5.activity.loader(true);
 
-                _this5.reset();
+            _this5.reset();
 
-                object.search = elem.title;
-                object.search_date = year;
-                selected_id = elem.id;
+            object.search = elem.title;
+            object.search_date = year;
+            selected_id = elem.id;
 
-                _this5.extendChoice();
+            _this5.extendChoice();
 
-                sources[balanser].search(object, elem.kp_id || elem.kinopoisk_id || elem.kinopoiskId || elem.filmId || elem.imdb_id, [elem]);
-            });
+            sources[balanser].search(object, elem.kp_id || elem.kinopoisk_id || elem.kinopoiskId || elem.filmId || elem.imdb_id, [elem]);
+          });
 
-            _this5.append(item);
+          _this5.append(item);
         });
 
         if (search_more) {
-            var elem = {
-                title: Lampa.Lang.translate('online_mod_show_more'),
-                quality: '...',
-                info: ''
-            };
-            
-            var item;
-            if (skipImages) {
-                item = $(`<div class="online-folder-simple selector">
-                    <div class="online-folder-simple__title">${elem.title}</div>
-                    <div class="online-folder-simple__year">${elem.quality}</div>
-                    <div class="online-folder-simple__info">${elem.info}</div>
-                </div>`);
-            } else {
-                item = Lampa.Template.get('online_mod_folder', elem);
-            }
-            
-            item.on('hover:enter', function () {
-                _this5.activity.loader(true);
+          var elem = {
+            title: Lampa.Lang.translate('online_mod_show_more'),
+            quality: '...',
+            info: ''
+          };
+          var item = Lampa.Template.get('online_mod_folder', elem);
+          item.on('hover:enter', function () {
+            _this5.activity.loader(true);
 
-                _this5.reset();
+            _this5.reset();
 
-                search_more(more_params);
-            });
-            
-            _this5.append(item);
+            search_more(more_params);
+          });
+          this.append(item);
         }
       };
       /**
@@ -18387,37 +18365,6 @@
             font-size: 1.5em;
             margin-bottom: 0.5em;
             color: #fff;
-        }
-        
-        /* Стили для упрощенных карточек похожих результатов */
-        .online-folder-simple {
-            padding: 15px 20px;
-            margin-bottom: 5px;
-            background: rgba(30,30,30,0.9);
-            border-radius: 5px;
-            border-left: 3px solid #ffd700;
-            transition: all 0.2s;
-        }
-        .online-folder-simple.focus {
-            background: rgba(50,50,50,0.95);
-            transform: scale(1.01);
-            box-shadow: 0 0 15px rgba(255,215,0,0.3);
-        }
-        .online-folder-simple__title {
-            font-size: 1.2em;
-            color: #fff;
-            margin-bottom: 5px;
-        }
-        .online-folder-simple__year {
-            font-size: 0.9em;
-            color: #ffd700;
-            display: inline-block;
-            margin-right: 10px;
-        }
-        .online-folder-simple__info {
-            font-size: 0.9em;
-            color: #888;
-            display: inline-block;
         }
         
         /* Адаптация для мобильных */
