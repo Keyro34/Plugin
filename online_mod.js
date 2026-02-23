@@ -1141,18 +1141,29 @@
           var viewed = Lampa.Storage.cache('online_view', 5000, []);
           var last_episode = component.getLastEpisode(items);
 
-          var tmdbId = object.movie.id;
-          var seasonNumber = choice.season + 1;
+          // 🔥 Берём правильный TMDB id
+          var tmdbId = object.movie.tmdb_id || object.movie.id;
+
+          // 🔥 Определяем реальный номер сезона
+          var seasonNumber = 1;
+
+          if (items.length && items[0].season) {
+              seasonNumber = parseInt(items[0].season);
+          } else {
+              seasonNumber = choice.season + 1;
+          }
 
           function loadEpisodeData(callback) {
 
-              if (!tmdbId || !object.movie.name) {
+              if (!tmdbId) {
                   callback({});
                   return;
               }
 
-              var url = 'https://api.themoviedb.org/3/tv/' + tmdbId +
-                  '/season/' + seasonNumber +
+              var url = 'https://api.themoviedb.org/3/tv/' +
+                  tmdbId +
+                  '/season/' +
+                  seasonNumber +
                   '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
 
               $.ajax({
@@ -1165,8 +1176,8 @@
                       if (data && data.episodes) {
                           data.episodes.forEach(function (ep) {
                               episodesData[ep.episode_number] = {
-                                  still_path: ep.still_path,
                                   name: ep.name,
+                                  still_path: ep.still_path,
                                   vote_average: ep.vote_average,
                                   air_date: ep.air_date
                               };
@@ -1186,13 +1197,13 @@
               var existingEpisodes = {};
 
               // =========================
-              // 1. РИСУЕМ ДОСТУПНЫЕ СЕРИИ
+              // ДОСТУПНЫЕ СЕРИИ
               // =========================
 
               items.forEach(function (element) {
 
-                  var episode_num = element.episode || 1;
-                  var season_num = element.season || 1;
+                  var episode_num = parseInt(element.episode) || 1;
+                  var season_num = parseInt(element.season) || seasonNumber;
 
                   existingEpisodes[episode_num] = true;
 
@@ -1202,18 +1213,6 @@
                   }
 
                   var episodeTMDB = episodesData[episode_num] || {};
-
-                  var duration = element.duration || object.movie.runtime || 0;
-                  var timeFormatted = duration ? Lampa.Utils.secondsToTime(duration * 60, true) : '';
-
-                  var rating = element.rating ||
-                      episodeTMDB.vote_average ||
-                      object.movie.vote_average;
-
-                  var ratingHtml = rating ?
-                      '<span class="online-prestige-rate">⭐ ' +
-                      (typeof rating === 'number' ? rating.toFixed(1) : rating) +
-                      '</span>' : '';
 
                   var hash = Lampa.Utils.hash(
                       [season_num, episode_num, object.movie.original_title].join('')
@@ -1228,12 +1227,16 @@
                   var view = Lampa.Timeline.view(hash);
                   element.timeline = view;
 
+                  var rating = episodeTMDB.vote_average || object.movie.vote_average;
+
                   var cardData = {
                       title: episodeTMDB.name || element.title,
-                      time: timeFormatted,
+                      time: '',
                       info: element.translate_voice || '',
                       quality: element.quality || 'HD',
-                      rating: ratingHtml,
+                      rating: rating ?
+                          '<span class="online-prestige-rate">⭐ ' +
+                          rating.toFixed(1) + '</span>' : '',
                       season_num: season_num,
                       episode_num: episode_num
                   };
@@ -1244,10 +1247,10 @@
                   item.find('.online-card__timeline')
                       .append(Lampa.Timeline.render(view));
 
-                  // картинка
-                  var imgPath = episodeTMDB.still_path ||
-                                element.still_path ||
-                                object.movie.poster_path;
+                  var imgPath =
+                      episodeTMDB.still_path ||
+                      element.still_path ||
+                      object.movie.poster_path;
 
                   if (imgPath) {
                       item.find('img').attr(
@@ -1260,7 +1263,7 @@
                       imageDiv.append('<div class="online-card__viewed">✓</div>');
                   }
 
-                  // запуск
+                  // ▶ запуск
                   item.on('hover:enter', function () {
 
                       if (element.loading) return;
@@ -1288,7 +1291,6 @@
                           Lampa.Player.play(first);
 
                       }, function () {
-
                           element.loading = false;
                           Lampa.Noty.show(
                               Lampa.Lang.translate('online_mod_nolink')
@@ -1302,7 +1304,7 @@
 
 
               // =========================
-              // 2. ДОБАВЛЯЕМ БУДУЩИЕ СЕРИИ
+              // БУДУЩИЕ СЕРИИ
               // =========================
 
               Object.keys(episodesData).forEach(function (epNumber) {
@@ -1314,7 +1316,8 @@
                   var episodeTMDB = episodesData[epNumber];
                   var airDate = episodeTMDB.air_date;
 
-                  var isFuture = airDate &&
+                  var isFuture =
+                      airDate &&
                       new Date(airDate) > new Date();
 
                   var infoText = 'Ожидается';
