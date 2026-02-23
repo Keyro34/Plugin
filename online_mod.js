@@ -18144,7 +18144,7 @@
         }
         
         .online-card__image-container {
-            width: 8em;
+            width: 13em;
             flex-shrink: 0;
             position: relative;
         }
