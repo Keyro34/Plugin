@@ -1137,228 +1137,263 @@
 
       function append(items) {
           component.reset();
-
           var viewed = Lampa.Storage.cache('online_view', 5000, []);
           var last_episode = component.getLastEpisode(items);
-
-          // 🔥 Берём правильный TMDB id
-          var tmdbId = object.movie.tmdb_id || object.movie.id;
-
-          // 🔥 Определяем реальный номер сезона
-          var seasonNumber = 1;
-
-          if (items.length && items[0].season) {
-              seasonNumber = parseInt(items[0].season);
-          } else {
-              seasonNumber = choice.season + 1;
-          }
-
+          
+          // Получаем TMDB ID сериала
+          var tmdbId = object.movie.id;
+          var seasonNumber = choice.season + 1; // Предполагаем что сезон выбран в фильтре
+          
+          // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-
-              if (!tmdbId) {
+              if (!tmdbId || !object.movie.name) {
                   callback({});
                   return;
               }
-
-              var url = 'https://api.themoviedb.org/3/tv/' +
-                  tmdbId +
-                  '/season/' +
-                  seasonNumber +
-                  '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
-
+              
+              var url = 'https://api.themoviedb.org/3/tv/' + tmdbId + '/season/' + seasonNumber + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+              
               $.ajax({
                   url: url,
                   method: 'GET',
-                  success: function (data) {
-
+                  success: function(data) {
                       var episodesData = {};
-
                       if (data && data.episodes) {
-                          data.episodes.forEach(function (ep) {
+                          data.episodes.forEach(function(ep) {
                               episodesData[ep.episode_number] = {
-                                  name: ep.name,
                                   still_path: ep.still_path,
-                                  vote_average: ep.vote_average,
-                                  air_date: ep.air_date
+                                  name: ep.name,
+                                  vote_average: ep.vote_average
                               };
                           });
                       }
-
                       callback(episodesData);
                   },
-                  error: function () {
+                  error: function() {
                       callback({});
                   }
               });
           }
-
-          loadEpisodeData(function (episodesData) {
-
-              var existingEpisodes = {};
-
-              // =========================
-              // ДОСТУПНЫЕ СЕРИИ
-              // =========================
-
+          
+          // Загружаем данные эпизодов и потом отрисовываем
+          loadEpisodeData(function(episodesData) {
               items.forEach(function (element) {
-
-                  var episode_num = parseInt(element.episode) || 1;
-                  var season_num = parseInt(element.season) || seasonNumber;
-
-                  existingEpisodes[episode_num] = true;
-
                   if (element.season) {
                       element.translate_episode_end = last_episode;
                       element.translate_voice = filter_items.voice[choice.voice];
                   }
 
+                  var episode_num = element.episode || 1;
+                  var season_num = element.season || 1;
+                  
+                  // Получаем данные конкретного эпизода из TMDB
                   var episodeTMDB = episodesData[episode_num] || {};
+                  
+                  // Форматируем время
+                  var duration = element.duration || object.movie.runtime || 0;
+                  var timeFormatted = duration ? Lampa.Utils.secondsToTime(duration * 60, true) : '';
+                  
+                  // Формируем информацию
+                  var infoText = '';
+                  if (element.info) {
+                      infoText = element.info;
+                  } else if (element.season && element.translate_voice) {
+                      infoText = element.translate_voice;
+                  }
 
-                  var hash = Lampa.Utils.hash(
-                      [season_num, episode_num, object.movie.original_title].join('')
-                  );
+                  // Добавляем рейтинг
+                  var rating = element.rating || episodeTMDB.vote_average || object.movie.vote_average;
+                  var ratingHtml = '';
+                  if (rating) {
+                      ratingHtml = '<span class="online-prestige-rate">⭐ ' + (typeof rating === 'number' ? rating.toFixed(1) : rating) + '</span>';
+                  }
 
-                  var hash_file = Lampa.Utils.hash(
-                      [season_num, episode_num,
-                      object.movie.original_title,
-                      filter_items.voice[choice.voice]].join('')
-                  );
+                  // Создаем hash
+                  var hash = Lampa.Utils.hash(element.season ? 
+                      [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : 
+                      object.movie.original_title);
+                  
+                  var hash_file = Lampa.Utils.hash(element.season ? 
+                      [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : 
+                      object.movie.original_title + element.title);
 
                   var view = Lampa.Timeline.view(hash);
                   element.timeline = view;
 
-                  var rating = episodeTMDB.vote_average || object.movie.vote_average;
-
+                  // Данные для карточки
                   var cardData = {
-                      title: episodeTMDB.name || element.title,
-                      time: '',
-                      info: element.translate_voice || '',
+                      title: element.season ? (episodeTMDB.name || element.title) : (select_title + (element.title == select_title ? '' : ' / ' + element.title)),
+                      time: timeFormatted,
+                      info: infoText,
                       quality: element.quality || 'HD',
-                      rating: rating ?
-                          '<span class="online-prestige-rate">⭐ ' +
-                          rating.toFixed(1) + '</span>' : '',
+                      rating: ratingHtml,
                       season_num: season_num,
                       episode_num: episode_num
                   };
 
                   var item = Lampa.Template.get('online_mod_card', cardData);
+                  
+                  var loader = item.find('.online-card__loader');
                   var imageDiv = item.find('.online-card__image');
+                  var img = item.find('img')[0];
+                  
+                  item.find('.online-card__timeline').append(Lampa.Timeline.render(view));
 
-                  item.find('.online-card__timeline')
-                      .append(Lampa.Timeline.render(view));
+                  // Загружаем изображение
+                  if (img) {
+                      // Для серий используем still_path из TMDB
+                      var imagePath = null;
+                      
+                      if (element.season) {
+                          // Сначала пробуем получить still_path из TMDB для этой серии
+                          imagePath = episodeTMDB.still_path;
+                          
+                          // Если нет, используем то что пришло от источника
+                          if (!imagePath) {
+                              imagePath = element.still_path;
+                          }
+                          
+                          // Генерируем уникальный путь на основе номера серии, если ничего нет
+                          if (!imagePath) {
+                              // Создаем заглушку с номером серии
+                              imagePath = null;
+                          }
+                      } else {
+                          imagePath = element.poster_path || object.movie.poster_path;
+                      }
+                      
+                      // Функция для добавления номера эпизода
+                      function addEpisodeNumber() {
+                          if (element.season && !imageDiv.find('.online-card__episode-number').length) {
+                              imageDiv.append('<div class="online-card__episode-number">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
+                      }
+                      
+                      img.onload = function() {
+                          imageDiv.addClass('online-card__image--loaded');
+                          loader.remove();
+                          addEpisodeNumber();
+                      };
+                      
+                      img.onerror = function() {
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          addEpisodeNumber();
+                          if (!imageDiv.find('.online-card__fallback-icon').length) {
+                              // Вместо иконки показываем номер серии крупно
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
+                      };
 
-                  var imgPath =
-                      episodeTMDB.still_path ||
-                      element.still_path ||
-                      object.movie.poster_path;
-
-                  if (imgPath) {
-                      item.find('img').attr(
-                          'src',
-                          'https://image.tmdb.org/t/p/w300' + imgPath
-                      );
+                      if (imagePath) {
+                          var imageUrl = 'https://image.tmdb.org/t/p/w300' + imagePath;
+                          img.src = imageUrl;
+                          console.log('Загружаем изображение для серии', episode_num, ':', imageUrl);
+                      } else {
+                          // Если нет изображения, показываем крупный номер серии
+                          imageDiv.addClass('online-card__image--loaded online-card__image--fallback');
+                          loader.remove();
+                          if (!imageDiv.find('.online-card__episode-number-large').length) {
+                              imageDiv.append('<div class="online-card__episode-number-large">' + 
+                                  ('0' + episode_num).slice(-2) + '</div>');
+                          }
+                      }
                   }
 
+                  // Отметка о просмотренном
                   if (viewed.indexOf(hash_file) !== -1) {
-                      imageDiv.append('<div class="online-card__viewed">✓</div>');
+                      if (!imageDiv.find('.online-card__viewed').length) {
+                          imageDiv.append('<div class="online-card__viewed">✓</div>');
+                      }
                   }
 
-                  // ▶ запуск
-                  item.on('hover:enter', function () {
-
+                  // Обработчик выбора
+                  item.on('hover:enter', function (event, options) {
                       if (element.loading) return;
-
+                      if (object.movie.id) Lampa.Favorite.add('history', object.movie, 100);
+                      
                       element.loading = true;
-
+                      
                       getStream(element, function (element) {
-
                           element.loading = false;
-
+                          
                           var first = {
-                              url: component.getDefaultQuality(
-                                  element.qualitys,
-                                  element.stream
-                              ),
-                              quality: component.renameQualityMap(
-                                  element.qualitys
-                              ),
+                              url: component.getDefaultQuality(element.qualitys, element.stream),
+                              quality: component.renameQualityMap(element.qualitys),
                               subtitles: element.subtitles,
                               timeline: element.timeline,
-                              title: element.title
+                              title: element.season ? element.title : select_title + (element.title == select_title ? '' : ' / ' + element.title)
                           };
 
-                          Lampa.Player.playlist([first]);
+                          if (element.season && Lampa.Platform.version) {
+                              var playlist = [];
+                              items.forEach(function (elem) {
+                                  if (elem == element) {
+                                      playlist.push(first);
+                                  } else {
+                                      var cell = {
+                                          url: function url(call) {
+                                              getStream(elem, function (elem) {
+                                                  cell.url = component.getDefaultQuality(elem.qualitys, elem.stream);
+                                                  cell.quality = component.renameQualityMap(elem.qualitys);
+                                                  cell.subtitles = elem.subtitles;
+                                                  call();
+                                              }, function () {
+                                                  cell.url = '';
+                                                  call();
+                                              });
+                                          },
+                                          timeline: elem.timeline,
+                                          title: elem.title
+                                      };
+                                      playlist.push(cell);
+                                  }
+                              });
+                              Lampa.Player.playlist(playlist);
+                          } else {
+                              Lampa.Player.playlist([first]);
+                          }
+
                           Lampa.Player.play(first);
 
-                      }, function () {
+                          if (viewed.indexOf(hash_file) == -1) {
+                              viewed.push(hash_file);
+                              if (!imageDiv.find('.online-card__viewed').length) {
+                                  imageDiv.append('<div class="online-card__viewed">✓</div>');
+                              }
+                              Lampa.Storage.set('online_view', viewed);
+                          }
+                      }, function (error) {
                           element.loading = false;
-                          Lampa.Noty.show(
-                              Lampa.Lang.translate('online_mod_nolink')
-                          );
+                          Lampa.Noty.show(error || Lampa.Lang.translate('online_mod_nolink'));
                       });
+                  });
 
+                  component.contextmenu({
+                      item: item,
+                      view: view,
+                      viewed: viewed,
+                      hash_file: hash_file,
+                      element: element,
+                      file: function file(call) {
+                          getStream(element, function (element) {
+                              call({
+                                  file: element.stream,
+                                  quality: element.qualitys
+                              });
+                          }, function (error) {
+                              Lampa.Noty.show(error || Lampa.Lang.translate('online_mod_nolink'));
+                          });
+                      }
                   });
 
                   component.append(item);
               });
 
-
-              // =========================
-              // БУДУЩИЕ СЕРИИ
-              // =========================
-
-              Object.keys(episodesData).forEach(function (epNumber) {
-
-                  epNumber = parseInt(epNumber);
-
-                  if (existingEpisodes[epNumber]) return;
-
-                  var episodeTMDB = episodesData[epNumber];
-                  var airDate = episodeTMDB.air_date;
-
-                  var isFuture =
-                      airDate &&
-                      new Date(airDate) > new Date();
-
-                  var infoText = 'Ожидается';
-
-                  if (isFuture) {
-                      var date = new Date(airDate);
-                      infoText = 'Выйдет ' +
-                          date.toLocaleDateString('ru-RU');
-                  }
-
-                  var cardData = {
-                      title: episodeTMDB.name || 'Серия ' + epNumber,
-                      time: '',
-                      info: infoText,
-                      quality: '',
-                      rating: episodeTMDB.vote_average ?
-                          '<span class="online-prestige-rate">⭐ ' +
-                          episodeTMDB.vote_average.toFixed(1) +
-                          '</span>' : '',
-                      season_num: seasonNumber,
-                      episode_num: epNumber
-                  };
-
-                  var item = Lampa.Template.get('online_mod_card', cardData);
-
-                  var imageDiv = item.find('.online-card__image');
-
-                  imageDiv.addClass('online-card__image--fallback');
-                  imageDiv.append(
-                      '<div class="online-card__episode-number-large">' +
-                      ('0' + epNumber).slice(-2) +
-                      '</div>'
-                  );
-
-                  item.addClass('online-card--disabled');
-
-                  component.append(item);
-              });
-
               component.start(true);
-          });
+            });
       }
     }
 
