@@ -18144,10 +18144,10 @@
         }
         
         .online-card__image-container {
-            width: 13em;
+            width: 16em;
             flex-shrink: 0;
-            position: relative;
             min-height: 8.2em;
+            position: relative;
         }
         
         .online-card__image {
@@ -18236,7 +18236,7 @@
             left: 0.3em;
             width: 1.5em;
             height: 1.5em;
-            background: #ffffffff;
+            background: #4CAF50;
             border-radius: 50%;
             display: flex;
             align-items: center;
