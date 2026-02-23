@@ -18147,6 +18147,7 @@
             width: 13em;
             flex-shrink: 0;
             position: relative;
+            min-height: 8.2em;
         }
         
         .online-card__image {
@@ -18166,6 +18167,7 @@
             height: 100%;
             object-fit: cover;
             opacity: 0;
+            border-radius: .3em;
             transition: opacity 0.3s;
         }
         
@@ -18234,7 +18236,7 @@
             left: 0.3em;
             width: 1.5em;
             height: 1.5em;
-            background: #4CAF50;
+            background: #ffffffff;
             border-radius: 50%;
             display: flex;
             align-items: center;
