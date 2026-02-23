@@ -18127,7 +18127,7 @@
         /* Основные стили для карточек */
         .online-card {
             display: flex;
-            background: rgba(30, 30, 30, 0.95);
+            background-color: rgba(0, 0, 0, 0.3);
             border-radius: 0.5em;
             margin-bottom: 1em;
             overflow: hidden;
