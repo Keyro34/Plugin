@@ -18144,7 +18144,7 @@
         }
         
         .online-card__image-container {
-            width: 13em;
+            min-width: 6em;
             flex-shrink: 0;
             min-height: 8.2em;
             position: relative;
@@ -18155,7 +18155,6 @@
             width: 100%;
             height: 100%;
             min-height: 6em;
-            min-width: 6em;
             background: #1a1a1a;
             overflow: hidden;
         }
