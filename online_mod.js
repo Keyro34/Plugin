@@ -1,4 +1,4 @@
-//06.03.2026 - Fix
+//19.02.2026 - Fix
 
 (function () {
     'use strict';
@@ -742,13 +742,6 @@
       this.search = function (_object, kinopoisk_id, data) {
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         var error = component.empty.bind(component);
         var found = false;
         var src = embed + 'content';
@@ -770,9 +763,9 @@
             src2 = Lampa.Utils.addUrlComponent(src2, 'imdbId=' + encodeURIComponent(object.movie.imdb_id));
             src2 = Lampa.Utils.addUrlComponent(src2, suffix);
             lumex_search(src2, function (json, cookie) {
-              if (json) success(json, cookie);else component.emptyForQuery(query);
+              if (json) success(json, cookie);else component.emptyForQuery(select_title);
             }, error);
-          } else component.emptyForQuery(query);
+          } else component.emptyForQuery(select_title);
         }, error);
       };
 
@@ -1445,13 +1438,6 @@
       this.search = function (_object, kinopoisk_id, data) {
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         var error = component.empty.bind(component);
         var src = embed + 'sId/' + encodeURIComponent(object.movie.id) + '/mod/';
 
@@ -1586,7 +1572,7 @@
 
           filter();
           append(filtred());
-        } else component.emptyForQuery(query);
+        } else component.emptyForQuery(select_title);
       }
       /**
        * Построить фильтр
@@ -2060,13 +2046,6 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         if (this.wait_similars && data && data[0].is_similars) return getPage(data[0].link);
         error_message = '';
         var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
@@ -3332,13 +3311,6 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         if (this.wait_similars && data && data[0].is_similars) return getPage(data[0].link);
         var url = embed + 'search?query=' + encodeURIComponent(component.cleanTitle(select_title));
         var cookie = check_cookie;
@@ -4232,13 +4204,6 @@
       this.search = function (_object, kinopoisk_id) {
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         var error = component.empty.bind(component);
         var api = (+kinopoisk_id ? 'kp/' : 'imdb/') + kinopoisk_id;
         collaps_api_search(api, function (str) {
@@ -4780,13 +4745,6 @@
       this.search = function (_object, kinopoisk_id) {
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
 
         var empty = function empty() {
           component.emptyForQuery(select_title);
@@ -5476,13 +5434,6 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         if (this.wait_similars && data && data[0].is_similars) return find(data[0].id);
         var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
         var search_year = parseInt((search_date + '').slice(0, 4));
@@ -5527,7 +5478,7 @@
 
               if (select_title) {
                 var _tmp = cards.filter(function (c) {
-                  return component.equalAnyTitle([c.title, c.orig_title], [select_title]);
+                  return component.containsAnyTitle([c.title, c.orig_title], [select_title]);
                 });
 
                 if (_tmp.length) {
@@ -6278,13 +6229,6 @@
         select_id = kinopoisk_id;
         select_title = object.search || object.movie.title;
 
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
-
         if (isNaN(select_id)) {
           component.emptyForQuery(select_title);
           return;
@@ -6890,13 +6834,6 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         if (this.wait_similars && data && data[0].is_similars) return getPage(data[0].link);
         var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
         var search_year = parseInt((search_date + '').slice(0, 4));
@@ -6951,7 +6888,7 @@
 
               if (select_title) {
                 var _tmp = cards.filter(function (c) {
-                  return component.equalAnyTitle([c.title, c.orig_title], [select_title]);
+                  return component.containsAnyTitle([c.title, c.orig_title], [select_title]);
                 });
 
                 if (_tmp.length) {
@@ -7002,12 +6939,7 @@
         };
 
         var url = embed + 'index.php?do=search';
-        var year = object.movie.year || object.movie.release_date || '';
-        var query = select_title;
-
-        if(year) query += ' ' + year;
-
-        var postdata = 'do=search&subaction=search&search_start=0&full_search=1&result_from=1&story=' + encodeURIComponent(query)
+        var postdata = 'do=search&subaction=search&search_start=0&full_search=1&result_from=1&story=' + encodeURIComponent(select_title) + '&titleonly=3&searchuser=&replyless=0&replylimit=0&searchdate=0&beforeafter=after&sortby=title&resorder=asc&showposts=0&catlist%5B%5D=10';
         network.clear();
         network.timeout(10000);
         network["native"](component.proxyLink(url, prox, prox_enc), function (str) {
@@ -7713,13 +7645,6 @@
         object = _object;
         select_title = object.search || object.movie.title;
 
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
-
         if (isNaN(kinopoisk_id)) {
           component.emptyForQuery(select_title);
           return;
@@ -8366,13 +8291,6 @@
         select_id = kinopoisk_id;
         select_title = object.search || object.movie.title;
 
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
-
         if (isNaN(select_id)) {
           component.emptyForQuery(select_title);
           return;
@@ -8999,13 +8917,6 @@
       this.search = function (_object, kinopoisk_id) {
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
 
         if (isNaN(kinopoisk_id)) {
           component.emptyForQuery(select_title);
@@ -9726,13 +9637,6 @@
       this.search = function (_object, kinopoisk_id) {
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
 
         var empty = function empty() {
           component.emptyForQuery(select_title);
@@ -10546,13 +10450,6 @@
       this.search = function (_object, kinopoisk_id) {
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         var error = component.empty.bind(component);
         var api = (+kinopoisk_id ? 'kp=' : 'imdb=') + kinopoisk_id;
         alloha_api_search(api, function (json) {
@@ -11188,13 +11085,6 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         if (this.wait_similars && data && data[0].is_similars) return getPage(data[0]);
         var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
         var search_year = parseInt((search_date + '').slice(0, 4));
@@ -11242,7 +11132,7 @@
 
               if (select_title) {
                 var _tmp = cards.filter(function (c) {
-                  return component.equalAnyTitle([c.title, c.orig_title], [select_title]);
+                  return component.containsAnyTitle([c.title, c.orig_title], [select_title]);
                 });
 
                 if (_tmp.length) {
@@ -11772,13 +11662,6 @@
       this.search = function (_object, kinopoisk_id) {
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
 
         if (isNaN(kinopoisk_id)) {
           component.emptyForQuery(select_title);
@@ -12374,13 +12257,6 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         if (this.wait_similars && data && data[0].is_similars) return getRelease(data[0]);
         var search_year = object.search_date;
         var orig_titles = [];
@@ -12955,13 +12831,6 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         if (this.wait_similars && data && data[0].is_similars) return getRelease(data[0]);
         var search_year = object.search_date;
         var orig_titles = [];
@@ -13558,13 +13427,6 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         if (this.wait_similars && data && data[0].is_similars) return getEpisodes(data[0]);
         var search_year = object.search_date;
         var orig_titles = [];
@@ -14286,13 +14148,6 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         if (this.wait_similars && data && data[0].is_similars) return success(data[0]);
         var search_year = object.search_date;
         var orig_titles = [];
@@ -15123,13 +14978,6 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
-
-        var search_year = object.movie.year || 
-                          (object.movie.release_date ? parseInt(object.movie.release_date) : 0) || 
-                          0;
-
-        var query = select_title;
-        if (search_year) query += ' ' + search_year;
         if (this.wait_similars && data && data[0].is_similars) return success(data[0]);
         var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
         var search_year = parseInt((search_date + '').slice(0, 4));
