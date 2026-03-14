@@ -1146,13 +1146,16 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
-              
+
               var url = 'https://api.themoviedb.org/3/tv/' + tmdbId + '/season/' + seasonNumber + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
-              
+
               $.ajax({
                   url: url,
                   method: 'GET',
@@ -1708,7 +1711,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -3024,7 +3030,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -3876,7 +3885,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -4423,7 +4435,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -5106,7 +5121,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -5950,7 +5968,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -6510,7 +6531,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -7340,7 +7364,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -7997,7 +8024,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -8627,7 +8657,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -9334,7 +9367,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -10152,7 +10188,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -10763,7 +10802,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -11388,7 +11430,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -11984,7 +12029,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -12558,7 +12606,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -13131,7 +13182,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -13858,7 +13912,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -14680,7 +14737,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
@@ -15602,7 +15662,10 @@
           
           // Функция для загрузки данных эпизодов из TMDB
           function loadEpisodeData(callback) {
-              if (!tmdbId || !object.movie.name) {
+              // Проверяем, что это сериал (есть поле name или first_air_date) и есть ID
+              var isTVShow = !!(object.movie.name || object.movie.first_air_date);
+              
+              if (!tmdbId || !isTVShow) {
                   callback({});
                   return;
               }
