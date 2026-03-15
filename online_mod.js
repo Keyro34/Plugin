@@ -14030,8 +14030,59 @@
     }
 
     function resetTemplates() {
-      Lampa.Template.add('online_mod', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 128\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <circle cx=\"64\" cy=\"64\" r=\"56\" stroke=\"white\" stroke-width=\"16\"/>\n                    <path d=\"M90.5 64.3827L50 87.7654L50 41L90.5 64.3827Z\" fill=\"white\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
-      Lampa.Template.add('online_mod_folder', "<div class=\"online selector\">\n        <div class=\"online__body\">\n            <div style=\"position: absolute;left: 0;top: -0.3em;width: 2.4em;height: 2.4em\">\n                <svg style=\"height: 2.4em; width:  2.4em;\" viewBox=\"0 0 128 112\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                    <rect y=\"20\" width=\"128\" height=\"92\" rx=\"13\" fill=\"white\"/>\n                    <path d=\"M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z\" fill=\"white\" fill-opacity=\"0.23\"/>\n                    <rect x=\"11\" y=\"8\" width=\"106\" height=\"76\" rx=\"13\" fill=\"white\" fill-opacity=\"0.51\"/>\n                </svg>\n            </div>\n            <div class=\"online__title\" style=\"padding-left: 2.1em;\">{title}</div>\n            <div class=\"online__quality\" style=\"padding-left: 3.4em;\">{quality}{info}</div>\n        </div>\n    </div>");
+      // === НОВЫЙ ДИЗАЙН КАРТОЧКИ ФАЙЛА ===
+      Lampa.Template.add('online_mod', `
+          <div class="online selector" style="border-radius: 16px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.45); transition: all 0.2s;">
+              <div class="online__body" style="display: flex; align-items: center; padding: 14px 18px; background: linear-gradient(135deg, #1f1f1f, #2d2d2d);">
+                  
+                  <!-- Иконка Play -->
+                  <div style="position: relative; width: 56px; height: 56px; margin-right: 18px; flex-shrink: 0;">
+                      <svg width="56" height="56" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="64" cy="64" r="58" stroke="#ffffff" stroke-width="10" stroke-opacity="0.9"/>
+                          <path d="M92 64L52 88L52 40L92 64Z" fill="#ffffff"/>
+                      </svg>
+                  </div>
+
+                  <!-- Текстовая часть -->
+                  <div style="flex: 1; min-width: 0;">
+                      <div class="online__title" style="font-size: 1.18em; font-weight: 600; color: #ffffff; line-height: 1.3; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                          {title}
+                      </div>
+                      <div class="online__quality" style="font-size: 0.96em; color: #a0a0a0; display: flex; align-items: center; gap: 8px;">
+                          {quality}
+                          <span style="color: #777;">{info}</span>
+                      </div>
+                  </div>
+
+              </div>
+          </div>
+      `);
+
+      // === НОВЫЙ ДИЗАЙН ПАПКИ (сезоны и т.п.) ===
+      Lampa.Template.add('online_mod_folder', `
+          <div class="online selector" style="border-radius: 16px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.45);">
+              <div class="online__body" style="display: flex; align-items: center; padding: 14px 18px; background: linear-gradient(135deg, #252525, #333333);">
+                  
+                  <!-- Иконка папки -->
+                  <div style="position: relative; width: 56px; height: 56px; margin-right: 18px; flex-shrink: 0;">
+                      <svg width="56" height="56" viewBox="0 0 128 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect y="20" width="128" height="92" rx="13" fill="#ffffff" fill-opacity="0.95"/>
+                          <path d="M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z" fill="#ffffff" fill-opacity="0.35"/>
+                          <rect x="11" y="8" width="106" height="76" rx="13" fill="#ffffff" fill-opacity="0.65"/>
+                      </svg>
+                  </div>
+
+                  <div style="flex: 1;">
+                      <div class="online__title" style="font-size: 1.18em; font-weight: 600; color: #ffffff; margin-bottom: 4px;">
+                          {title}
+                      </div>
+                      <div class="online__quality" style="font-size: 0.96em; color: #a0a0a0;">
+                          {quality}{info}
+                      </div>
+                  </div>
+              </div>
+          </div>
+      `);
     }
 
     function checkMyIp(onComplite) {
