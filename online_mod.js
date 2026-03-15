@@ -1078,6 +1078,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -1477,6 +1486,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -2435,6 +2453,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -3124,6 +3151,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -3487,6 +3523,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
@@ -3986,6 +4031,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -4667,6 +4721,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -5041,6 +5104,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -5685,6 +5757,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -6179,6 +6260,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -6646,6 +6736,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -7190,6 +7289,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
@@ -7825,6 +7933,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
@@ -8245,6 +8362,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -8707,6 +8833,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
@@ -9112,6 +9247,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
@@ -9515,6 +9659,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
@@ -9895,6 +10048,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
@@ -10429,6 +10591,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -11089,6 +11260,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -11846,6 +12026,15 @@
 
       function append(items) {
         component.reset();
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            }
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
@@ -14030,55 +14219,45 @@
     }
 
     function resetTemplates() {
-      // === НОВЫЙ ДИЗАЙН КАРТОЧКИ ФАЙЛА ===
-      Lampa.Template.add('online_mod', `
-          <div class="online selector" style="border-radius: 16px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.45); transition: all 0.2s;">
-              <div class="online__body" style="display: flex; align-items: center; padding: 14px 18px; background: linear-gradient(135deg, #1f1f1f, #2d2d2d);">
+        Lampa.Template.add('online_mod', `
+          <div class="online selector" style="border-radius: 18px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.55); transition: all 0.25s ease;">
+              <div style="display: flex; align-items: center; padding: 14px 18px; background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);">
                   
-                  <!-- Иконка Play -->
-                  <div style="position: relative; width: 56px; height: 56px; margin-right: 18px; flex-shrink: 0;">
-                      <svg width="56" height="56" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <circle cx="64" cy="64" r="58" stroke="#ffffff" stroke-width="10" stroke-opacity="0.9"/>
-                          <path d="M92 64L52 88L52 40L92 64Z" fill="#ffffff"/>
-                      </svg>
+                  <!-- ПОСТЕР -->
+                  <div style="width: 64px; height: 96px; flex-shrink: 0; border-radius: 10px; overflow: hidden; margin-right: 18px; background: #111; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.6);">
+                      <img src="{poster}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';">
+                      <!-- Оверлей Play -->
+                      <div style="position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55)); display: flex; align-items: center; justify-content: center;">
+                          <svg width="34" height="34" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <circle cx="64" cy="64" r="56" stroke="#ffffff" stroke-width="9" stroke-opacity="0.95"/>
+                              <path d="M92 64L52 88L52 40L92 64Z" fill="#ffffff"/>
+                          </svg>
+                      </div>
                   </div>
 
-                  <!-- Текстовая часть -->
+                  <!-- ТЕКСТ -->
                   <div style="flex: 1; min-width: 0;">
-                      <div class="online__title" style="font-size: 1.18em; font-weight: 600; color: #ffffff; line-height: 1.3; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      <div class="online__title" style="font-size: 1.24em; font-weight: 700; color: #ffffff; line-height: 1.3; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                           {title}
                       </div>
-                      <div class="online__quality" style="font-size: 0.96em; color: #a0a0a0; display: flex; align-items: center; gap: 8px;">
-                          {quality}
-                          <span style="color: #777;">{info}</span>
+                      <div class="online__quality" style="font-size: 1.02em; color: #bbbbbb;">
+                          {quality}<span style="margin-left: 8px; color: #888;">{info}</span>
                       </div>
                   </div>
-
               </div>
           </div>
       `);
 
-      // === НОВЫЙ ДИЗАЙН ПАПКИ (сезоны и т.п.) ===
+      // Папки (сезоны/похожие) — тоже с постером
       Lampa.Template.add('online_mod_folder', `
-          <div class="online selector" style="border-radius: 16px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.45);">
-              <div class="online__body" style="display: flex; align-items: center; padding: 14px 18px; background: linear-gradient(135deg, #252525, #333333);">
-                  
-                  <!-- Иконка папки -->
-                  <div style="position: relative; width: 56px; height: 56px; margin-right: 18px; flex-shrink: 0;">
-                      <svg width="56" height="56" viewBox="0 0 128 112" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <rect y="20" width="128" height="92" rx="13" fill="#ffffff" fill-opacity="0.95"/>
-                          <path d="M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z" fill="#ffffff" fill-opacity="0.35"/>
-                          <rect x="11" y="8" width="106" height="76" rx="13" fill="#ffffff" fill-opacity="0.65"/>
-                      </svg>
+          <div class="online selector" style="border-radius: 18px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.55);">
+              <div style="display: flex; align-items: center; padding: 14px 18px; background: linear-gradient(135deg, #252525 0%, #333333 100%);">
+                  <div style="width: 64px; height: 96px; flex-shrink: 0; border-radius: 10px; overflow: hidden; margin-right: 18px; background: #111;">
+                      <img src="{poster}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';">
                   </div>
-
                   <div style="flex: 1;">
-                      <div class="online__title" style="font-size: 1.18em; font-weight: 600; color: #ffffff; margin-bottom: 4px;">
-                          {title}
-                      </div>
-                      <div class="online__quality" style="font-size: 0.96em; color: #a0a0a0;">
-                          {quality}{info}
-                      </div>
+                      <div class="online__title" style="font-size: 1.24em; font-weight: 700; color: #ffffff; margin-bottom: 6px;">{title}</div>
+                      <div class="online__quality" style="font-size: 1.02em; color: #bbbbbb;">{quality}{info}</div>
                   </div>
               </div>
           </div>
