@@ -1079,24 +1079,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -1498,24 +1487,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -2476,24 +2454,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -3185,24 +3152,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -3568,24 +3524,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -4087,24 +4032,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -4788,24 +4722,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -5182,24 +5105,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -5846,24 +5758,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -6360,24 +6261,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -6847,24 +6737,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -7411,24 +7290,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -8066,24 +7934,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -8506,24 +8363,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -8988,24 +8834,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -9413,24 +9248,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -9836,24 +9660,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -10236,24 +10049,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -10790,24 +10592,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -11470,24 +11261,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -12247,24 +12027,13 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item){
-
-            if(item.poster){
-                item.poster = item.poster;
+        items.forEach(function(item) {
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
-            else if(item.img){
-                item.poster = item.img;
-            }
-            else if(item.image){
-                item.poster = item.image;
-            }
-            else if(object.movie.poster){
-                item.poster = object.movie.poster;
-            }
-            else{
-                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-            }
-
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -13351,6 +13120,18 @@
       this.similars = function (json, search_more, more_params) {
         var _this5 = this;
 
+        // Получаем постер из данных текущего фильма/сериала (TMDB или другой источник)
+        var _moviePoster = (function() {
+          var mov = object && object.movie;
+          if (!mov) return '';
+          var p = mov.poster || mov.poster_path || mov.background_image || mov.img || '';
+          if (p && p.indexOf('://') === -1 && p.charAt(0) === '/') {
+            // TMDB relative path → full URL
+            p = 'https://image.tmdb.org/t/p/w185' + p;
+          }
+          return p;
+        })();
+
         json.forEach(function (elem) {
           var title = elem.title || elem.ru_title || elem.nameRu || elem.en_title || elem.nameEn || elem.orig_title || elem.nameOriginal;
           var orig_title = elem.orig_title || elem.nameOriginal || elem.en_title || elem.nameEn;
@@ -13362,6 +13143,14 @@
           elem.title = title;
           elem.quality = year ? (year + '').slice(0, 4) : '----';
           elem.info = info.length ? ' / ' + info.join(' / ') : '';
+          // Устанавливаем постер: сначала собственный у элемента, иначе постер фильма из Lampa
+          if (!elem.poster || elem.poster === '') {
+            var ep = elem.poster_path || elem.background_image || elem.img || '';
+            if (ep && ep.charAt(0) === '/' && ep.indexOf('://') === -1) {
+              ep = 'https://image.tmdb.org/t/p/w185' + ep;
+            }
+            elem.poster = ep || _moviePoster || '';
+          }
           var item = Lampa.Template.get('online_mod_folder', elem);
           item.on('hover:enter', function () {
             _this5.activity.loader(true);
@@ -14483,8 +14272,9 @@
       Lampa.Template.add('online_mod_folder', `
           <div class="online selector" style="border-radius: 18px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.55);">
               <div style="display: flex; align-items: center; padding: 14px 18px; background: linear-gradient(135deg, #252525 0%, #333333 100%);">
-                  <div style="width: 64px; height: 96px; flex-shrink: 0; border-radius: 10px; overflow: hidden; margin-right: 18px; background: #111;">
-                      <img src="{poster}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';">
+                  <div style="width: 64px; height: 96px; flex-shrink: 0; border-radius: 10px; overflow: hidden; margin-right: 18px; background: #1a1a1a; display:flex; align-items:center; justify-content:center;">
+                      <img src="{poster}" style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                           onerror="this.style.display='none'; this.parentNode.innerHTML='<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'32\\' height=\\'32\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'#555\\' stroke-width=\\'1.5\\'><rect x=\\'2\\' y=\\'2\\' width=\\'20\\' height=\\'20\\' rx=\\'3\\'></rect><circle cx=\\'8.5\\' cy=\\'8.5\\' r=\\'1.5\\'></circle><polyline points=\\'21 15 16 10 5 21\\'></polyline></svg>';">
                   </div>
                   <div style="flex: 1;">
                       <div class="online__title" style="font-size: 1.24em; font-weight: 700; color: #ffffff; margin-bottom: 6px;">{title}</div>
