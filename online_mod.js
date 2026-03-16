@@ -1079,23 +1079,22 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
+        items.forEach(function(item){
 
-            if (!item.poster && !item.poster_path && !item.img) {
-
-                if (object.movie && object.movie.poster) {
-                    item.poster = object.movie.poster;
-                }
-                else if (object.movie && object.movie.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w500' + object.movie.poster_path;
-                }
-                else if (object.movie && object.movie.img) {
-                    item.poster = object.movie.img;
-                }
-                else {
-                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
-                }
-
+            if(item.poster){
+                item.poster = item.poster;
+            }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
             }
 
         });
@@ -1499,13 +1498,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -2466,13 +2476,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -3164,13 +3185,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -3536,13 +3568,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -4044,13 +4087,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -4734,13 +4788,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -5117,13 +5182,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -5770,13 +5846,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -6273,13 +6360,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -6749,13 +6847,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -7302,13 +7411,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -7946,13 +8066,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -8375,13 +8506,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -8846,13 +8988,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -9260,13 +9413,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -9672,13 +9836,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -10061,13 +10236,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -10604,13 +10790,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -11273,13 +11470,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -12039,13 +12247,24 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+        items.forEach(function(item){
+
+            if(item.poster){
+                item.poster = item.poster;
             }
+            else if(item.img){
+                item.poster = item.img;
+            }
+            else if(item.image){
+                item.poster = item.image;
+            }
+            else if(object.movie.poster){
+                item.poster = object.movie.poster;
+            }
+            else{
+                item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+            }
+
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
