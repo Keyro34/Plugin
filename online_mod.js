@@ -14317,46 +14317,120 @@
 
     function resetTemplates() {
         Lampa.Template.add('online_mod', `
-          <div class="online selector" style="border-radius: 18px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.55); transition: all 0.25s ease;">
-              <div style="display: flex; align-items: center; padding: 14px 18px; background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);">
-                  
-                  <!-- ПОСТЕР -->
-                  <div style="width: 64px; height: 96px; flex-shrink: 0; border-radius: 10px; overflow: hidden; margin-right: 18px; background: #111; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.6);">
-                      <img src="{poster}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';">
-                      <!-- Оверлей Play -->
-                      <div style="position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55)); display: flex; align-items: center; justify-content: center;">
-                          <svg width="34" height="34" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <circle cx="64" cy="64" r="56" stroke="#ffffff" stroke-width="9" stroke-opacity="0.95"/>
-                              <path d="M92 64L52 88L52 40L92 64Z" fill="#ffffff"/>
-                          </svg>
+          <div class="online selector" style="
+              border-radius: 12px;
+              overflow: hidden;
+              background: #1e1e1e;
+              box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+          ">
+              <div style="display: flex; align-items: stretch; min-height: 90px;">
+
+                  <!-- ПОСТЕР слева -->
+                  <div style="
+                      width: 62px;
+                      flex-shrink: 0;
+                      background: #111;
+                      position: relative;
+                      overflow: hidden;
+                  ">
+                      <img src="{poster}"
+                           style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                           onerror="this.style.display='none'; this.parentNode.style.background='#222';">
+                  </div>
+
+                  <!-- ИНФОРМАЦИЯ справа -->
+                  <div style="
+                      flex: 1;
+                      padding: 14px 16px;
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: center;
+                      min-width: 0;
+                      border-left: 2px solid rgba(255,255,255,0.06);
+                  ">
+                      <div class="online__title" style="
+                          font-size: 1.08em;
+                          font-weight: 600;
+                          color: #f0f0f0;
+                          line-height: 1.35;
+                          margin-bottom: 6px;
+                          white-space: nowrap;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                      ">{title}</div>
+
+                      <div class="online__quality" style="
+                          font-size: 0.9em;
+                          color: #888;
+                          display: flex;
+                          align-items: center;
+                          gap: 6px;
+                      ">
+                          <span style="color: #aaa;">{quality}</span>
+                          <span style="color: #555;">{info}</span>
                       </div>
                   </div>
 
-                  <!-- ТЕКСТ -->
-                  <div style="flex: 1; min-width: 0;">
-                      <div class="online__title" style="font-size: 1.24em; font-weight: 700; color: #ffffff; line-height: 1.3; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          {title}
-                      </div>
-                      <div class="online__quality" style="font-size: 1.02em; color: #bbbbbb;">
-                          {quality}<span style="margin-left: 8px; color: #888;">{info}</span>
-                      </div>
-                  </div>
               </div>
           </div>
       `);
 
       // Папки (сезоны/похожие) — тоже с постером
       Lampa.Template.add('online_mod_folder', `
-          <div class="online selector" style="border-radius: 18px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.55);">
-              <div style="display: flex; align-items: center; padding: 14px 18px; background: linear-gradient(135deg, #252525 0%, #333333 100%);">
-                  <div style="width: 64px; height: 96px; flex-shrink: 0; border-radius: 10px; overflow: hidden; margin-right: 18px; background: #1a1a1a; display:flex; align-items:center; justify-content:center;">
-                      <img src="{poster}" style="width: 100%; height: 100%; object-fit: cover; display: block;"
-                           onerror="this.style.display='none'; this.parentNode.innerHTML='<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'32\\' height=\\'32\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'#555\\' stroke-width=\\'1.5\\'><rect x=\\'2\\' y=\\'2\\' width=\\'20\\' height=\\'20\\' rx=\\'3\\'></rect><circle cx=\\'8.5\\' cy=\\'8.5\\' r=\\'1.5\\'></circle><polyline points=\\'21 15 16 10 5 21\\'></polyline></svg>';">
+          <div class="online selector" style="
+              border-radius: 12px;
+              overflow: hidden;
+              background: #1e1e1e;
+              box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+          ">
+              <div style="display: flex; align-items: stretch; min-height: 90px;">
+
+                  <!-- ПОСТЕР — книжный формат слева -->
+                  <div style="
+                      width: 62px;
+                      flex-shrink: 0;
+                      background: #111;
+                      position: relative;
+                      overflow: hidden;
+                  ">
+                      <img src="{poster}"
+                           style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                           onerror="this.style.display='none'; this.parentNode.style.background='#222';">
                   </div>
-                  <div style="flex: 1;">
-                      <div class="online__title" style="font-size: 1.24em; font-weight: 700; color: #ffffff; margin-bottom: 6px;">{title}</div>
-                      <div class="online__quality" style="font-size: 1.02em; color: #bbbbbb;">{quality}{info}</div>
+
+                  <!-- ИНФОРМАЦИЯ справа -->
+                  <div style="
+                      flex: 1;
+                      padding: 14px 16px;
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: center;
+                      min-width: 0;
+                      border-left: 2px solid rgba(255,255,255,0.06);
+                  ">
+                      <div class="online__title" style="
+                          font-size: 1.08em;
+                          font-weight: 600;
+                          color: #f0f0f0;
+                          line-height: 1.35;
+                          margin-bottom: 6px;
+                          white-space: nowrap;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                      ">{title}</div>
+
+                      <div class="online__quality" style="
+                          font-size: 0.9em;
+                          color: #888;
+                          display: flex;
+                          align-items: center;
+                          gap: 6px;
+                      ">
+                          <span style="color: #aaa;">{quality}</span>
+                          <span style="color: #555;">{info}</span>
+                      </div>
                   </div>
+
               </div>
           </div>
       `);
