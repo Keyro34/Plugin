@@ -1079,23 +1079,26 @@
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
-        if (!item.poster || item.poster === '') {
-            if (object.movie.poster) {
-                item.poster = object.movie.poster;
+        items.forEach(function(item) {
+
+            if (!item.poster && !item.poster_path && !item.img) {
+
+                if (object.movie && object.movie.poster) {
+                    item.poster = object.movie.poster;
+                }
+                else if (object.movie && object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w500' + object.movie.poster_path;
+                }
+                else if (object.movie && object.movie.img) {
+                    item.poster = object.movie.img;
+                }
+                else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
+
             }
-            else if (object.movie.background_image) {
-                item.poster = object.movie.background_image;
-            }
-            else if (object.movie.img) {
-                item.poster = object.movie.img;
-            }
-            else if (object.movie.tmdb_id) {
-                item.poster = 'https://image.tmdb.org/t/p/w500/' + object.movie.tmdb_id + '.jpg';
-            }
-            else {
-                item.poster = 'https://image.tmdb.org/t/p/w500';
-            }
-        }
+
+        });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
