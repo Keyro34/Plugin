@@ -1796,11 +1796,19 @@
                 year = parseInt(found[2]);
               }
 
+              // Извлекаем индивидуальный постер из <img> внутри результата поиска
+              var poster = '';
+              var imgEl = $('img', li);
+              if (imgEl.length) {
+                poster = imgEl.attr('src') || imgEl.attr('data-src') || imgEl.attr('data-original') || '';
+              }
+
               return {
                 year: year,
                 title: titl,
                 orig_title: orig_title,
-                link: link.attr('href') || ''
+                link: link.attr('href') || '',
+                poster: poster
               };
             });
             var cards = items;
@@ -13126,11 +13134,71 @@
           if (!mov) return '';
           var p = mov.poster || mov.poster_path || mov.background_image || mov.img || '';
           if (p && p.indexOf('://') === -1 && p.charAt(0) === '/') {
-            // TMDB relative path → full URL
             p = 'https://image.tmdb.org/t/p/w185' + p;
           }
           return p;
         })();
+
+        // Загружаем постер через TMDB Search API по названию и году
+        var _tmdbApiKey = '4ef0d7355d9ffb5151e987764708ce96';
+        var _tmdbCache = {};
+
+        function _fetchTmdbPoster(title, year, isSerial, imgEl) {
+          var cacheKey = title + '|' + year;
+          if (_tmdbCache[cacheKey]) {
+            // Уже загружено — просто подставляем
+            if (_tmdbCache[cacheKey] !== 'none') {
+              imgEl.attr('src', _tmdbCache[cacheKey]);
+            }
+            return;
+          }
+          _tmdbCache[cacheKey] = 'loading';
+          var type = isSerial ? 'tv' : 'multi';
+          var query = encodeURIComponent(title);
+          var yearParam = year ? '&year=' + year : '';
+          var apiBase = typeof Lampa.TMDB !== 'undefined'
+            ? Lampa.TMDB.api('search/' + type + '?api_key=' + _tmdbApiKey + '&language=ru&query=' + query + yearParam)
+            : 'https://api.themoviedb.org/3/search/' + type + '?api_key=' + _tmdbApiKey + '&language=ru&query=' + query + yearParam;
+
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', apiBase, true);
+          xhr.timeout = 8000;
+          xhr.onload = function() {
+            try {
+              var data = JSON.parse(xhr.responseText);
+              var results = data.results || [];
+              var poster_path = '';
+              if (results.length) {
+                // Ищем наиболее подходящий по году
+                var best = results[0];
+                if (year) {
+                  results.forEach(function(r) {
+                    var ry = parseInt((r.release_date || r.first_air_date || '').slice(0,4));
+                    if (Math.abs(ry - year) < Math.abs(parseInt((best.release_date || best.first_air_date || '0').slice(0,4)) - year)) {
+                      best = r;
+                    }
+                  });
+                }
+                poster_path = best.poster_path || '';
+              }
+              if (poster_path) {
+                var url = 'https://image.tmdb.org/t/p/w185' + poster_path;
+                _tmdbCache[cacheKey] = url;
+                imgEl.attr('src', url).show();
+              } else {
+                _tmdbCache[cacheKey] = 'none';
+              }
+            } catch(e) {
+              _tmdbCache[cacheKey] = 'none';
+            }
+          };
+          xhr.onerror = xhr.ontimeout = function() {
+            _tmdbCache[cacheKey] = 'none';
+          };
+          xhr.send();
+        }
+
+        var _isSerial = !!(object && object.movie && object.movie.number_of_seasons);
 
         json.forEach(function (elem) {
           var title = elem.title || elem.ru_title || elem.nameRu || elem.en_title || elem.nameEn || elem.orig_title || elem.nameOriginal;
@@ -13143,7 +13211,8 @@
           elem.title = title;
           elem.quality = year ? (year + '').slice(0, 4) : '----';
           elem.info = info.length ? ' / ' + info.join(' / ') : '';
-          // Устанавливаем постер: сначала собственный у элемента, иначе постер фильма из Lampa
+
+          // Начальный постер: собственный у элемента → постер текущего фильма из Lampa
           if (!elem.poster || elem.poster === '') {
             var ep = elem.poster_path || elem.background_image || elem.img || '';
             if (ep && ep.charAt(0) === '/' && ep.indexOf('://') === -1) {
@@ -13151,7 +13220,15 @@
             }
             elem.poster = ep || _moviePoster || '';
           }
+
           var item = Lampa.Template.get('online_mod_folder', elem);
+
+          // Запрашиваем индивидуальный постер через TMDB Search API
+          if (title) {
+            var imgEl = item.find('img');
+            _fetchTmdbPoster(orig_title || title, year ? parseInt(year) : 0, _isSerial, imgEl);
+          }
+
           item.on('hover:enter', function () {
             _this5.activity.loader(true);
 
