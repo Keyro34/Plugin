@@ -1192,49 +1192,82 @@
           });
         });
         // ── Добавляем будущие эпизоды из TMDB ──────────────────────────────
-        if (object.movie && object.movie.id && object.movie.number_of_seasons) {
-          var _seasonNum = items.length && items[0].season ? items[0].season : 0;
+        // ── Добавляем будущие эпизоды из TMDB ─────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+
+          // Получаем номер сезона из загруженных эпизодов
+          var _seasonNum = 0;
+          for (var si = 0; si < items.length; si++) {
+            if (items[si].season) { _seasonNum = items[si].season; break; }
+          }
+          if (!_seasonNum) return;
+
           var _lastEp = component.getLastEpisode(items);
-          if (_seasonNum && _lastEp) {
-            _tmdbFetchSeason(object.movie.id, _seasonNum, true, function(eps) {
-              var now = new Date();
-              Object.keys(eps).forEach(function(epKey) {
-                var epN = parseInt(epKey);
-                if (epN <= _lastEp) return; // уже показан
-                var ep = eps[epKey];
-                if (!ep || !ep.air_date) return;
-                var airDate = new Date(ep.air_date + 'T00:00:00');
-                if (airDate <= now) return; // уже вышел но нет в источнике — пропуск
+          console.log('[OnlineMod] Future eps: season=' + _seasonNum + ' lastEp=' + _lastEp + ' tmdbId=' + object.movie.id);
 
-                // Создаём фиктивный элемент для будущего эпизода
-                var fakeElem = {
-                  episode: epN,
-                  season: _seasonNum,
-                  title: ep.name || ('Эпизод ' + epN),
-                  quality: '00:00',
-                  info: '',
-                  poster: ''
-                };
-                var fakeItem = Lampa.Template.get('online_mod', fakeElem);
+          function _addFutureCards(eps) {
+            var now = new Date();
+            // Сортируем номера эпизодов по возрастанию
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            var added = 0;
+            epNums.forEach(function(epN) {
+              // Показываем все эпизоды после последнего в источнике
+              if (epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
 
-                // Сразу переключаем в режим будущего
-                fakeItem.find('.omcard__media').hide();
-                fakeItem.find('.omcard__future').css('display','flex');
-                fakeItem.find('.omcard__future-num').text(epN);
-                fakeItem.find('.omcard__future-title').text(fakeElem.title);
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              var isFuture = airDate && airDate > now;
 
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN,
+                season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '',
+                info: '',
+                poster: ''
+              });
+
+              // Всегда показываем как будущий блок
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title')
+                .text(ep.name || ('Эпизод ' + epN))
+                .css('color', isFuture ? '#888' : '#bbb');
+
+              if (airDate) {
                 var months = ['Янв','Фев','Мар','Апр','Май','Июн',
                               'Июл','Авг','Сен','Окт','Ноя','Дек'];
-                var dateStr = airDate.getDate() + ' ' + months[airDate.getMonth()];
+                fakeItem.find('.omcard__future-date')
+                  .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                  .css('color','#ffffff');
+              }
+              if (isFuture) {
                 var daysLeft = Math.ceil((airDate - now) / 86400000);
-                fakeItem.find('.omcard__future-date').text(dateStr).css('color','#ffffff');
-                if (daysLeft > 0) fakeItem.find('.omcard__future-days').text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                if (daysLeft > 0) {
+                  fakeItem.find('.omcard__future-days')
+                    .text('Осталось дней: ' + daysLeft)
+                    .css('color','#aaa');
+                }
+              }
 
-                component.append(fakeItem);
-              });
+              component.append(fakeItem);
+              added++;
             });
+            console.log('[OnlineMod] Added future cards: ' + added);
           }
-        }
+
+          // Если данные уже закэшированы — используем их сразу
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey]) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            // Иначе запрашиваем — карточки добавятся после ответа
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
 
         component.start(true);
       }
