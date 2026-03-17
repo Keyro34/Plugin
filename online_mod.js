@@ -14506,46 +14506,66 @@
         var ep = epNum ? eps[epNum] : null;
         var now = new Date();
 
-        // ── Скриншот ──────────────────────────────────────────────
-        if (ep && ep.still_path) {
-          var stillUrl = 'https://image.tmdb.org/t/p/w300' + ep.still_path;
-          item.find('.online__still-img').attr('src', stillUrl);
-        }
-
-        // ── Рейтинг ───────────────────────────────────────────────
-        if (ep && ep.vote_average && ep.vote_average > 0) {
-          var r = ep.vote_average.toFixed(1);
-          item.find('.online__rating').html(
-            '<span style="color:#f5c518;font-size:0.9em;">&#9733;</span> ' + r
-          ).css('color','#bbb');
-          item.find('.online__dot').css('display','inline');
-        }
-
-        // ── Дата выхода и "осталось дней" ─────────────────────────
+        // ── Дата выхода ──────────────────────────────────────────
         var airDate = ep && ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
-        if (airDate) {
+        var isFuture = airDate && airDate > now;
+
+        // ── Название эпизода из TMDB ─────────────────────────────
+        if (ep && ep.name) {
+          item.find('.online__title').text(ep.name).css('color','#fff');
+          item.find('.omcard__future-title').text(ep.name);
+        }
+
+        if (isFuture) {
+          // ── БУДУЩИЙ ЭПИЗОД: скрываем медиа-блок, показываем future-блок ──
+          item.find('.omcard__media').hide();
+          item.find('.omcard__future').css('display','flex');
+
           var months = ['Янв','Фев','Мар','Апр','Май','Июн',
                         'Июл','Авг','Сен','Окт','Ноя','Дек'];
           var dateStr = airDate.getDate() + ' ' + months[airDate.getMonth()];
-          item.find('.online__airdate').text(dateStr);
+          var daysLeft = Math.ceil((airDate - now) / 86400000);
 
-          if (airDate > now) {
-            var daysLeft = Math.ceil((airDate - now) / 86400000);
-            item.find('.online__days-left').text('Осталось дней: ' + daysLeft);
-            // Затемняем и скрываем скриншот для будущих эпизодов
-            item.find('.online__still-img').css('opacity','0.3');
-            item.css('opacity','0.6');
-          }
+          item.find('.omcard__future-date').text(dateStr);
+          if (daysLeft > 0) item.find('.omcard__future-days').text('Осталось дней: ' + daysLeft);
+          item.css('opacity','1'); // сбрасываем затемнение, используем свой стиль
+          return;
         }
 
-        // ── Длительность (runtime мин → «00:41») ──────────────────
+        // ── ВЫШЕДШИЙ ЭПИЗОД ──────────────────────────────────────
+
+        // Скриншот
+        if (ep && ep.still_path) {
+          item.find('.online__still-img')
+              .attr('src','https://image.tmdb.org/t/p/w300' + ep.still_path)
+              .css('opacity','1');
+        }
+
+        // Рейтинг
+        if (ep && ep.vote_average && ep.vote_average > 0) {
+          var r = ep.vote_average.toFixed(1);
+          item.find('.online__rating')
+              .html('<span style="color:#f5c518;">&#9733;</span> ' + r)
+              .css('color','#ccc');
+          item.find('.online__dot').css('display','inline');
+        }
+
+        // Дата
+        if (airDate) {
+          var months2 = ['Янв','Фев','Мар','Апр','Май','Июн',
+                         'Июл','Авг','Сен','Окт','Ноя','Дек'];
+          item.find('.online__airdate')
+              .text(airDate.getDate() + ' ' + months2[airDate.getMonth()]);
+        }
+
+        // Длительность
         if (ep && ep.runtime && ep.runtime > 0) {
           var h = Math.floor(ep.runtime / 60);
           var m = ep.runtime % 60;
           var ts = (h > 0 ? h + ':' : '00:') + (m < 10 ? '0' : '') + m;
           var timeEl = item.find('.online__time');
           if (timeEl.length && !timeEl.data('rt')) {
-            timeEl.data('rt', 1).text(ts);
+            timeEl.data('rt',1).text(ts);
           }
         }
       });
@@ -14554,67 +14574,71 @@
     function resetTemplates() {
         Lampa.Template.add('online_mod', `
           <div class="online selector omcard" style="
-              margin-bottom: 12px;
-              border-radius: 10px;
-              overflow: hidden;
-              background: rgba(255,255,255,0.04);
+              margin-bottom:10px; border-radius:10px;
+              overflow:hidden; background:rgba(255,255,255,0.05);
           ">
-            <div style="display:flex; align-items:stretch; min-height:80px;">
+            <!-- КАРТОЧКА С ВИДЕО -->
+            <div class="omcard__media" style="display:flex; align-items:stretch; min-height:86px;">
 
-              <!-- СКРИНШОТ 16:9 слева -->
+              <!-- СКРИНШОТ 16:9 -->
               <div class="online__still" style="
-                  position: relative;
-                  width: 148px;
-                  min-height: 88px;
-                  flex-shrink: 0;
-                  background: #151515;
-                  overflow: hidden;
+                  position:relative; width:152px; min-height:90px;
+                  flex-shrink:0; background:#151515; overflow:hidden;
               ">
-                  <img class="online__still-img" src="{poster}"
-                       style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.3s;">
-                  <!-- Номер эпизода -->
-                  <div class="online__epnum" style="
-                      position:absolute; bottom:5px; left:8px;
-                      font-size:1.6em; font-weight:800;
-                      color:rgba(255,255,255,0.55);
-                      text-shadow:0 2px 6px rgba(0,0,0,0.9);
-                      line-height:1;
-                  ">{episode}</div>
+                <img class="online__still-img" src="{poster}"
+                     style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.3s;">
+                <div class="online__epnum" style="
+                    position:absolute; bottom:5px; left:8px;
+                    font-size:1.55em; font-weight:800;
+                    color:rgba(255,255,255,0.6);
+                    text-shadow:0 2px 6px rgba(0,0,0,0.95); line-height:1;
+                ">{episode}</div>
               </div>
 
               <!-- ПРАВАЯ ЧАСТЬ -->
-              <div style="flex:1; min-width:0; padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
-
-                <!-- СТРОКА 1: заголовок + время -->
-                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:6px; margin-bottom:4px;">
+              <div style="flex:1; min-width:0; padding:10px 12px 8px; display:flex; flex-direction:column; justify-content:space-between;">
+                <!-- Заголовок + время -->
+                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:6px;">
                   <div class="online__title" style="
-                      font-size:0.97em; font-weight:600; color:#eee;
+                      font-size:0.96em; font-weight:600; color:#ffffff;
                       white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;
                   ">{title}</div>
-                  <div class="online__time" style="
-                      font-size:0.82em; color:#777; flex-shrink:0; white-space:nowrap;
-                  ">{quality}</div>
+                  <div class="online__time" style="font-size:0.82em; color:#999; flex-shrink:0; white-space:nowrap; margin-left:6px;">{quality}</div>
                 </div>
-
-                <!-- ПРОГРЕСС-БАР -->
-                <div style="height:2px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden; margin-bottom:5px;">
+                <!-- Прогресс -->
+                <div style="height:2px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; margin:6px 0;">
                   <div class="online__progress-bar" style="height:100%;width:0%;background:#e74c3c;border-radius:2px;"></div>
                 </div>
-
-                <!-- СТРОКА 2: рейтинг • студия / дата / дни -->
-                <div class="online__quality" style="
-                    font-size:0.8em; color:#666;
-                    display:flex; align-items:center; gap:5px; flex-wrap:wrap;
-                ">
-                  <span class="online__rating"></span>
-                  <span class="online__dot" style="display:none; color:#444;">•</span>
-                  <span class="online__studio" style="color:#777;">{info}</span>
-                  <span class="online__airdate" style="color:#666;"></span>
-                  <span class="online__days-left" style="float:right; margin-left:auto; color:#555;"></span>
+                <!-- Рейтинг • студия + дата -->
+                <div class="online__quality" style="font-size:0.8em; color:#888; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+                  <span class="online__rating" style="color:#ccc;"></span>
+                  <span class="online__dot" style="display:none; color:#555;">•</span>
+                  <span class="online__studio" style="color:#888;">{info}</span>
+                  <span class="online__airdate" style="color:#777; margin-left:4px;"></span>
+                  <span class="online__days-left" style="margin-left:auto; color:#666;"></span>
                 </div>
-
               </div>
             </div>
+
+            <!-- КАРТОЧКА БУДУЩЕГО ЭПИЗОДА (скрыта по умолчанию) -->
+            <div class="omcard__future" style="display:none; align-items:center; padding:14px 16px; gap:14px; min-height:72px;">
+              <!-- Большой номер -->
+              <div class="omcard__future-num" style="
+                  width:42px; flex-shrink:0;
+                  font-size:2em; font-weight:800;
+                  color:rgba(255,255,255,0.2); text-align:center; line-height:1;
+              ">{episode}</div>
+              <!-- Текст -->
+              <div style="flex:1; min-width:0;">
+                <div class="omcard__future-title" style="font-size:0.95em; color:#999; margin-bottom:4px;">{title}</div>
+                <div style="height:2px; background:rgba(255,255,255,0.08); border-radius:2px; margin-bottom:6px;"></div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8em;">
+                  <span class="omcard__future-date" style="color:#777;"></span>
+                  <span class="omcard__future-days" style="color:#666;"></span>
+                </div>
+              </div>
+            </div>
+
           </div>
       `);
 
