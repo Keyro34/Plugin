@@ -1269,6 +1269,60 @@
           }
         })();
 
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -1692,6 +1746,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -2674,6 +2782,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -3352,6 +3514,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -3725,6 +3941,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -4265,6 +4535,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -4943,6 +5267,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -5337,6 +5715,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -6024,6 +6456,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -6538,6 +7024,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -7025,6 +7565,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -7561,6 +8155,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -8216,6 +8864,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -8684,6 +9386,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -9128,6 +9884,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -9562,6 +10372,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -9954,6 +10818,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -10344,6 +11262,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -10919,6 +11891,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
@@ -11586,6 +12612,60 @@
             }
           });
         });
+
+        // ── Будущие эпизоды из TMDB ──────────────────────────────────────
+        (function() {
+          if (!object.movie || !object.movie.id || !object.movie.number_of_seasons) return;
+          var _seasonNum = 0;
+          for (var _si = 0; _si < items.length; _si++) {
+            if (items[_si].season) { _seasonNum = parseInt(items[_si].season); break; }
+          }
+          if (!_seasonNum) return;
+          var _lastEp = component.getLastEpisode(items);
+
+          function _addFutureCards(eps) {
+            var now = new Date();
+            var epNums = Object.keys(eps).map(Number).sort(function(a,b){return a-b;});
+            epNums.forEach(function(epN) {
+              if (_lastEp && epN <= _lastEp) return;
+              var ep = eps[epN];
+              if (!ep) return;
+              var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+              if (!airDate) return;
+
+              var fakeItem = Lampa.Template.get('online_mod', {
+                episode: epN, season: _seasonNum,
+                title: ep.name || ('Эпизод ' + epN),
+                quality: '', info: '', poster: ''
+              });
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+              }
+              component.append(fakeItem);
+            });
+          }
+
+          var cacheKey = object.movie.id + '_s' + _seasonNum;
+          if (_tmdbEpCache[cacheKey] && !_tmdbEpCache[cacheKey + '_loading']) {
+            _addFutureCards(_tmdbEpCache[cacheKey]);
+          } else {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, _addFutureCards);
+          }
+        })();
         component.start(true);
       }
     }
