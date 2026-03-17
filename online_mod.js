@@ -15730,22 +15730,27 @@
               background:transparent;
           ">
             <!-- КАРТОЧКА С ВИДЕО -->
-            <div class="omcard__media" style="display:flex; align-items:stretch; min-height:80px;">
-              <!-- СКРИНШОТ -->
+            <div class="omcard__media" style="display:flex; align-items:center; padding:8px 12px; gap:12px; min-height:80px;">
+              <!-- СКРИНШОТ со скруглением и затемнением -->
               <div class="online__still" style="
-                  position:relative; width:108px; min-height:72px;
-                  flex-shrink:0; background:#1a1a1a; overflow:hidden;">
+                  position:relative; width:100px; height:64px;
+                  flex-shrink:0; border-radius:8px; overflow:hidden;
+                  background:#1a1a1a; box-shadow:0 2px 8px rgba(0,0,0,0.5);">
                 <img class="online__still-img" src="{poster}"
                      style="width:100%;height:100%;object-fit:cover;display:block;">
+                <!-- Затемнение поверх фото -->
+                <div style="position:absolute;inset:0;background:rgba(0,0,0,0.45);border-radius:8px;"></div>
+                <!-- Номер эпизода по центру -->
                 <div class="online__epnum" style="
-                    position:absolute; bottom:4px; left:7px;
-                    font-size:1.3em; font-weight:800;
-                    color:rgba(255,255,255,0.65);
-                    text-shadow:0 2px 6px rgba(0,0,0,0.95); line-height:1;
+                    position:absolute; inset:0;
+                    display:flex; align-items:center; justify-content:center;
+                    font-size:1.6em; font-weight:800;
+                    color:#ffffff;
+                    text-shadow:0 2px 8px rgba(0,0,0,0.9); line-height:1;
                 ">{episode}</div>
               </div>
               <!-- ПРАВАЯ ЧАСТЬ -->
-              <div style="flex:1; min-width:0; padding:10px 14px 8px; display:flex; flex-direction:column; justify-content:space-between;">
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:space-between; gap:4px;">
                 <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px;">
                   <div class="online__title" style="
                       font-size:0.98em; font-weight:600; color:#ffffff;
@@ -15754,10 +15759,10 @@
                   </div>
                   <div class="online__time" style="font-size:0.82em; color:#ffffff; flex-shrink:0; white-space:nowrap;">{quality}</div>
                 </div>
-                <div style="height:2px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; margin:5px 0;">
+                <div style="height:2px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden;">
                   <div class="online__progress-bar" style="height:100%;width:0%;background:#e74c3c;border-radius:2px;"></div>
                 </div>
-                <div class="online__quality" style="font-size:0.8em; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <div class="online__quality" style="font-size:0.8em; display:flex; align-items:center; gap:6px;">
                   <span class="online__rating" style="color:#f5c518;"></span>
                   <span class="online__dot" style="display:none; color:#ffffff;">•</span>
                   <span class="online__airdate" style="color:#ffffff;"></span>
@@ -15766,18 +15771,19 @@
             </div>
 
             <!-- БУДУЩИЙ ЭПИЗОД -->
-            <div class="omcard__future" style="display:none; align-items:center; padding:12px 16px; gap:16px; min-height:64px;">
+            <div class="omcard__future" style="display:none; align-items:center; padding:10px 12px; gap:16px; min-height:64px;">
+              <!-- Большой номер -->
               <div class="omcard__future-num" style="
-                  width:38px; flex-shrink:0; font-size:1.9em; font-weight:800;
+                  width:100px; flex-shrink:0; font-size:2em; font-weight:800;
                   color:rgba(255,255,255,0.2); text-align:center; line-height:1;">
                 {episode}
               </div>
-              <div style="flex:1; min-width:0;">
-                <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:5px;">
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:4px;">
+                <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px;">
                   <div class="omcard__future-title" style="font-size:0.95em; font-weight:500; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">{title}</div>
-                  <span style="font-size:0.82em; color:#ffffff;">00:00</span>
+                  <span style="font-size:0.82em; color:#666;">00:00</span>
                 </div>
-                <div style="height:2px; background:rgba(255,255,255,0.08); border-radius:2px; margin-bottom:6px;"></div>
+                <div style="height:2px; background:rgba(255,255,255,0.08); border-radius:2px;"></div>
                 <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.82em;">
                   <span class="omcard__future-date" style="color:#ffffff;"></span>
                   <span class="omcard__future-days" style="color:#ffffff;"></span>
