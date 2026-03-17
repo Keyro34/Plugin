@@ -1100,10 +1100,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -1513,10 +1519,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -2493,10 +2505,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -3196,7 +3214,8 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title, 'kinobase'].join('') : object.movie.original_title + element.quality + 'kinobase');
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
@@ -3562,7 +3581,8 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title].join('') : object.movie.original_title + 'collaps');
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
@@ -4076,10 +4096,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -4771,10 +4797,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -5159,10 +5191,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -5817,10 +5855,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -6325,10 +6369,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -6806,10 +6856,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -7358,10 +7414,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -8007,10 +8069,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -8447,10 +8515,16 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
+          }
+
+          // Синхронизируем наш прогресс-бар с данными просмотра
+          if (view && view.percent) {
+            item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -8917,7 +8991,8 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
@@ -9331,7 +9406,8 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.data_id);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
@@ -9743,7 +9819,8 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
@@ -10132,7 +10209,8 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
@@ -10682,7 +10760,8 @@
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           element.template = item;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
@@ -11350,7 +11429,8 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
@@ -12110,7 +12190,8 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
-          item.append(Lampa.Timeline.render(view));
+          var _tl = Lampa.Timeline.render(view);
+          if (_tl) { _tl.css('display','none'); item.append(_tl); }
 
           if (Lampa.Timeline.details) {
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
@@ -14420,58 +14501,51 @@
     }
 
     function _tmdbEnrichEpisodeCard(item, tmdbId, seasonNum, epNum, isTV) {
-      if (!tmdbId || !seasonNum || !epNum) return;
+      if (!tmdbId || !seasonNum) return;
       _tmdbFetchSeason(tmdbId, seasonNum, isTV, function(eps) {
-        var ep = eps[epNum];
-        if (!ep) return;
+        var ep = epNum ? eps[epNum] : null;
+        var now = new Date();
 
-        // Скриншот кадра (still)
-        if (ep.still_path) {
+        // ── Скриншот ──────────────────────────────────────────────
+        if (ep && ep.still_path) {
           var stillUrl = 'https://image.tmdb.org/t/p/w300' + ep.still_path;
-          var img = item.find('.online__still-img');
-          if (img.length) { img.attr('src', stillUrl).css('opacity', '1'); }
+          item.find('.online__still-img').attr('src', stillUrl);
         }
 
-        // Рейтинг
-        if (ep.vote_average && ep.vote_average > 0) {
-          var rating = ep.vote_average.toFixed(1);
-          var ratingEl = item.find('.online__rating');
-          var dotEl = item.find('.online__dot');
-          if (ratingEl.length) {
-            ratingEl.html('<span style="color:#f5c518;">&#9733;</span> ' + rating);
-            ratingEl.css('color', '#ccc');
-            if (dotEl.length) dotEl.show();
+        // ── Рейтинг ───────────────────────────────────────────────
+        if (ep && ep.vote_average && ep.vote_average > 0) {
+          var r = ep.vote_average.toFixed(1);
+          item.find('.online__rating').html(
+            '<span style="color:#f5c518;font-size:0.9em;">&#9733;</span> ' + r
+          ).css('color','#bbb');
+          item.find('.online__dot').css('display','inline');
+        }
+
+        // ── Дата выхода и "осталось дней" ─────────────────────────
+        var airDate = ep && ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
+        if (airDate) {
+          var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                        'Июл','Авг','Сен','Окт','Ноя','Дек'];
+          var dateStr = airDate.getDate() + ' ' + months[airDate.getMonth()];
+          item.find('.online__airdate').text(dateStr);
+
+          if (airDate > now) {
+            var daysLeft = Math.ceil((airDate - now) / 86400000);
+            item.find('.online__days-left').text('Осталось дней: ' + daysLeft);
+            // Затемняем и скрываем скриншот для будущих эпизодов
+            item.find('.online__still-img').css('opacity','0.3');
+            item.css('opacity','0.6');
           }
         }
 
-        // Дата выхода
-        if (ep.air_date) {
-          var now = new Date();
-          var airDate = new Date(ep.air_date);
-          var airEl = item.find('.online__airdate');
-          var daysEl = item.find('.online__days-left');
-          if (airEl.length) {
-            var months = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
-            airEl.text(airDate.getDate() + ' ' + months[airDate.getMonth()]);
-          }
-          if (daysEl.length && airDate > now) {
-            var daysLeft = Math.ceil((airDate - now) / (1000 * 60 * 60 * 24));
-            daysEl.text('Осталось дней: ' + daysLeft);
-            // Затемняем карточку для будущих эпизодов
-            item.css('opacity', '0.55');
-          }
-        }
-
-        // Длительность (runtime в минутах → MM:SS формат как 00:41)
-        if (ep.runtime && ep.runtime > 0) {
+        // ── Длительность (runtime мин → «00:41») ──────────────────
+        if (ep && ep.runtime && ep.runtime > 0) {
           var h = Math.floor(ep.runtime / 60);
           var m = ep.runtime % 60;
-          var timeStr = h > 0 ? h + ':' + (m < 10 ? '0' : '') + m : '00:' + (m < 10 ? '0' : '') + m;
+          var ts = (h > 0 ? h + ':' : '00:') + (m < 10 ? '0' : '') + m;
           var timeEl = item.find('.online__time');
-          // Дополняем к уже существующему тексту качества
-          if (timeEl.length && !timeEl.data('tmdb-time')) {
-            timeEl.data('tmdb-time', true);
-            timeEl.append('<span style="margin-left:6px;color:#666;">' + timeStr + '</span>');
+          if (timeEl.length && !timeEl.data('rt')) {
+            timeEl.data('rt', 1).text(ts);
           }
         }
       });
@@ -14479,84 +14553,68 @@
 
     function resetTemplates() {
         Lampa.Template.add('online_mod', `
-          <div class="online selector" style="
-              border-radius: 0;
+          <div class="online selector omcard" style="
+              margin-bottom: 12px;
+              border-radius: 10px;
               overflow: hidden;
-              background: transparent;
-              border-bottom: 1px solid rgba(255,255,255,0.06);
+              background: rgba(255,255,255,0.04);
           ">
-              <div style="display: flex; align-items: center; padding: 8px 12px; gap: 12px; min-height: 86px;">
+            <div style="display:flex; align-items:stretch; min-height:80px;">
 
-                  <!-- СКРИНШОТ 16:9 + НОМЕР -->
-                  <div class="online__still" style="
-                      position: relative;
-                      width: 120px;
-                      height: 72px;
-                      flex-shrink: 0;
-                      border-radius: 8px;
-                      overflow: hidden;
-                      background: #1a1a1a;
-                  ">
-                      <img class="online__still-img" src="{poster}"
-                           style="width:100%;height:100%;object-fit:cover;display:block;"
-                           onerror="this.style.opacity='0';">
-                      <div class="online__epnum" style="
-                          position: absolute;
-                          bottom: 4px;
-                          left: 6px;
-                          font-size: 1.5em;
-                          font-weight: 800;
-                          color: rgba(255,255,255,0.5);
-                          line-height: 1;
-                          text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-                      ">{episode}</div>
-                  </div>
-
-                  <!-- ПРАВАЯ ЧАСТЬ -->
-                  <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:5px;">
-
-                      <!-- СТРОКА 1: название + время -->
-                      <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px;">
-                          <div class="online__title" style="
-                              font-size: 1.0em;
-                              font-weight: 600;
-                              color: #f0f0f0;
-                              white-space: nowrap;
-                              overflow: hidden;
-                              text-overflow: ellipsis;
-                              flex: 1;
-                          ">{title}</div>
-                          <div class="online__time" style="
-                              font-size: 0.85em;
-                              color: #888;
-                              flex-shrink: 0;
-                              white-space: nowrap;
-                          ">{quality}</div>
-                      </div>
-
-                      <!-- ПРОГРЕСС-БАР -->
-                      <div style="height:2px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden;">
-                          <div class="online__progress" style="height:100%; width:0%; background:#c0392b; border-radius:2px; transition:width 0.3s;"></div>
-                      </div>
-
-                      <!-- СТРОКА 2: рейтинг + студия / дата выхода -->
-                      <div class="online__quality" style="
-                          font-size: 0.82em;
-                          color: #777;
-                          display: flex;
-                          align-items: center;
-                          gap: 6px;
-                          flex-wrap: wrap;
-                      ">
-                          <span class="online__rating" style="color:#aaa;"></span>
-                          <span class="online__dot" style="color:#444; display:none;">•</span>
-                          <span class="online__studio" style="color:#888;">{info}</span>
-                          <span class="online__airdate" style="color:#666;"></span>
-                          <span class="online__days-left" style="color:#555;"></span>
-                      </div>
-
-                  </div>
+              <!-- СКРИНШОТ 16:9 слева -->
+              <div class="online__still" style="
+                  position: relative;
+                  width: 148px;
+                  min-height: 88px;
+                  flex-shrink: 0;
+                  background: #151515;
+                  overflow: hidden;
+              ">
+                  <img class="online__still-img" src="{poster}"
+                       style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.3s;">
+                  <!-- Номер эпизода -->
+                  <div class="online__epnum" style="
+                      position:absolute; bottom:5px; left:8px;
+                      font-size:1.6em; font-weight:800;
+                      color:rgba(255,255,255,0.55);
+                      text-shadow:0 2px 6px rgba(0,0,0,0.9);
+                      line-height:1;
+                  ">{episode}</div>
               </div>
+
+              <!-- ПРАВАЯ ЧАСТЬ -->
+              <div style="flex:1; min-width:0; padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
+
+                <!-- СТРОКА 1: заголовок + время -->
+                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:6px; margin-bottom:4px;">
+                  <div class="online__title" style="
+                      font-size:0.97em; font-weight:600; color:#eee;
+                      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;
+                  ">{title}</div>
+                  <div class="online__time" style="
+                      font-size:0.82em; color:#777; flex-shrink:0; white-space:nowrap;
+                  ">{quality}</div>
+                </div>
+
+                <!-- ПРОГРЕСС-БАР -->
+                <div style="height:2px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden; margin-bottom:5px;">
+                  <div class="online__progress-bar" style="height:100%;width:0%;background:#e74c3c;border-radius:2px;"></div>
+                </div>
+
+                <!-- СТРОКА 2: рейтинг • студия / дата / дни -->
+                <div class="online__quality" style="
+                    font-size:0.8em; color:#666;
+                    display:flex; align-items:center; gap:5px; flex-wrap:wrap;
+                ">
+                  <span class="online__rating"></span>
+                  <span class="online__dot" style="display:none; color:#444;">•</span>
+                  <span class="online__studio" style="color:#777;">{info}</span>
+                  <span class="online__airdate" style="color:#666;"></span>
+                  <span class="online__days-left" style="float:right; margin-left:auto; color:#555;"></span>
+                </div>
+
+              </div>
+            </div>
           </div>
       `);
 
