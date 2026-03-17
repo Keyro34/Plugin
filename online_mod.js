@@ -1191,6 +1191,51 @@
             }
           });
         });
+        // ── Добавляем будущие эпизоды из TMDB ──────────────────────────────
+        if (object.movie && object.movie.id && object.movie.number_of_seasons) {
+          var _seasonNum = items.length && items[0].season ? items[0].season : 0;
+          var _lastEp = component.getLastEpisode(items);
+          if (_seasonNum && _lastEp) {
+            _tmdbFetchSeason(object.movie.id, _seasonNum, true, function(eps) {
+              var now = new Date();
+              Object.keys(eps).forEach(function(epKey) {
+                var epN = parseInt(epKey);
+                if (epN <= _lastEp) return; // уже показан
+                var ep = eps[epKey];
+                if (!ep || !ep.air_date) return;
+                var airDate = new Date(ep.air_date + 'T00:00:00');
+                if (airDate <= now) return; // уже вышел но нет в источнике — пропуск
+
+                // Создаём фиктивный элемент для будущего эпизода
+                var fakeElem = {
+                  episode: epN,
+                  season: _seasonNum,
+                  title: ep.name || ('Эпизод ' + epN),
+                  quality: '00:00',
+                  info: '',
+                  poster: ''
+                };
+                var fakeItem = Lampa.Template.get('online_mod', fakeElem);
+
+                // Сразу переключаем в режим будущего
+                fakeItem.find('.omcard__media').hide();
+                fakeItem.find('.omcard__future').css('display','flex');
+                fakeItem.find('.omcard__future-num').text(epN);
+                fakeItem.find('.omcard__future-title').text(fakeElem.title);
+
+                var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                              'Июл','Авг','Сен','Окт','Ноя','Дек'];
+                var dateStr = airDate.getDate() + ' ' + months[airDate.getMonth()];
+                var daysLeft = Math.ceil((airDate - now) / 86400000);
+                fakeItem.find('.omcard__future-date').text(dateStr).css('color','#ffffff');
+                if (daysLeft > 0) fakeItem.find('.omcard__future-days').text('Осталось дней: ' + daysLeft).css('color','#aaa');
+
+                component.append(fakeItem);
+              });
+            });
+          }
+        }
+
         component.start(true);
       }
     }
@@ -14506,18 +14551,17 @@
         var ep = epNum ? eps[epNum] : null;
         var now = new Date();
 
-        // ── Дата выхода ──────────────────────────────────────────
         var airDate = ep && ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
         var isFuture = airDate && airDate > now;
 
-        // ── Название эпизода из TMDB ─────────────────────────────
+        // Название из TMDB
         if (ep && ep.name) {
           item.find('.online__title').text(ep.name).css('color','#fff');
           item.find('.omcard__future-title').text(ep.name);
         }
 
         if (isFuture) {
-          // ── БУДУЩИЙ ЭПИЗОД: скрываем медиа-блок, показываем future-блок ──
+          // Показываем блок будущего эпизода
           item.find('.omcard__media').hide();
           item.find('.omcard__future').css('display','flex');
 
@@ -14525,14 +14569,10 @@
                         'Июл','Авг','Сен','Окт','Ноя','Дек'];
           var dateStr = airDate.getDate() + ' ' + months[airDate.getMonth()];
           var daysLeft = Math.ceil((airDate - now) / 86400000);
-
-          item.find('.omcard__future-date').text(dateStr);
-          if (daysLeft > 0) item.find('.omcard__future-days').text('Осталось дней: ' + daysLeft);
-          item.css('opacity','1'); // сбрасываем затемнение, используем свой стиль
+          item.find('.omcard__future-date').text(dateStr).css('color','#ffffff');
+          if (daysLeft > 0) item.find('.omcard__future-days').text('Осталось дней: ' + daysLeft).css('color','#aaa');
           return;
         }
-
-        // ── ВЫШЕДШИЙ ЭПИЗОД ──────────────────────────────────────
 
         // Скриншот
         if (ep && ep.still_path) {
@@ -14545,8 +14585,8 @@
         if (ep && ep.vote_average && ep.vote_average > 0) {
           var r = ep.vote_average.toFixed(1);
           item.find('.online__rating')
-              .html('<span style="color:#f5c518;">&#9733;</span> ' + r)
-              .css('color','#ccc');
+              .html('&#9733; ' + r)
+              .css('color','#f5c518');
           item.find('.online__dot').css('display','inline');
         }
 
@@ -14555,7 +14595,8 @@
           var months2 = ['Янв','Фев','Мар','Апр','Май','Июн',
                          'Июл','Авг','Сен','Окт','Ноя','Дек'];
           item.find('.online__airdate')
-              .text(airDate.getDate() + ' ' + months2[airDate.getMonth()]);
+              .text(airDate.getDate() + ' ' + months2[airDate.getMonth()])
+              .css('color','#ffffff');
         }
 
         // Длительность
@@ -14565,7 +14606,7 @@
           var ts = (h > 0 ? h + ':' : '00:') + (m < 10 ? '0' : '') + m;
           var timeEl = item.find('.online__time');
           if (timeEl.length && !timeEl.data('rt')) {
-            timeEl.data('rt',1).text(ts);
+            timeEl.data('rt',1).text(ts).css('color','#ffffff');
           }
         }
       });
@@ -14579,12 +14620,10 @@
           ">
             <!-- КАРТОЧКА С ВИДЕО -->
             <div class="omcard__media" style="display:flex; align-items:stretch; min-height:86px;">
-
               <!-- СКРИНШОТ 16:9 -->
               <div class="online__still" style="
                   position:relative; width:152px; min-height:90px;
-                  flex-shrink:0; background:#151515; overflow:hidden;
-              ">
+                  flex-shrink:0; background:#151515; overflow:hidden;">
                 <img class="online__still-img" src="{poster}"
                      style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.3s;">
                 <div class="online__epnum" style="
@@ -14594,51 +14633,45 @@
                     text-shadow:0 2px 6px rgba(0,0,0,0.95); line-height:1;
                 ">{episode}</div>
               </div>
-
               <!-- ПРАВАЯ ЧАСТЬ -->
               <div style="flex:1; min-width:0; padding:10px 12px 8px; display:flex; flex-direction:column; justify-content:space-between;">
-                <!-- Заголовок + время -->
                 <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:6px;">
                   <div class="online__title" style="
                       font-size:0.96em; font-weight:600; color:#ffffff;
-                      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;
-                  ">{title}</div>
-                  <div class="online__time" style="font-size:0.82em; color:#999; flex-shrink:0; white-space:nowrap; margin-left:6px;">{quality}</div>
+                      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">
+                    {title}
+                  </div>
+                  <div class="online__time" style="font-size:0.82em; color:#ffffff; flex-shrink:0; white-space:nowrap; margin-left:6px;">{quality}</div>
                 </div>
-                <!-- Прогресс -->
                 <div style="height:2px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; margin:6px 0;">
                   <div class="online__progress-bar" style="height:100%;width:0%;background:#e74c3c;border-radius:2px;"></div>
                 </div>
-                <!-- Рейтинг • студия + дата -->
-                <div class="online__quality" style="font-size:0.8em; color:#888; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
-                  <span class="online__rating" style="color:#ccc;"></span>
-                  <span class="online__dot" style="display:none; color:#555;">•</span>
-                  <span class="online__studio" style="color:#888;">{info}</span>
-                  <span class="online__airdate" style="color:#777; margin-left:4px;"></span>
-                  <span class="online__days-left" style="margin-left:auto; color:#666;"></span>
+                <div class="online__quality" style="font-size:0.8em; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+                  <span class="online__rating" style="color:#f5c518;"></span>
+                  <span class="online__dot" style="display:none; color:#666;">•</span>
+                  <span class="online__studio" style="color:#ffffff;">{info}</span>
+                  <span class="online__airdate" style="color:#ffffff; margin-left:4px;"></span>
+                  <span class="online__days-left" style="margin-left:auto; color:#aaa;"></span>
                 </div>
               </div>
             </div>
 
-            <!-- КАРТОЧКА БУДУЩЕГО ЭПИЗОДА (скрыта по умолчанию) -->
-            <div class="omcard__future" style="display:none; align-items:center; padding:14px 16px; gap:14px; min-height:72px;">
-              <!-- Большой номер -->
+            <!-- БУДУЩИЙ ЭПИЗОД (скрыт по умолчанию) -->
+            <div class="omcard__future" style="display:none; align-items:center; padding:14px 16px; gap:14px; min-height:68px;">
               <div class="omcard__future-num" style="
-                  width:42px; flex-shrink:0;
-                  font-size:2em; font-weight:800;
-                  color:rgba(255,255,255,0.2); text-align:center; line-height:1;
-              ">{episode}</div>
-              <!-- Текст -->
+                  width:42px; flex-shrink:0; font-size:2em; font-weight:800;
+                  color:rgba(255,255,255,0.25); text-align:center; line-height:1;">
+                {episode}
+              </div>
               <div style="flex:1; min-width:0;">
-                <div class="omcard__future-title" style="font-size:0.95em; color:#999; margin-bottom:4px;">{title}</div>
+                <div class="omcard__future-title" style="font-size:0.95em; color:#bbb; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{title}</div>
                 <div style="height:2px; background:rgba(255,255,255,0.08); border-radius:2px; margin-bottom:6px;"></div>
-                <div style="display:flex; justify-content:space-between; font-size:0.8em;">
-                  <span class="omcard__future-date" style="color:#777;"></span>
-                  <span class="omcard__future-days" style="color:#666;"></span>
+                <div style="display:flex; justify-content:space-between; font-size:0.82em;">
+                  <span class="omcard__future-date" style="color:#aaa;"></span>
+                  <span class="omcard__future-days" style="color:#888;"></span>
                 </div>
               </div>
             </div>
-
           </div>
       `);
 
