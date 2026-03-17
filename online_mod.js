@@ -1239,13 +1239,13 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title')
                 .text(ep.name || ('Эпизод ' + epN))
-                .css('color', isFuture ? '#888' : '#bbb');
+                .css('color','#ffffff');
 
               if (airDate) {
-                var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                              'Июл','Авг','Сен','Окт','Ноя','Дек'];
+                var fMonths = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                               'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
                 fakeItem.find('.omcard__future-date')
-                  .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                  .text(airDate.getDate() + ' ' + fMonths[airDate.getMonth()])
                   .css('color','#ffffff');
               }
               if (isFuture) {
@@ -1253,7 +1253,7 @@
                 if (daysLeft > 0) {
                   fakeItem.find('.omcard__future-days')
                     .text('Осталось дней: ' + daysLeft)
-                    .css('color','#aaa');
+                    .css('color','#ffffff');
                 }
               }
 
@@ -15607,7 +15607,7 @@
       _tmdbFetchSeason(tmdbId, seasonNum, isTV, function(eps) {
         var ep = epNum ? eps[epNum] : null;
         var now = new Date();
-        var MONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+        var months = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                       'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
 
         var airDate = ep && ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
@@ -15615,20 +15615,21 @@
 
         // Название из TMDB
         if (ep && ep.name) {
-          item.find('.online-prestige__title, .online__title').text(ep.name);
+          item.find('.online__title').text(ep.name).css('color','#fff');
           item.find('.omcard__future-title').text(ep.name);
         }
 
         if (isFuture) {
           item.find('.omcard__media').hide();
           item.find('.omcard__future').css('display','flex');
-          if (airDate) {
-            item.find('.omcard__future-date')
-              .text(airDate.getDate() + ' ' + MONTHS[airDate.getMonth()]);
-          }
           var daysLeft = Math.ceil((airDate - now) / 86400000);
+          item.find('.omcard__future-date')
+              .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+              .css('color','#ffffff');
           if (daysLeft > 0) {
-            item.find('.omcard__future-days').text('Осталось дней: ' + daysLeft);
+            item.find('.omcard__future-days')
+                .text('Осталось дней: ' + daysLeft)
+                .css('color','#ffffff');
           }
           return;
         }
@@ -15636,31 +15637,31 @@
         // Скриншот
         if (ep && ep.still_path) {
           item.find('.online__still-img')
-              .attr('src', 'https://image.tmdb.org/t/p/w300' + ep.still_path);
+              .attr('src','https://image.tmdb.org/t/p/w300' + ep.still_path);
         }
 
         // Рейтинг
         if (ep && ep.vote_average && ep.vote_average > 0) {
-          item.find('.online__rating').css('display','inline-flex');
-          item.find('.online__rating-val').text(ep.vote_average.toFixed(1));
+          item.find('.online__rating')
+              .html('&#9733; ' + ep.vote_average.toFixed(1));
           item.find('.online__dot').css('display','inline');
-          if (airDate) item.find('.online__dot2').css('display','inline');
         }
 
         // Дата
         if (airDate) {
           item.find('.online__airdate')
-            .text(airDate.getDate() + ' ' + MONTHS[airDate.getMonth()] + ' ' + airDate.getFullYear())
-            .css('display','inline');
+              .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+              .css('color','#ffffff');
         }
 
         // Длительность
         if (ep && ep.runtime && ep.runtime > 0) {
-          var h = Math.floor(ep.runtime / 60), m = ep.runtime % 60;
+          var h = Math.floor(ep.runtime / 60);
+          var m = ep.runtime % 60;
           var ts = (h > 0 ? h + ':' : '00:') + (m < 10 ? '0' : '') + m;
-          var timeEl = item.find('.online-prestige__time, .online__time');
+          var timeEl = item.find('.online__time');
           if (timeEl.length && !timeEl.data('rt')) {
-            timeEl.data('rt', 1).text(ts);
+            timeEl.data('rt',1).text(ts).css('color','#ffffff');
           }
         }
       });
@@ -15819,54 +15820,65 @@
         try { delete Lampa.Template.templates['online_mod']; } catch(e) {}
         try { delete Lampa.Template.templates['online_mod_folder']; } catch(e) {}
         Lampa.Template.add('online_mod', `
-          <div class="online-prestige online selector omcard" style="margin-bottom:.4em;">
-            <!-- КАРТОЧКА С ВИДЕО -->
-            <div class="omcard__media" style="display:contents;">
-              <div class="online-prestige__img">
-                <img class="online__still-img" src="{poster}" alt="" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover;display:block;">
-                <div class="online-prestige__episode-number">{episode}</div>
+          <div class="online selector omcard" style="
+              border-bottom: 1px solid rgba(255,255,255,0.07);
+              background: transparent;
+          ">
+            <!-- ВЫШЕДШИЙ ЭПИЗОД -->
+            <div class="omcard__media" style="display:flex; align-items:stretch; min-height:80px;">
+              <!-- скриншот -->
+              <div class="online__still" style="
+                  position:relative; width:96px; min-height:80px;
+                  flex-shrink:0; background:#111; overflow:hidden;">
+                <img class="online__still-img" src="{poster}"
+                     style="width:100%;height:100%;object-fit:cover;display:block;">
+                <div class="online__epnum" style="
+                    position:absolute; bottom:4px; left:6px;
+                    font-size:1.4em; font-weight:800;
+                    color:rgba(255,255,255,0.65);
+                    text-shadow:0 2px 5px rgba(0,0,0,0.95); line-height:1;">
+                  {episode}
+                </div>
               </div>
-              <div class="online-prestige__body">
-                <div class="online-prestige__head">
-                  <div class="online-prestige__title online__title">{title}</div>
-                  <div class="online-prestige__time online__time">{quality}</div>
-                </div>
-                <div class="online-prestige__timeline">
-                  <div class="time-line">
-                    <div class="online__progress-bar" style="width:0%;height:0.3em;border-radius:3em;background:#fff;"></div>
+              <!-- текст -->
+              <div style="flex:1; min-width:0; padding:10px 12px 8px; display:flex; flex-direction:column; justify-content:space-between;">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                  <div class="online__title" style="
+                      font-size:0.97em; font-weight:600; color:#ffffff;
+                      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">
+                    {title}
                   </div>
+                  <div class="online__time" style="font-size:0.82em; color:#ffffff; flex-shrink:0; margin-left:6px;">{quality}</div>
                 </div>
-                <div class="online-prestige__footer">
-                  <div class="online-prestige__info online__quality">
-                    <span class="online__rating" style="display:none;">
-                      <div class="online-prestige-rate">
-                        <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path fill-rule="evenodd" clip-rule="evenodd" d="M8.39409 0.192139L10.99 5.30994L16.7882 6.20387L12.5475 10.4277L13.5819 15.9311L8.39409 13.2425L3.20626 15.9311L4.24065 10.4277L0 6.20387L5.79819 5.30994L8.39409 0.192139Z" fill="#fff"/>
-                        </svg>
-                        <span class="online__rating-val"></span>
-                      </div>
-                    </span>
-                    <span class="online__dot online-prestige-split" style="display:none;">●</span>
-                    <span class="online__airdate" style="display:none;"></span>
-                    <span class="online__dot2 online-prestige-split" style="display:none;">●</span>
-                    <span class="online__studio">{info}</span>
-                  </div>
+                <div style="height:2px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; margin:5px 0;">
+                  <div class="online__progress-bar" style="height:100%;width:0%;background:#e74c3c;border-radius:2px;"></div>
+                </div>
+                <div class="online__quality" style="font-size:0.82em; display:flex; align-items:center; gap:6px;">
+                  <span class="online__rating" style="color:#f5c518;"></span>
+                  <span class="online__dot" style="display:none; color:#555;">•</span>
+                  <span class="online__studio" style="color:#ffffff;">{info}</span>
+                  <span class="online__airdate" style="color:#ffffff;"></span>
+                  <span class="online__days-left" style="margin-left:auto; color:#ffffff;"></span>
                 </div>
               </div>
             </div>
 
             <!-- БУДУЩИЙ ЭПИЗОД -->
-            <div class="omcard__future" style="display:none; width:100%; align-items:center; padding:.8em 1.2em; gap:1em;">
-              <div class="omcard__future-num" style="font-size:2em;font-weight:700;color:rgba(255,255,255,0.2);width:2em;text-align:center;flex-shrink:0;">{episode}</div>
-              <div style="flex:1;min-width:0;">
-                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:.5em;margin-bottom:.5em;">
-                  <div class="omcard__future-title" style="font-size:1.1em;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">{title}</div>
-                  <span style="font-size:.85em;opacity:.4;flex-shrink:0;">00:00</span>
+            <div class="omcard__future" style="display:none; align-items:center; padding:12px 16px; gap:16px; min-height:68px;">
+              <div class="omcard__future-num" style="
+                  width:40px; flex-shrink:0; font-size:1.9em; font-weight:800;
+                  color:rgba(255,255,255,0.3); text-align:center; line-height:1;">
+                {episode}
+              </div>
+              <div style="flex:1; min-width:0;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">
+                  <div class="omcard__future-title" style="font-size:0.95em; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;"></div>
+                  <span style="font-size:0.82em; color:#ffffff; flex-shrink:0; margin-left:8px;">00:00</span>
                 </div>
-                <div style="height:.2em;background:rgba(255,255,255,0.1);border-radius:3em;margin-bottom:.5em;"></div>
-                <div style="display:flex;justify-content:space-between;font-size:.85em;opacity:.7;">
-                  <span class="omcard__future-date"></span>
-                  <span class="omcard__future-days"></span>
+                <div style="height:2px; background:rgba(255,255,255,0.08); border-radius:2px; margin-bottom:5px;"></div>
+                <div style="display:flex; justify-content:space-between; font-size:0.82em;">
+                  <span class="omcard__future-date" style="color:#ffffff;"></span>
+                  <span class="omcard__future-days" style="color:#ffffff;"></span>
                 </div>
               </div>
             </div>
