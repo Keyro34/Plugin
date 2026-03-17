@@ -1300,17 +1300,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -1777,17 +1777,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -2813,17 +2813,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -3545,17 +3545,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -3972,17 +3972,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -4566,17 +4566,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -5298,17 +5298,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -5746,17 +5746,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -6487,17 +6487,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -7055,17 +7055,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -7596,17 +7596,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -8186,17 +8186,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -8895,17 +8895,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -9417,17 +9417,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -9915,17 +9915,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -10403,17 +10403,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -10849,17 +10849,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -11293,17 +11293,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -11922,17 +11922,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -12643,17 +12643,17 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
 
-              var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                            'Июл','Авг','Сен','Окт','Ноя','Дек'];
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
               fakeItem.find('.omcard__future-date')
-                .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
                 .css('color','#ffffff');
 
               var now2 = new Date();
               if (airDate > now2) {
                 var daysLeft = Math.ceil((airDate - now2) / 86400000);
                 fakeItem.find('.omcard__future-days')
-                  .text('Осталось дней: ' + daysLeft).css('color','#aaa');
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
               }
               component.append(fakeItem);
             });
@@ -15663,6 +15663,8 @@
       _tmdbFetchSeason(tmdbId, seasonNum, isTV, function(eps) {
         var ep = epNum ? eps[epNum] : null;
         var now = new Date();
+        var MONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                      'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
 
         var airDate = ep && ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
         var isFuture = airDate && airDate > now;
@@ -15670,52 +15672,47 @@
         // Название из TMDB
         if (ep && ep.name) {
           item.find('.online__title').text(ep.name).css('color','#fff');
-          item.find('.omcard__future-title').text(ep.name);
+          item.find('.omcard__future-title').text(ep.name).css('color','#fff');
         }
 
         if (isFuture) {
-          // Показываем блок будущего эпизода
           item.find('.omcard__media').hide();
           item.find('.omcard__future').css('display','flex');
-
-          var months = ['Янв','Фев','Мар','Апр','Май','Июн',
-                        'Июл','Авг','Сен','Окт','Ноя','Дек'];
-          var dateStr = airDate.getDate() + ' ' + months[airDate.getMonth()];
+          if (airDate) {
+            item.find('.omcard__future-date')
+              .text(airDate.getDate() + ' ' + MONTHS[airDate.getMonth()])
+              .css('color','#ffffff');
+          }
           var daysLeft = Math.ceil((airDate - now) / 86400000);
-          item.find('.omcard__future-date').text(dateStr).css('color','#ffffff');
-          if (daysLeft > 0) item.find('.omcard__future-days').text('Осталось дней: ' + daysLeft).css('color','#aaa');
+          if (daysLeft > 0) {
+            item.find('.omcard__future-days')
+              .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+          }
           return;
         }
 
         // Скриншот
         if (ep && ep.still_path) {
           item.find('.online__still-img')
-              .attr('src','https://image.tmdb.org/t/p/w300' + ep.still_path)
-              .css('opacity','1');
+              .attr('src','https://image.tmdb.org/t/p/w300' + ep.still_path);
         }
 
-        // Рейтинг
+        // Рейтинг + дата
+        var ratingEl = item.find('.online__rating');
+        var dotEl = item.find('.online__dot');
         if (ep && ep.vote_average && ep.vote_average > 0) {
-          var r = ep.vote_average.toFixed(1);
-          item.find('.online__rating')
-              .html('&#9733; ' + r)
-              .css('color','#f5c518');
-          item.find('.online__dot').css('display','inline');
+          ratingEl.html('&#9733; ' + ep.vote_average.toFixed(1)).css('color','#f5c518');
+          dotEl.css('display','inline').css('color','#ffffff');
         }
-
-        // Дата
         if (airDate) {
-          var months2 = ['Янв','Фев','Мар','Апр','Май','Июн',
-                         'Июл','Авг','Сен','Окт','Ноя','Дек'];
           item.find('.online__airdate')
-              .text(airDate.getDate() + ' ' + months2[airDate.getMonth()])
-              .css('color','#ffffff');
+            .text(airDate.getDate() + ' ' + MONTHS[airDate.getMonth()])
+            .css('color','#ffffff');
         }
 
         // Длительность
         if (ep && ep.runtime && ep.runtime > 0) {
-          var h = Math.floor(ep.runtime / 60);
-          var m = ep.runtime % 60;
+          var h = Math.floor(ep.runtime / 60), m = ep.runtime % 60;
           var ts = (h > 0 ? h + ':' : '00:') + (m < 10 ? '0' : '') + m;
           var timeEl = item.find('.online__time');
           if (timeEl.length && !timeEl.data('rt')) {
@@ -15728,60 +15725,62 @@
     function resetTemplates() {
         Lampa.Template.add('online_mod', `
           <div class="online selector omcard" style="
-              margin-bottom:10px; border-radius:10px;
-              overflow:hidden; background:rgba(255,255,255,0.05);
+              border-radius:0; overflow:hidden;
+              border-bottom:1px solid rgba(255,255,255,0.07);
+              background:transparent;
           ">
             <!-- КАРТОЧКА С ВИДЕО -->
-            <div class="omcard__media" style="display:flex; align-items:stretch; min-height:86px;">
-              <!-- СКРИНШОТ 16:9 -->
+            <div class="omcard__media" style="display:flex; align-items:stretch; min-height:80px;">
+              <!-- СКРИНШОТ -->
               <div class="online__still" style="
-                  position:relative; width:152px; min-height:90px;
-                  flex-shrink:0; background:#151515; overflow:hidden;">
+                  position:relative; width:108px; min-height:72px;
+                  flex-shrink:0; background:#1a1a1a; overflow:hidden;">
                 <img class="online__still-img" src="{poster}"
-                     style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.3s;">
+                     style="width:100%;height:100%;object-fit:cover;display:block;">
                 <div class="online__epnum" style="
-                    position:absolute; bottom:5px; left:8px;
-                    font-size:1.55em; font-weight:800;
-                    color:rgba(255,255,255,0.6);
+                    position:absolute; bottom:4px; left:7px;
+                    font-size:1.3em; font-weight:800;
+                    color:rgba(255,255,255,0.65);
                     text-shadow:0 2px 6px rgba(0,0,0,0.95); line-height:1;
                 ">{episode}</div>
               </div>
               <!-- ПРАВАЯ ЧАСТЬ -->
-              <div style="flex:1; min-width:0; padding:10px 12px 8px; display:flex; flex-direction:column; justify-content:space-between;">
-                <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:6px;">
+              <div style="flex:1; min-width:0; padding:10px 14px 8px; display:flex; flex-direction:column; justify-content:space-between;">
+                <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px;">
                   <div class="online__title" style="
-                      font-size:0.96em; font-weight:600; color:#ffffff;
+                      font-size:0.98em; font-weight:600; color:#ffffff;
                       white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">
                     {title}
                   </div>
-                  <div class="online__time" style="font-size:0.82em; color:#ffffff; flex-shrink:0; white-space:nowrap; margin-left:6px;">{quality}</div>
+                  <div class="online__time" style="font-size:0.82em; color:#ffffff; flex-shrink:0; white-space:nowrap;">{quality}</div>
                 </div>
-                <div style="height:2px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; margin:6px 0;">
+                <div style="height:2px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; margin:5px 0;">
                   <div class="online__progress-bar" style="height:100%;width:0%;background:#e74c3c;border-radius:2px;"></div>
                 </div>
-                <div class="online__quality" style="font-size:0.8em; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+                <div class="online__quality" style="font-size:0.8em; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                   <span class="online__rating" style="color:#f5c518;"></span>
-                  <span class="online__dot" style="display:none; color:#666;">•</span>
-                  <span class="online__studio" style="color:#ffffff;">{info}</span>
-                  <span class="online__airdate" style="color:#ffffff; margin-left:4px;"></span>
-                  <span class="online__days-left" style="margin-left:auto; color:#aaa;"></span>
+                  <span class="online__dot" style="display:none; color:#ffffff;">•</span>
+                  <span class="online__airdate" style="color:#ffffff;"></span>
                 </div>
               </div>
             </div>
 
-            <!-- БУДУЩИЙ ЭПИЗОД (скрыт по умолчанию) -->
-            <div class="omcard__future" style="display:none; align-items:center; padding:14px 16px; gap:14px; min-height:68px;">
+            <!-- БУДУЩИЙ ЭПИЗОД -->
+            <div class="omcard__future" style="display:none; align-items:center; padding:12px 16px; gap:16px; min-height:64px;">
               <div class="omcard__future-num" style="
-                  width:42px; flex-shrink:0; font-size:2em; font-weight:800;
-                  color:rgba(255,255,255,0.25); text-align:center; line-height:1;">
+                  width:38px; flex-shrink:0; font-size:1.9em; font-weight:800;
+                  color:rgba(255,255,255,0.2); text-align:center; line-height:1;">
                 {episode}
               </div>
               <div style="flex:1; min-width:0;">
-                <div class="omcard__future-title" style="font-size:0.95em; color:#bbb; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{title}</div>
+                <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:5px;">
+                  <div class="omcard__future-title" style="font-size:0.95em; font-weight:500; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">{title}</div>
+                  <span style="font-size:0.82em; color:#ffffff;">00:00</span>
+                </div>
                 <div style="height:2px; background:rgba(255,255,255,0.08); border-radius:2px; margin-bottom:6px;"></div>
-                <div style="display:flex; justify-content:space-between; font-size:0.82em;">
-                  <span class="omcard__future-date" style="color:#aaa;"></span>
-                  <span class="omcard__future-days" style="color:#888;"></span>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.82em;">
+                  <span class="omcard__future-date" style="color:#ffffff;"></span>
+                  <span class="omcard__future-days" style="color:#ffffff;"></span>
                 </div>
               </div>
             </div>
