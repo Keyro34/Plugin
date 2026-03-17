@@ -1,4 +1,4 @@
-//17.03.2026 - UI Update v2
+//05.03.2026 - Fix
 
 (function () {
     'use strict';
@@ -1097,10 +1097,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -1239,13 +1235,13 @@
               fakeItem.find('.omcard__future-num').text(epN);
               fakeItem.find('.omcard__future-title')
                 .text(ep.name || ('Эпизод ' + epN))
-                .css('color','#ffffff');
+                .css('color', isFuture ? '#888' : '#bbb');
 
               if (airDate) {
-                var fMonths = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                               'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+                var months = ['Янв','Фев','Мар','Апр','Май','Июн',
+                              'Июл','Авг','Сен','Окт','Ноя','Дек'];
                 fakeItem.find('.omcard__future-date')
-                  .text(airDate.getDate() + ' ' + fMonths[airDate.getMonth()])
+                  .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
                   .css('color','#ffffff');
               }
               if (isFuture) {
@@ -1253,7 +1249,7 @@
                 if (daysLeft > 0) {
                   fakeItem.find('.omcard__future-days')
                     .text('Осталось дней: ' + daysLeft)
-                    .css('color','#ffffff');
+                    .css('color','#aaa');
                 }
               }
 
@@ -1294,21 +1290,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -1645,10 +1648,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -1768,21 +1767,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -2682,10 +2688,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -2801,21 +2803,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -3442,10 +3451,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title, 'kinobase'].join('') : object.movie.original_title + element.quality + 'kinobase');
           element.timeline = view;
@@ -3530,21 +3535,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -3860,10 +3872,6 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title].join('') : object.movie.original_title + 'collaps');
           element.timeline = view;
@@ -3954,21 +3962,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -4426,10 +4441,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -4545,21 +4556,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -5178,10 +5196,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -5274,21 +5288,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -5623,10 +5644,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -5719,21 +5736,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -6338,10 +6362,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -6457,21 +6477,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -6903,10 +6930,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -7022,21 +7045,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -7441,10 +7471,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -7560,21 +7586,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -8050,10 +8083,6 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -8147,21 +8176,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -8756,10 +8792,6 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -8853,21 +8885,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -9253,10 +9292,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
@@ -9372,21 +9407,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -9780,10 +9822,6 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
           element.timeline = view;
@@ -9867,21 +9905,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -10246,10 +10291,6 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.data_id);
           element.timeline = view;
@@ -10352,21 +10393,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -10710,10 +10758,6 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
@@ -10795,21 +10839,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -11151,10 +11202,6 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
@@ -11236,21 +11283,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -11752,10 +11806,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
@@ -11862,21 +11912,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -12473,10 +12530,6 @@
 
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
@@ -12580,21 +12633,28 @@
               var airDate = ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
               if (!airDate) return;
 
-              var FMONTHS2 = ['Января','Февраля','Марта','Апреля','Мая','Июня',
-                              'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
-              var _dateStr = airDate.getDate() + ' ' + FMONTHS2[airDate.getMonth()];
-              var _daysLeft = Math.ceil((airDate - new Date()) / 86400000);
-              var _infoStr = _dateStr + (_daysLeft > 0 ? ' · Осталось дней: ' + _daysLeft : '');
-
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: String(epN).padStart(2,'0'),
-                season: _seasonNum,
+                episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '00:00',
-                info: _infoStr,
-                poster: ''
+                quality: '', info: '', poster: ''
               });
-              fakeItem.addClass('online-prestige--future');
+              fakeItem.find('.omcard__media').hide();
+              fakeItem.find('.omcard__future').css('display','flex');
+              fakeItem.find('.omcard__future-num').text(epN);
+              fakeItem.find('.omcard__future-title').text(ep.name || ('Эпизод ' + epN));
+
+              var FMONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+                             'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
+              fakeItem.find('.omcard__future-date')
+                .text(airDate.getDate() + ' ' + FMONTHS[airDate.getMonth()])
+                .css('color','#ffffff');
+
+              var now2 = new Date();
+              if (airDate > now2) {
+                var daysLeft = Math.ceil((airDate - now2) / 86400000);
+                fakeItem.find('.omcard__future-days')
+                  .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
+              }
               component.append(fakeItem);
             });
           }
@@ -13285,10 +13345,6 @@
         items.forEach(function (element) {
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
-          // Форматируем номер эпизода (01, 02 ... 14)
-          if (element.episode !== undefined && element.episode !== null) {
-            element.episode = String(parseInt(element.episode) || '').padStart(2, '0');
-          }
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
@@ -15607,7 +15663,7 @@
       _tmdbFetchSeason(tmdbId, seasonNum, isTV, function(eps) {
         var ep = epNum ? eps[epNum] : null;
         var now = new Date();
-        var months = ['Января','Февраля','Марта','Апреля','Мая','Июня',
+        var MONTHS = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                       'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
 
         var airDate = ep && ep.air_date ? new Date(ep.air_date + 'T00:00:00') : null;
@@ -15616,20 +15672,21 @@
         // Название из TMDB
         if (ep && ep.name) {
           item.find('.online__title').text(ep.name).css('color','#fff');
-          item.find('.omcard__future-title').text(ep.name);
+          item.find('.omcard__future-title').text(ep.name).css('color','#fff');
         }
 
         if (isFuture) {
           item.find('.omcard__media').hide();
           item.find('.omcard__future').css('display','flex');
-          var daysLeft = Math.ceil((airDate - now) / 86400000);
-          item.find('.omcard__future-date')
-              .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
+          if (airDate) {
+            item.find('.omcard__future-date')
+              .text(airDate.getDate() + ' ' + MONTHS[airDate.getMonth()])
               .css('color','#ffffff');
+          }
+          var daysLeft = Math.ceil((airDate - now) / 86400000);
           if (daysLeft > 0) {
             item.find('.omcard__future-days')
-                .text('Осталось дней: ' + daysLeft)
-                .css('color','#ffffff');
+              .text('Осталось дней: ' + daysLeft).css('color','#ffffff');
           }
           return;
         }
@@ -15640,24 +15697,22 @@
               .attr('src','https://image.tmdb.org/t/p/w300' + ep.still_path);
         }
 
-        // Рейтинг
+        // Рейтинг + дата
+        var ratingEl = item.find('.online__rating');
+        var dotEl = item.find('.online__dot');
         if (ep && ep.vote_average && ep.vote_average > 0) {
-          item.find('.online__rating')
-              .html('&#9733; ' + ep.vote_average.toFixed(1));
-          item.find('.online__dot').css('display','inline');
+          ratingEl.html('&#9733; ' + ep.vote_average.toFixed(1)).css('color','#f5c518');
+          dotEl.css('display','inline').css('color','#ffffff');
         }
-
-        // Дата
         if (airDate) {
           item.find('.online__airdate')
-              .text(airDate.getDate() + ' ' + months[airDate.getMonth()])
-              .css('color','#ffffff');
+            .text(airDate.getDate() + ' ' + MONTHS[airDate.getMonth()])
+            .css('color','#ffffff');
         }
 
         // Длительность
         if (ep && ep.runtime && ep.runtime > 0) {
-          var h = Math.floor(ep.runtime / 60);
-          var m = ep.runtime % 60;
+          var h = Math.floor(ep.runtime / 60), m = ep.runtime % 60;
           var ts = (h > 0 ? h + ':' : '00:') + (m < 10 ? '0' : '') + m;
           var timeEl = item.find('.online__time');
           if (timeEl.length && !timeEl.data('rt')) {
@@ -15668,215 +15723,68 @@
     }
 
     function resetTemplates() {
-        // Инжектируем CSS из style.css
-        if (!document.getElementById('online-prestige-css')) {
-          var style = document.createElement('style');
-          style.id = 'online-prestige-css';
-          style.textContent = `.online-prestige {
-    position: relative;
-    -webkit-border-radius: .3em;
-    border-radius: .3em;
-    background-color: rgba(0, 0, 0, 0.3);
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: flex;
-}
-
-.online-prestige__img {
-    position: relative;
-    width: 13em;
-    -webkit-flex-shrink: 0;
-    flex-shrink: 0;
-    min-height: 8.2em;
-}
-
-.online-prestige__episode-number {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: flex;
-    -webkit-box-align: center;
-    -webkit-align-items: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    -webkit-justify-content: center;
-    justify-content: center;
-    font-size: 2em;
-}
-
-.online-prestige__body {
-    padding: 1.2em;
-    line-height: 1.3;
-    -webkit-box-flex: 1;
-    flex-grow: 1;
-    position: relative;
-}
-
-.online-prestige__head, .online-prestige__footer{
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: flex;
-    -webkit-box-pack: justify;
-    -webkit-justify-content: space-between;
-    justify-content: space-between;
-    -webkit-box-align: center;
-    -webkit-align-items: center;
-    align-items: center;
-}
-
-.online-prestige__title {
-    font-size: 1.7em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
-    -webkit-box-orient: vertical;
-}
-
-.online-prestige__time {
-    padding-left: 2em;
-}
-
-.online-prestige__timeline {
-    margin: .8em 0;
-}
-
-.online-prestige__timeline>.time-line {
-    display: block !important;
-}
-
-.time-line {
-    margin-top: 1em;
-    -webkit-border-radius: 3em;
-    border-radius: 3em;
-    background-color: rgba(255, 255, 255, 0.3);
-}
-
-.time-line > div {
-    height: 0.3em;
-    -webkit-border-radius: 3em;
-    border-radius: 3em;
-    background-color: #fff;
-}
-
-.hide {
-    display: none !important;
-}
-
-.online-prestige__info {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-align: center;
-    -webkit-align-items: center;
-    -moz-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-}
-
-.online-prestige-rate {
-    display: -webkit-inline-box;
-    display: -webkit-inline-flex;
-    display: inline-flex;
-    -webkit-box-align: center;
-    -webkit-align-items: center;
-    align-items: center;
-}
-
-.online-prestige .online-prestige-split {
-    font-size: .8em;
-    margin: 0 1em;
-    -webkit-flex-shrink: 0;
-    flex-shrink: 0;
-}
-
-.online-prestige__info>* {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
-    -webkit-box-orient: vertical;
-}
-
-.online-prestige__quality {
-    display: none !important;
-}
-
-.online-prestige__quality {
-    padding-left: 1em;
-    white-space: nowrap;
-}`;
-          document.head.appendChild(style);
-        }
-        // Принудительно удаляем старые шаблоны перед перезаписью
-        try { delete Lampa.Template.templates['online_mod']; } catch(e) {}
-        try { delete Lampa.Template.templates['online_mod_folder']; } catch(e) {}
         Lampa.Template.add('online_mod', `
           <div class="online selector omcard" style="
-              border-bottom: 1px solid rgba(255,255,255,0.07);
-              background: transparent;
+              border-radius:0; overflow:hidden;
+              border-bottom:1px solid rgba(255,255,255,0.07);
+              background:transparent;
           ">
-            <!-- ВЫШЕДШИЙ ЭПИЗОД -->
-            <div class="omcard__media" style="display:flex; align-items:stretch; min-height:80px;">
-              <!-- скриншот -->
+            <!-- КАРТОЧКА С ВИДЕО -->
+            <div class="omcard__media" style="display:flex; align-items:center; padding:8px 12px; gap:12px; min-height:80px;">
+              <!-- СКРИНШОТ со скруглением и затемнением -->
               <div class="online__still" style="
-                  position:relative; width:96px; min-height:80px;
-                  flex-shrink:0; background:#111; overflow:hidden;">
+                  position:relative; width:100px; height:64px;
+                  flex-shrink:0; border-radius:8px; overflow:hidden;
+                  background:#1a1a1a; box-shadow:0 2px 8px rgba(0,0,0,0.5);">
                 <img class="online__still-img" src="{poster}"
                      style="width:100%;height:100%;object-fit:cover;display:block;">
+                <!-- Затемнение поверх фото -->
+                <div style="position:absolute;inset:0;background:rgba(0,0,0,0.45);border-radius:8px;"></div>
+                <!-- Номер эпизода по центру -->
                 <div class="online__epnum" style="
-                    position:absolute; bottom:4px; left:6px;
-                    font-size:1.4em; font-weight:800;
-                    color:rgba(255,255,255,0.65);
-                    text-shadow:0 2px 5px rgba(0,0,0,0.95); line-height:1;">
-                  {episode}
-                </div>
+                    position:absolute; inset:0;
+                    display:flex; align-items:center; justify-content:center;
+                    font-size:1.6em; font-weight:800;
+                    color:#ffffff;
+                    text-shadow:0 2px 8px rgba(0,0,0,0.9); line-height:1;
+                ">{episode}</div>
               </div>
-              <!-- текст -->
-              <div style="flex:1; min-width:0; padding:10px 12px 8px; display:flex; flex-direction:column; justify-content:space-between;">
-                <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+              <!-- ПРАВАЯ ЧАСТЬ -->
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:space-between; gap:4px;">
+                <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px;">
                   <div class="online__title" style="
-                      font-size:0.97em; font-weight:600; color:#ffffff;
+                      font-size:0.98em; font-weight:600; color:#ffffff;
                       white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">
                     {title}
                   </div>
-                  <div class="online__time" style="font-size:0.82em; color:#ffffff; flex-shrink:0; margin-left:6px;">{quality}</div>
+                  <div class="online__time" style="font-size:0.82em; color:#ffffff; flex-shrink:0; white-space:nowrap;">{quality}</div>
                 </div>
-                <div style="height:2px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; margin:5px 0;">
+                <div style="height:2px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden;">
                   <div class="online__progress-bar" style="height:100%;width:0%;background:#e74c3c;border-radius:2px;"></div>
                 </div>
-                <div class="online__quality" style="font-size:0.82em; display:flex; align-items:center; gap:6px;">
+                <div class="online__quality" style="font-size:0.8em; display:flex; align-items:center; gap:6px;">
                   <span class="online__rating" style="color:#f5c518;"></span>
-                  <span class="online__dot" style="display:none; color:#555;">•</span>
-                  <span class="online__studio" style="color:#ffffff;">{info}</span>
+                  <span class="online__dot" style="display:none; color:#ffffff;">•</span>
                   <span class="online__airdate" style="color:#ffffff;"></span>
-                  <span class="online__days-left" style="margin-left:auto; color:#ffffff;"></span>
                 </div>
               </div>
             </div>
 
             <!-- БУДУЩИЙ ЭПИЗОД -->
-            <div class="omcard__future" style="display:none; align-items:center; padding:12px 16px; gap:16px; min-height:68px;">
+            <div class="omcard__future" style="display:none; align-items:center; padding:10px 12px; gap:16px; min-height:64px;">
+              <!-- Большой номер -->
               <div class="omcard__future-num" style="
-                  width:40px; flex-shrink:0; font-size:1.9em; font-weight:800;
-                  color:rgba(255,255,255,0.3); text-align:center; line-height:1;">
+                  width:100px; flex-shrink:0; font-size:2em; font-weight:800;
+                  color:rgba(255,255,255,0.2); text-align:center; line-height:1;">
                 {episode}
               </div>
-              <div style="flex:1; min-width:0;">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:5px;">
-                  <div class="omcard__future-title" style="font-size:0.95em; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;"></div>
-                  <span style="font-size:0.82em; color:#ffffff; flex-shrink:0; margin-left:8px;">00:00</span>
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:4px;">
+                <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px;">
+                  <div class="omcard__future-title" style="font-size:0.95em; font-weight:500; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">{title}</div>
+                  <span style="font-size:0.82em; color:#666;">00:00</span>
                 </div>
-                <div style="height:2px; background:rgba(255,255,255,0.08); border-radius:2px; margin-bottom:5px;"></div>
-                <div style="display:flex; justify-content:space-between; font-size:0.82em;">
+                <div style="height:2px; background:rgba(255,255,255,0.08); border-radius:2px;"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.82em;">
                   <span class="omcard__future-date" style="color:#ffffff;"></span>
                   <span class="omcard__future-days" style="color:#ffffff;"></span>
                 </div>
@@ -16026,38 +15934,6 @@
     }
 
     function initMain() {
-      // Inject prestige card styles
-      if (!document.getElementById('online-prestige-css')) {
-        var _style = document.createElement('style');
-        _style.id = 'online-prestige-css';
-        _style.textContent = `
-.online-prestige{position:relative;border-radius:.3em;background-color:rgba(0,0,0,0.3);display:flex;transition:background .2s}
-.online-prestige.selector:hover,.online-prestige.selector.focus{background-color:rgba(255,255,255,0.08)}
-.online-prestige__img{position:relative;width:13em;flex-shrink:0;min-height:8.2em;overflow:hidden;border-radius:.3em 0 0 .3em}
-.online-prestige__img img{width:100%;height:100%;object-fit:cover;display:block}
-.online-prestige__episode-number{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:2em;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.9);background:rgba(0,0,0,.4)}
-.online-prestige__body{padding:1.2em;line-height:1.3;flex-grow:1;position:relative;display:flex;flex-direction:column;justify-content:space-between}
-.online-prestige__head,.online-prestige__footer{display:flex;justify-content:space-between;align-items:center}
-.online-prestige__title{font-size:1.7em;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;flex:1}
-.online-prestige__time{padding-left:2em;white-space:nowrap;opacity:.85}
-.online-prestige__timeline{margin:.8em 0}
-.online-prestige__timeline>.time-line{display:block!important}
-.time-line{border-radius:3em;background-color:rgba(255,255,255,0.2)}
-.time-line>div{height:.3em;border-radius:3em;background-color:#fff}
-.online-prestige__info{display:flex;align-items:center;flex:1;overflow:hidden}
-.online-prestige__info>*{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;white-space:nowrap}
-.online-prestige-rate{display:inline-flex;align-items:center;gap:.3em}
-.online-prestige-rate svg{flex-shrink:0}
-.online-prestige-split{font-size:.8em;margin:0 .6em;flex-shrink:0;opacity:.5}
-.online-prestige__quality{display:none!important}
-.online-prestige--future{opacity:.55}
-.online-prestige--future .online-prestige__img{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04)}
-.online-prestige--future .online-prestige__img img{display:none}
-.online-prestige--future .online-prestige__episode-number{position:static;font-size:2.2em;background:transparent;color:rgba(255,255,255,.25)}
-`;
-        document.head.appendChild(_style);
-      }
-
       // нужна заглушка, а то при страте лампы говорит пусто
       Lampa.Component.add('online_mod', component); //то же самое
 
