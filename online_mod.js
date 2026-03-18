@@ -1122,12 +1122,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -1752,12 +1763,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -2838,12 +2860,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -4693,12 +4726,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -5494,12 +5538,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -5988,12 +6043,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -6752,12 +6818,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -7366,12 +7443,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -7953,12 +8041,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -8611,12 +8710,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -9366,12 +9476,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -9912,12 +10033,23 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            var _mp = object.movie.poster || object.movie.poster_path ||
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
                       object.movie.background_image || object.movie.img || '';
             if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
               _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-            if (_mp) item.find('.online__still-img').attr('src', _mp);
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
+            // Название озвучки вместо title фильма
+            var _voiceTitle = element.title || '';
+            var _filmTitle = object.movie.title || object.movie.name || '';
+            if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
+              item.find('.online-prestige__title.online__title').text(_voiceTitle);
+            }
           }
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
@@ -16835,7 +16967,9 @@
           <div class="online-prestige online-prestige--full selector omcard">
 
             <div class="online-prestige__img omcard__img">
-              <img class="online__still-img" alt="" src="{poster}">
+              <img class="online__still-img" alt="" src="{poster}"
+                   style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;font-size:1em!important;opacity:1;transition:opacity 0.3s;"
+                   onerror="this.style.opacity='0.05';">
               <div class="online-prestige__episode-number omcard__epnum"></div>
             </div>
 
