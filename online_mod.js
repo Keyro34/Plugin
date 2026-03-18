@@ -15007,63 +15007,81 @@
           return p;
         })();
 
-        // Загружаем постер через TMDB Search API по названию и году
+        // TMDB постер для карточек выбора
         var _tmdbApiKey = '4ef0d7355d9ffb5151e987764708ce96';
         var _tmdbCache = {};
 
-        function _fetchTmdbPoster(title, year, isSerial, imgEl) {
-          var cacheKey = title + '|' + year;
+        function _fetchTmdbPoster(title, origTitle, year, imgEl) {
+          // Приоритет: оригинальное название → русское
+          var titles = [];
+          if (origTitle && origTitle !== title) titles.push(origTitle);
+          titles.push(title);
+
+          var cacheKey = (origTitle || title) + '|' + (year || '');
+
           if (_tmdbCache[cacheKey]) {
-            // Уже загружено — просто подставляем
-            if (_tmdbCache[cacheKey] !== 'none') {
+            if (_tmdbCache[cacheKey] !== 'none' && _tmdbCache[cacheKey] !== 'loading') {
               imgEl.attr('src', _tmdbCache[cacheKey]);
             }
             return;
           }
           _tmdbCache[cacheKey] = 'loading';
-          var type = isSerial ? 'tv' : 'multi';
-          var query = encodeURIComponent(title);
-          var yearParam = year ? '&year=' + year : '';
-          var apiBase = typeof Lampa.TMDB !== 'undefined'
-            ? Lampa.TMDB.api('search/' + type + '?api_key=' + _tmdbApiKey + '&language=ru&query=' + query + yearParam)
-            : 'https://api.themoviedb.org/3/search/' + type + '?api_key=' + _tmdbApiKey + '&language=ru&query=' + query + yearParam;
 
-          var xhr = new XMLHttpRequest();
-          xhr.open('GET', apiBase, true);
-          xhr.timeout = 8000;
-          xhr.onload = function() {
-            try {
-              var data = JSON.parse(xhr.responseText);
-              var results = data.results || [];
-              var poster_path = '';
-              if (results.length) {
-                // Ищем наиболее подходящий по году
-                var best = results[0];
-                if (year) {
-                  results.forEach(function(r) {
-                    var ry = parseInt((r.release_date || r.first_air_date || '').slice(0,4));
-                    if (Math.abs(ry - year) < Math.abs(parseInt((best.release_date || best.first_air_date || '0').slice(0,4)) - year)) {
-                      best = r;
-                    }
-                  });
-                }
-                poster_path = best.poster_path || '';
-              }
-              if (poster_path) {
-                var url = 'https://image.tmdb.org/t/p/w185' + poster_path;
-                _tmdbCache[cacheKey] = url;
-                imgEl.attr('src', url).show();
-              } else {
-                _tmdbCache[cacheKey] = 'none';
-              }
-            } catch(e) {
-              _tmdbCache[cacheKey] = 'none';
-            }
-          };
-          xhr.onerror = xhr.ontimeout = function() {
-            _tmdbCache[cacheKey] = 'none';
-          };
-          xhr.send();
+          var apiKey = _tmdbApiKey;
+
+          function pickBest(results) {
+            if (!results || !results.length) return null;
+            if (!year) return results[0];
+            var best = results[0], bestDiff = 9999;
+            results.forEach(function(r) {
+              var ry = parseInt((r.release_date || r.first_air_date || '0').slice(0,4));
+              var diff = Math.abs(ry - parseInt(year));
+              if (diff < bestDiff) { bestDiff = diff; best = r; }
+            });
+            return best;
+          }
+
+          function applyPoster(poster_path) {
+            var url = 'https://image.tmdb.org/t/p/w342' + poster_path;
+            _tmdbCache[cacheKey] = url;
+            imgEl.attr('src', url);
+          }
+
+          function searchOne(searchTitle, type, onFound, onEmpty) {
+            var q = encodeURIComponent(searchTitle);
+            var yp = year ? '&year=' + year : '';
+            var url = typeof Lampa.TMDB !== 'undefined'
+              ? Lampa.TMDB.api('search/' + type + '?api_key=' + apiKey + '&language=ru&query=' + q + yp)
+              : 'https://api.themoviedb.org/3/search/' + type + '?api_key=' + apiKey + '&language=ru&query=' + q + yp;
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.timeout = 8000;
+            xhr.onload = function() {
+              try {
+                var data = JSON.parse(xhr.responseText);
+                var best = pickBest(data.results || []);
+                if (best && best.poster_path) onFound(best.poster_path);
+                else onEmpty();
+              } catch(e) { onEmpty(); }
+            };
+            xhr.onerror = xhr.ontimeout = onEmpty;
+            xhr.send();
+          }
+
+          // Цепочка: origTitle/multi → origTitle/tv → origTitle/movie → ruTitle/multi → пусто
+          var steps = [];
+          titles.forEach(function(t) {
+            ['multi','tv','movie'].forEach(function(type) {
+              steps.push({ title: t, type: type });
+            });
+          });
+
+          function runStep(i) {
+            if (i >= steps.length) { _tmdbCache[cacheKey] = 'none'; return; }
+            var s = steps[i];
+            searchOne(s.title, s.type, applyPoster, function() { runStep(i + 1); });
+          }
+          runStep(0);
         }
 
         var _isSerial = !!(object && object.movie && object.movie.number_of_seasons);
@@ -15080,21 +15098,22 @@
           elem.quality = year ? (year + '').slice(0, 4) : '----';
           elem.info = info.length ? ' / ' + info.join(' / ') : '';
 
-          // Начальный постер: собственный у элемента → постер текущего фильма из Lampa
+          // Начальный постер из данных элемента или текущего фильма
           if (!elem.poster || elem.poster === '') {
             var ep = elem.poster_path || elem.background_image || elem.img || '';
             if (ep && ep.charAt(0) === '/' && ep.indexOf('://') === -1) {
-              ep = 'https://image.tmdb.org/t/p/w185' + ep;
+              ep = 'https://image.tmdb.org/t/p/w342' + ep;
             }
-            elem.poster = ep || _moviePoster || '';
+            elem.poster = ep || '';  // НЕ подставляем постер текущего фильма — только свой
           }
 
           var item = Lampa.Template.get('online_mod_folder', elem);
 
-          // Запрашиваем индивидуальный постер через TMDB Search API
+          // Ищем индивидуальный постер через TMDB
           if (title) {
-            var imgEl = item.find('img');
-            _fetchTmdbPoster(orig_title || title, year ? parseInt(year) : 0, _isSerial, imgEl);
+            var imgEl = item.find('.folder__poster');
+            if (!imgEl.length) imgEl = item.find('img').first();
+            _fetchTmdbPoster(title, orig_title, year ? parseInt(year) : 0, imgEl);
           }
 
           item.on('hover:enter', function () {
@@ -16580,23 +16599,40 @@
       Lampa.Template.add('online_mod_folder', `
           <div class="online-prestige online-prestige--full online-prestige--folder selector" style="margin-bottom:10px;">
 
-            <!-- Постер (книжный 2:3) -->
-            <div class="online-prestige__img" style="
-                flex: 0 0 auto !important;
+            <!-- Книжный постер 2:3 -->
+            <div class="online-prestige__img online-prestige--folder__img" style="
+                flex: 0 0 72px !important;
                 width: 72px !important;
                 max-width: 72px !important;
+                min-height: 108px !important;
+                background: #1a1a1a;
             ">
-              <img class="folder__poster" alt="" src="{poster}"
-                   onerror="this.style.opacity='0.1';"
-                   style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;font-size:1em!important;">
-              <!-- Убираем ::before для книжного соотношения 2:3 -->
+              <img class="folder__poster" alt="" src=""
+                   style="
+                       position:absolute !important;
+                       inset:0 !important;
+                       width:100% !important;
+                       height:100% !important;
+                       object-fit:cover !important;
+                       display:block !important;
+                       font-size:1em !important;
+                       opacity:0;
+                       transition:opacity 0.3s;
+                   "
+                   onload="this.style.opacity='1';"
+                   onerror="this.style.opacity='0.1';">
             </div>
 
             <!-- Информация -->
             <div class="online-prestige__body">
               <div class="online-prestige__head">
-                <div class="online-prestige__title online__title" style="white-space:normal!important; line-height:1.3; max-height:2.6em; overflow:hidden;">{title}</div>
-                <div class="online-prestige__time" style="color:#888; font-size:0.85em;">{quality}</div>
+                <div class="online-prestige__title online__title" style="
+                    white-space:normal !important;
+                    line-height:1.3;
+                    max-height:2.6em;
+                    overflow:hidden;
+                ">{title}</div>
+                <div class="online-prestige__time" style="color:#888; font-size:0.85em; flex-shrink:0;">{quality}</div>
               </div>
               <div style="height:1px; background:rgba(255,255,255,0.07); margin:6px 0;"></div>
               <div class="online-prestige__info" style="font-size:0.82em; color:#888;">
