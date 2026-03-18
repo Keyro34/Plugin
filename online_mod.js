@@ -1224,7 +1224,7 @@
                 episode: epN,
                 season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '',
+                quality: '00:00',
                 info: '',
                 poster: ''
               });
@@ -1256,7 +1256,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
 
               // Осталось дней + приглушение
@@ -1267,12 +1269,12 @@
                       .text('Осталось дней: ' + daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -1317,7 +1319,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -1338,7 +1340,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -1348,12 +1352,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -1815,7 +1819,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -1836,7 +1840,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -1846,12 +1852,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -2872,7 +2878,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -2893,7 +2899,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -2903,12 +2911,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -3625,7 +3633,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -3646,7 +3654,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -3656,12 +3666,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -4073,7 +4083,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -4094,7 +4104,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -4104,12 +4116,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -4688,7 +4700,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -4709,7 +4721,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -4719,12 +4733,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -5441,7 +5455,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -5462,7 +5476,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -5472,12 +5488,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -5910,7 +5926,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -5931,7 +5947,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -5941,12 +5959,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -6672,7 +6690,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -6693,7 +6711,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -6703,12 +6723,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -7261,7 +7281,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -7282,7 +7302,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -7292,12 +7314,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -7823,7 +7845,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -7844,7 +7866,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -7854,12 +7878,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -8434,7 +8458,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -8455,7 +8479,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -8465,12 +8491,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -9164,7 +9190,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -9185,7 +9211,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -9195,12 +9223,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -9707,7 +9735,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -9728,7 +9756,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -9738,12 +9768,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -10226,7 +10256,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -10247,7 +10277,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -10257,12 +10289,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -10735,7 +10767,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -10756,7 +10788,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -10766,12 +10800,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -11202,7 +11236,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -11223,7 +11257,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -11233,12 +11269,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -11667,7 +11703,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -11688,7 +11724,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -11698,12 +11736,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -12317,7 +12355,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -12338,7 +12376,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -12348,12 +12388,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -13059,7 +13099,7 @@
               var fakeItem = Lampa.Template.get('online_mod', {
                 episode: epN, season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
-                quality: '', info: '', poster: ''
+                quality: '00:00', info: '', poster: ''
               });
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -13080,7 +13120,9 @@
                 fakeItem.find('.online__airdate')
                     .text(airDate.getDate() + ' ' + _FM[airDate.getMonth()])
                     .css('display','inline');
-                fakeItem.find('.online__sep2').css('display','inline');
+                // sep2 показываем только если есть студия
+                var _st = fakeItem.find('.online__studio').text().trim();
+                if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
@@ -13090,12 +13132,12 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна)
+                // Длительность из TMDB (если известна) — иначе остаётся 00:00
               if (ep.runtime && ep.runtime > 0) {
                 var _h = Math.floor(ep.runtime / 60);
                 var _m = ep.runtime % 60;
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
               fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
@@ -16146,7 +16188,11 @@
           item.find('.online__airdate')
               .text(airDate.getDate() + ' ' + MONTHS[airDate.getMonth()])
               .css('display','inline');
-          item.find('.online__sep2').css('display','inline');
+          // sep2 (●) показываем только если есть студия
+          var _studio = item.find('.online__studio').text().trim();
+          if (_studio && _studio !== '') {
+            item.find('.online__sep2').css('display','inline');
+          }
         }
 
         // ── Длительность (для будущих тоже, если известна) ────────
