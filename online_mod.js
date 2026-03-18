@@ -1112,6 +1112,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -1221,13 +1239,17 @@
               var isFuture = airDate && airDate > now;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN,
+                episode: '',
                 season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00',
                 info: '',
                 poster: ''
               });
+
+              // Устанавливаем режим эпизода + номер
+              fakeItem.find('.omcard__epnum').text(epN);
+              fakeItem.find('.omcard__img').addClass('omcard__img--episode');
 
               // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
@@ -1320,10 +1342,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -1719,6 +1742,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -1824,10 +1865,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -2786,6 +2828,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -2887,10 +2947,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -3646,10 +3707,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -4100,10 +4162,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -4620,6 +4683,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -4721,10 +4802,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -5402,6 +5484,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -5480,10 +5580,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -5877,6 +5978,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -5955,10 +6074,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -6622,6 +6742,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -6723,10 +6861,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -7217,6 +7356,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -7318,10 +7475,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -7785,6 +7943,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -7886,10 +8062,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -8424,6 +8601,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -8503,10 +8698,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -9160,6 +9356,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -9239,10 +9453,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -9687,6 +9902,24 @@
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
+          // ── Сериал или фильм ────────────────────────────────────
+          var _isEpisode = !!(element.season || element.episode);
+          if (_isEpisode) {
+            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            item.find('.omcard__epnum').text(element.episode || '');
+            item.find('.omcard__img').addClass('omcard__img--episode');
+          } else {
+            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            item.find('.omcard__img').addClass('omcard__img--movie');
+            item.find('.omcard__epnum').hide();
+            var _mp = object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            }
+            if (_mp) item.find('.online__still-img').attr('src', _mp);
+          }
+
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
             _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
@@ -9788,10 +10021,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -10313,10 +10547,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -10828,10 +11063,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -11301,10 +11537,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -11772,10 +12009,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -12428,10 +12666,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -13176,10 +13415,11 @@
               if (!airDate) return;
 
               var fakeItem = Lampa.Template.get('online_mod', {
-                episode: epN, season: _seasonNum,
+                episode: '', season: _seasonNum,
                 title: ep.name || ('Эпизод ' + epN),
                 quality: '00:00', info: '', poster: ''
               });
+              fakeItem.find('.omcard__epnum').text(epN);
                             // Единый layout — как вышедший эпизод
               var _FM = ['Января','Февраля','Марта','Апреля','Мая','Июня',
                          'Июля','Августа','Сентября','Октября','Ноября','Декабря'];
@@ -16532,6 +16772,19 @@
         '  line-height: 1;',
         '}',
 
+        /* ── Фильм: книжный постер 2:3 (без номера эпизода) ── */
+        '.online-prestige--movie-poster {',
+        '  flex: 0 0 72px !important;',
+        '  width: 72px !important;',
+        '  max-width: 72px !important;',
+        '}',
+        '.online-prestige--movie-poster::before {',
+        '  padding-top: 150% !important;',
+        '}',
+        '.online-prestige--movie-poster .omcard__epnum {',
+        '  display: none !important;',
+        '}',
+
         /* ── Папка: книжный постер 2:3 ── */
         '.online-prestige--folder .online-prestige__img {',
         '  width: 72px !important;',
@@ -16551,6 +16804,21 @@
         '  overflow: hidden !important;',
         '}',
 
+        /* ── Режим эпизода: скриншот 16:9 ── */
+        '.omcard__img--episode::before {',
+        '  padding-top: 56.25% !important;',
+        '}',
+
+        /* ── Режим фильма: книжный постер 2:3 ── */
+        '.omcard__img--movie {',
+        '  flex: 0 0 72px !important;',
+        '  width: 72px !important;',
+        '  max-width: 72px !important;',
+        '}',
+        '.omcard__img--movie::before {',
+        '  padding-top: 150% !important;',
+        '}',
+
         /* ── Hover / focus ── */
         '.online-prestige.selector.focus {',
         '  background: linear-gradient(180deg,#252525 0%,#1a1a1a 100%);',
@@ -16566,9 +16834,9 @@
         Lampa.Template.add('online_mod', `
           <div class="online-prestige online-prestige--full selector omcard">
 
-            <div class="online-prestige__img">
+            <div class="online-prestige__img omcard__img">
               <img class="online__still-img" alt="" src="{poster}">
-              <div class="online-prestige__episode-number">{episode}</div>
+              <div class="online-prestige__episode-number omcard__epnum"></div>
             </div>
 
             <div class="online-prestige__body">
@@ -16595,14 +16863,23 @@
                   <span class="online__sep2 online-prestige-split" style="display:none;">●</span>
                   <span class="online__studio">{info}</span>
                 </div>
-                <!-- Осталось дней — справа в футере, белый -->
                 <div class="online__days-left" style="display:none; color:#ffffff; font-size:0.82em; font-weight:500; flex-shrink:0; white-space:nowrap;"></div>
+              </div>
+
+              <div class="online__days-row" style="display:none; font-size:0.82em; color:#f0a500; font-weight:500;">
+                <span class="online__days-left-text"></span>
               </div>
 
             </div>
 
           </div>
       `);
+
+      // Скрываем блок с картинкой для карточек без эпизода (озвучки/переводы)
+      // и показываем простой стиль
+      Lampa.Template.filter('online_mod', function(html, data) {
+        return html;
+      });
 
       // Папки (сезоны/похожие) — тоже с постером
       Lampa.Template.add('online_mod_folder', `
