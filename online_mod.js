@@ -1276,7 +1276,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
 
               component.append(fakeItem);
@@ -1359,7 +1359,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -1859,7 +1859,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -2918,7 +2918,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -3673,7 +3673,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -4123,7 +4123,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -4740,7 +4740,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -5495,7 +5495,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -5966,7 +5966,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -6730,7 +6730,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -7321,7 +7321,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -7885,7 +7885,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -8498,7 +8498,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -9230,7 +9230,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -9775,7 +9775,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -10296,7 +10296,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -10807,7 +10807,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -11276,7 +11276,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -11743,7 +11743,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -12395,7 +12395,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -13139,7 +13139,7 @@
                 var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
-              fakeItem.find('.online-prestige__img').css('opacity','0.75');
+              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -16211,7 +16211,7 @@
                 .text('Осталось дней: ' + dl)
                 .css('display','block');
           }
-          item.find('.online-prestige__img').css('opacity','0.75');
+          item.css('opacity','0.5');
         }
       });
     }
