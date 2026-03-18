@@ -15749,25 +15749,42 @@
             <!-- ── ВЫШЕДШИЙ ЭПИЗОД ───────────────────────────── -->
             <div class="omcard__media" style="
                 display: flex;
-                align-items: center;
+                align-items: stretch;
                 padding: 12px 14px;
                 gap: 14px;
                 min-height: 90px;
+                box-sizing: border-box;
             ">
-              <!-- Миниатюра 16:9 -->
+              <!-- Миниатюра: под-контейнер 16:9, max-width 45% ячейки -->
               <div style="
-                  width: 128px;
-                  height: 72px;
-                  flex-shrink: 0;
+                  flex: 0 0 auto;
+                  width: 45%;
+                  max-width: 180px;
+                  align-self: stretch;
                   border-radius: 8px;
                   overflow: hidden;
                   background: #0f0f0f;
+                  position: relative;
               ">
-                <img class="online__still-img" src="{poster}"
-                     style="width:100%; height:100%; object-fit:cover; display:block;">
+                <!-- Padding-top 56.25% держит пропорцию 16:9 -->
+                <div style="
+                    position: relative;
+                    width: 100%;
+                    padding-top: 56.25%;
+                    height: 0;
+                ">
+                  <img class="online__still-img" src="{poster}" style="
+                      position: absolute;
+                      inset: 0;
+                      width: 100%;
+                      height: 100%;
+                      object-fit: cover;
+                      display: block;
+                  ">
+                </div>
               </div>
 
-              <!-- Информация -->
+              <!-- Информация справа -->
               <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:6px;">
 
                 <!-- Верхняя строка: номер: название -->
@@ -15792,7 +15809,6 @@
                     color: #b0b0b0;
                     display: flex;
                     align-items: center;
-                    gap: 0;
                     white-space: nowrap;
                     overflow: hidden;
                 ">
@@ -15819,7 +15835,6 @@
                 gap: 14px;
                 min-height: 90px;
             ">
-              <!-- Большой номер -->
               <div class="omcard__future-num" style="
                   width: 44px;
                   flex-shrink: 0;
@@ -15830,9 +15845,7 @@
                   line-height: 1;
               ">{episode}</div>
 
-              <!-- Текст будущего -->
               <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:6px;">
-                <!-- Название -->
                 <div class="omcard__future-title" style="
                     font-size: 1.0em;
                     font-weight: 500;
@@ -15841,9 +15854,7 @@
                     overflow: hidden;
                     text-overflow: ellipsis;
                 ">{title}</div>
-                <!-- Линия -->
                 <div style="height:2px; background:rgba(255,255,255,0.07); border-radius:2px;"></div>
-                <!-- Дата + осталось -->
                 <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.84em;">
                   <span class="omcard__future-date" style="color:#b0b0b0;"></span>
                   <span class="omcard__future-days" style="color:#f0a500; font-weight:500;"></span>
