@@ -16011,7 +16011,7 @@
               <div class="online-prestige__body">
                 <div class="online-prestige__head">
                   <div class="online-prestige__title omcard__future-title">{title}</div>
-                  <div class="online-prestige__time" style="color:#555;">00:00</div>
+                  <div class="online-prestige__time" style="color:#dbdbdb;">00:00</div>
                 </div>
                 <div style="height:2px; background:rgba(255,255,255,0.07); border-radius:2px; margin:6px 0;"></div>
                 <div class="online-prestige__footer" style="justify-content:space-between;">
