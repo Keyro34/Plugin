@@ -1263,11 +1263,18 @@
               if (isFuture) {
                 var daysLeft = Math.ceil((airDate - now) / 86400000);
                 if (daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
 
               component.append(fakeItem);
@@ -1337,11 +1344,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -1828,11 +1842,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -2878,11 +2899,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -3624,11 +3652,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -4065,11 +4100,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -4673,11 +4715,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -5419,11 +5468,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -5881,11 +5937,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -6636,11 +6699,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -7218,11 +7288,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -7773,11 +7850,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -8377,11 +8461,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -9100,11 +9191,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -9636,11 +9734,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -10148,11 +10253,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -10650,11 +10762,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -11110,11 +11229,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -11568,11 +11694,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -12211,11 +12344,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -12946,11 +13086,18 @@
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
-                  fakeItem.find('.online__days-left').text('Осталось дней: ' + _daysLeft);
-                  fakeItem.find('.online__days-row').css('display','block');
+                  fakeItem.find('.online__days-left')
+                      .text('Осталось дней: ' + _daysLeft)
+                      .css('display','block');
                 }
-                fakeItem.find('.online-prestige__img').css('opacity','0.75');
-                fakeItem.find('.online-prestige__time.online__time').css('color','#666');
+                // Длительность из TMDB (если известна)
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts).css('color','');
+              }
+              fakeItem.find('.online-prestige__img').css('opacity','0.75');
               }
               component.append(fakeItem);
             });
@@ -16002,16 +16149,23 @@
           item.find('.online__sep2').css('display','inline');
         }
 
-        // ── Осталось дней (только если ещё не вышел) ────────────
+        // ── Длительность (для будущих тоже, если известна) ────────
+        if (ep && ep.runtime && ep.runtime > 0) {
+          var h  = Math.floor(ep.runtime / 60);
+          var m  = ep.runtime % 60;
+          var ts = (h > 0 ? h + ':' : '00:') + (m < 10 ? '0' : '') + m;
+          item.find('.online-prestige__time.online__time').text(ts).css('color','');
+        }
+
+        // ── Осталось дней — справа в футере, белый ───────────────
         if (isFuture) {
           var dl = Math.ceil((airDate - now) / 86400000);
           if (dl > 0) {
-            item.find('.online__days-left').text('Осталось дней: ' + dl);
-            item.find('.online__days-row').css('display','block');
+            item.find('.online__days-left')
+                .text('Осталось дней: ' + dl)
+                .css('display','block');
           }
-          // Приглушаем карточку
-          item.find('.online-prestige__img').css('opacity','0.7');
-          item.find('.online-prestige__time.online__time').css('color','#666');
+          item.find('.online-prestige__img').css('opacity','0.75');
         }
       });
     }
@@ -16196,12 +16350,7 @@
         '    flex-shrink: 0;',
         '}',
 
-        /* ── Осталось дней ── */
-        '.online__days-row {',
-        '  font-size: 0.8em;',
-        '  color: #f0a500;',
-        '  font-weight: 500;',
-        '}',
+
 
         /* ── Будущий эпизод ── */
         '.omcard__future {',
@@ -16266,12 +16415,8 @@
                   <span class="online__sep2 online-prestige-split" style="display:none;">●</span>
                   <span class="online__studio">{info}</span>
                 </div>
-                <div class="online-prestige__quality"></div>
-              </div>
-
-              <!-- Осталось дней (только для будущих) -->
-              <div class="online__days-row" style="display:none;">
-                <span class="online__days-left"></span>
+                <!-- Осталось дней — справа в футере, белый -->
+                <div class="online__days-left" style="display:none; color:#ffffff; font-size:0.82em; font-weight:500; flex-shrink:0; white-space:nowrap;"></div>
               </div>
 
             </div>
