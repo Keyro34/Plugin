@@ -16504,6 +16504,25 @@
         '  line-height: 1;',
         '}',
 
+        /* ── Папка: книжный постер 2:3 ── */
+        '.online-prestige--folder .online-prestige__img {',
+        '  width: 72px !important;',
+        '  max-width: 72px !important;',
+        '  flex: 0 0 72px !important;',
+        '}',
+        '.online-prestige--folder .online-prestige__img::before {',
+        '  padding-top: 150% !important;',
+        '}',
+        '.online-prestige--folder .online-prestige__body {',
+        '  padding: 12px 14px !important;',
+        '}',
+        '.online-prestige--folder .online-prestige__title {',
+        '  white-space: normal !important;',
+        '  line-height: 1.3 !important;',
+        '  max-height: 2.6em !important;',
+        '  overflow: hidden !important;',
+        '}',
+
         /* ── Hover / focus ── */
         '.online-prestige.selector.focus {',
         '  background: linear-gradient(180deg,#252525 0%,#1a1a1a 100%);',
@@ -16559,61 +16578,32 @@
 
       // Папки (сезоны/похожие) — тоже с постером
       Lampa.Template.add('online_mod_folder', `
-          <div class="online selector" style="
-              border-radius: 12px;
-              overflow: hidden;
-              background: #1e1e1e;
-              box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-          ">
-              <div style="display: flex; align-items: stretch; min-height: 90px;">
+          <div class="online-prestige online-prestige--full online-prestige--folder selector" style="margin-bottom:10px;">
 
-                  <!-- ПОСТЕР — книжный формат слева -->
-                  <div style="
-                      width: 62px;
-                      flex-shrink: 0;
-                      background: #111;
-                      position: relative;
-                      overflow: hidden;
-                  ">
-                      <img src="{poster}"
-                           style="width: 100%; height: 100%; object-fit: cover; display: block;"
-                           onerror="this.style.display='none'; this.parentNode.style.background='#222';">
-                  </div>
+            <!-- Постер (книжный 2:3) -->
+            <div class="online-prestige__img" style="
+                flex: 0 0 auto !important;
+                width: 72px !important;
+                max-width: 72px !important;
+            ">
+              <img class="folder__poster" alt="" src="{poster}"
+                   onerror="this.style.opacity='0.1';"
+                   style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;font-size:1em!important;">
+              <!-- Убираем ::before для книжного соотношения 2:3 -->
+            </div>
 
-                  <!-- ИНФОРМАЦИЯ справа -->
-                  <div style="
-                      flex: 1;
-                      padding: 14px 16px;
-                      display: flex;
-                      flex-direction: column;
-                      justify-content: center;
-                      min-width: 0;
-                      border-left: 2px solid rgba(255,255,255,0.06);
-                  ">
-                      <div class="online__title" style="
-                          font-size: 1.08em;
-                          font-weight: 600;
-                          color: #f0f0f0;
-                          line-height: 1.35;
-                          margin-bottom: 6px;
-                          white-space: nowrap;
-                          overflow: hidden;
-                          text-overflow: ellipsis;
-                      ">{title}</div>
-
-                      <div class="online__quality" style="
-                          font-size: 0.9em;
-                          color: #888;
-                          display: flex;
-                          align-items: center;
-                          gap: 6px;
-                      ">
-                          <span style="color: #aaa;">{quality}</span>
-                          <span style="color: #555;">{info}</span>
-                      </div>
-                  </div>
-
+            <!-- Информация -->
+            <div class="online-prestige__body">
+              <div class="online-prestige__head">
+                <div class="online-prestige__title online__title" style="white-space:normal!important; line-height:1.3; max-height:2.6em; overflow:hidden;">{title}</div>
+                <div class="online-prestige__time" style="color:#888; font-size:0.85em;">{quality}</div>
               </div>
+              <div style="height:1px; background:rgba(255,255,255,0.07); margin:6px 0;"></div>
+              <div class="online-prestige__info" style="font-size:0.82em; color:#888;">
+                {info}
+              </div>
+            </div>
+
           </div>
       `);
     }
