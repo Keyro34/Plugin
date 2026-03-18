@@ -1114,7 +1114,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -1261,7 +1261,18 @@
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
 
-              // Осталось дней + приглушение
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               if (isFuture) {
                 var daysLeft = Math.ceil((airDate - now) / 86400000);
                 if (daysLeft > 0) {
@@ -1269,14 +1280,6 @@
                       .text('Осталось дней: ' + daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
 
               component.append(fakeItem);
@@ -1344,6 +1347,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -1352,14 +1367,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -1714,7 +1721,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -1844,6 +1851,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -1852,14 +1871,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -2777,7 +2788,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -2903,6 +2914,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -2911,14 +2934,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -3658,6 +3673,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -3666,14 +3693,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -4108,6 +4127,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -4116,14 +4147,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -4599,7 +4622,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -4725,6 +4748,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -4733,14 +4768,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -5377,7 +5404,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -5480,6 +5507,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -5488,14 +5527,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -5848,7 +5879,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -5951,6 +5982,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -5959,14 +6002,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -6589,7 +6624,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -6715,6 +6750,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -6723,14 +6770,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -7180,7 +7219,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -7306,6 +7345,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -7314,14 +7365,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -7744,7 +7787,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -7870,6 +7913,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -7878,14 +7933,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -8379,7 +8426,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -8483,6 +8530,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -8491,14 +8550,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -9111,7 +9162,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -9215,6 +9266,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -9223,14 +9286,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -9634,7 +9689,7 @@
 
           // Обогащаем карточку данными TMDB (still, рейтинг, дата, длительность)
           if (element.season && object.movie && object.movie.id) {
-            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons);
+            _tmdbEnrichEpisodeCard(item, object.movie.id, element.season, element.episode, !!object.movie.number_of_seasons, true);
           }
 
           if (viewed.indexOf(hash_file) !== -1) item.append('<div class="torrent-item__viewed">' + Lampa.Template.get('icon_star', {}, true) + '</div>');
@@ -9760,6 +9815,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -9768,14 +9835,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -10281,6 +10340,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -10289,14 +10360,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -10792,6 +10855,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -10800,14 +10875,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -11261,6 +11328,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -11269,14 +11348,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -11728,6 +11799,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -11736,14 +11819,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -12380,6 +12455,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -12388,14 +12475,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -13124,6 +13203,18 @@
                 var _st = fakeItem.find('.online__studio').text().trim();
                 if (_st && _st !== '') fakeItem.find('.online__sep2').css('display','inline');
               }
+              // Длительность из TMDB (если известна) — иначе остаётся 00:00
+              if (ep.runtime && ep.runtime > 0) {
+                var _h = Math.floor(ep.runtime / 60);
+                var _m = ep.runtime % 60;
+                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
+                fakeItem.find('.online-prestige__time.online__time').text(_ts);
+              }
+
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
               if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
@@ -13132,14 +13223,6 @@
                       .text('Осталось дней: ' + _daysLeft)
                       .css('display','block');
                 }
-                // Длительность из TMDB (если известна) — иначе остаётся 00:00
-              if (ep.runtime && ep.runtime > 0) {
-                var _h = Math.floor(ep.runtime / 60);
-                var _m = ep.runtime % 60;
-                var _ts = (_h > 0 ? _h + ':' : '00:') + (_m < 10 ? '0' : '') + _m;
-                fakeItem.find('.online-prestige__time.online__time').text(_ts);
-              }
-              fakeItem.css('opacity','0.5');
               }
               component.append(fakeItem);
             });
@@ -16144,7 +16227,7 @@
       xhr.send();
     }
 
-    function _tmdbEnrichEpisodeCard(item, tmdbId, seasonNum, epNum, isTV) {
+    function _tmdbEnrichEpisodeCard(item, tmdbId, seasonNum, epNum, isTV, fromSource) {
       if (!tmdbId || !seasonNum) return;
       _tmdbFetchSeason(tmdbId, seasonNum, isTV, function(eps) {
         var ep     = epNum ? eps[epNum] : null;
@@ -16203,14 +16286,18 @@
           item.find('.online-prestige__time.online__time').text(ts).css('color','');
         }
 
-        // ── Осталось дней — справа в футере, белый ───────────────
-        if (isFuture) {
+        // ── Осталось дней + затемнение ──────────────────────────
+        if (isFuture && !fromSource) {
+          // Будущий эпизод не из источника (добавлен из TMDB)
           var dl = Math.ceil((airDate - now) / 86400000);
           if (dl > 0) {
             item.find('.online__days-left')
                 .text('Осталось дней: ' + dl)
                 .css('display','block');
           }
+          item.css('opacity','0.5');
+        } else if (!fromSource && airDate) {
+          // Вышел но не в источнике — тоже затемняем
           item.css('opacity','0.5');
         }
       });
