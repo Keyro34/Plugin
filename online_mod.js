@@ -15012,13 +15012,9 @@
         var _tmdbCache = {};
 
         function _fetchTmdbPoster(title, origTitle, year, imgEl) {
-          // Приоритет: оригинальное название → русское
-          var titles = [];
-          if (origTitle && origTitle !== title) titles.push(origTitle);
-          titles.push(title);
-
           var cacheKey = (origTitle || title) + '|' + (year || '');
 
+          // Уже в кэше
           if (_tmdbCache[cacheKey]) {
             if (_tmdbCache[cacheKey] !== 'none' && _tmdbCache[cacheKey] !== 'loading') {
               imgEl.attr('src', _tmdbCache[cacheKey]);
@@ -15029,6 +15025,7 @@
 
           var apiKey = _tmdbApiKey;
 
+          // Выбираем лучший результат по году (если год известен)
           function pickBest(results) {
             if (!results || !results.length) return null;
             if (!year) return results[0];
@@ -15047,12 +15044,14 @@
             imgEl.attr('src', url);
           }
 
-          function searchOne(searchTitle, type, onFound, onEmpty) {
+          function searchOne(searchTitle, type, useYear, onFound, onEmpty) {
             var q = encodeURIComponent(searchTitle);
-            var yp = year ? '&year=' + year : '';
+            // С годом — точнее, без года — шире
+            var yp = (useYear && year) ? '&year=' + year : '';
+            var base = 'search/' + type + '?api_key=' + apiKey + '&language=ru&query=' + q + yp;
             var url = typeof Lampa.TMDB !== 'undefined'
-              ? Lampa.TMDB.api('search/' + type + '?api_key=' + apiKey + '&language=ru&query=' + q + yp)
-              : 'https://api.themoviedb.org/3/search/' + type + '?api_key=' + apiKey + '&language=ru&query=' + q + yp;
+              ? Lampa.TMDB.api(base)
+              : 'https://api.themoviedb.org/3/' + base;
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
             xhr.timeout = 8000;
@@ -15068,18 +15067,28 @@
             xhr.send();
           }
 
-          // Цепочка: origTitle/multi → origTitle/tv → origTitle/movie → ruTitle/multi → пусто
+          // Цепочка шагов: название × тип × (с годом / без года)
+          // Порядок: orig+год, orig без года, ru+год, ru без года — каждый через multi/tv/movie
+          var titles = [];
+          if (origTitle && origTitle !== title) titles.push(origTitle);
+          titles.push(title);
+
           var steps = [];
           titles.forEach(function(t) {
-            ['multi','tv','movie'].forEach(function(type) {
-              steps.push({ title: t, type: type });
+            if (year) {
+              ['multi','tv','movie'].forEach(function(tp) {
+                steps.push({ t: t, tp: tp, y: true });
+              });
+            }
+            ['multi','tv','movie'].forEach(function(tp) {
+              steps.push({ t: t, tp: tp, y: false });
             });
           });
 
           function runStep(i) {
             if (i >= steps.length) { _tmdbCache[cacheKey] = 'none'; return; }
             var s = steps[i];
-            searchOne(s.title, s.type, applyPoster, function() { runStep(i + 1); });
+            searchOne(s.t, s.tp, s.y, applyPoster, function() { runStep(i + 1); });
           }
           runStep(0);
         }
