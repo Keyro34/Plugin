@@ -16866,20 +16866,10 @@
                 <div class="online__days-left" style="display:none; color:#ffffff; font-size:0.82em; font-weight:500; flex-shrink:0; white-space:nowrap;"></div>
               </div>
 
-              <div class="online__days-row" style="display:none; font-size:0.82em; color:#f0a500; font-weight:500;">
-                <span class="online__days-left-text"></span>
-              </div>
-
             </div>
 
           </div>
       `);
-
-      // Скрываем блок с картинкой для карточек без эпизода (озвучки/переводы)
-      // и показываем простой стиль
-      Lampa.Template.filter('online_mod', function(html, data) {
-        return html;
-      });
 
       // Папки (сезоны/похожие) — тоже с постером
       Lampa.Template.add('online_mod_folder', `
