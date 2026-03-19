@@ -1080,11 +1080,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -1721,11 +1730,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -2818,11 +2836,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -3638,11 +3665,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -4093,11 +4129,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -4684,11 +4729,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -5496,11 +5550,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -6001,11 +6064,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -6776,11 +6848,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -7401,11 +7482,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -7999,11 +8089,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -8674,11 +8773,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -9440,11 +9548,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -9991,11 +10108,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -10584,11 +10710,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -11081,11 +11216,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -11576,11 +11720,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -12048,11 +12201,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -12674,11 +12836,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -13426,11 +13597,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -14275,11 +14455,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
+            // Гарантированно обновляем постер при каждом открытии
+            item.poster = '';
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
