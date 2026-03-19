@@ -1080,17 +1080,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -1104,7 +1107,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -1728,17 +1730,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -1752,7 +1757,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -2167,9 +2171,23 @@
 
               // Извлекаем индивидуальный постер из <img> внутри результата поиска
               var poster = '';
-              var imgEl = $('img', li);
-              if (imgEl.length) {
-                poster = imgEl.attr('src') || imgEl.attr('data-src') || imgEl.attr('data-original') || '';
+
+              if (object.movie) {
+                  if (object.movie.poster_path) {
+                      poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                  } else if (object.movie.poster) {
+                      poster = object.movie.poster;
+                  } else if (object.movie.background_image) {
+                      poster = object.movie.background_image;
+                  } else {
+                      // fallback на старый способ (если вдруг нет TMDB)
+                      var imgEl = $('img', li);
+                      if (imgEl.length) {
+                          poster = imgEl.attr('src') || 
+                                  imgEl.attr('data-src') || 
+                                  imgEl.attr('data-original') || '';
+                      }
+                  }
               }
 
               return {
@@ -2832,17 +2850,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -2856,7 +2877,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -3659,17 +3679,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -3683,7 +3706,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title, 'kinobase'].join('') : object.movie.original_title + element.quality + 'kinobase');
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -4121,17 +4143,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -4139,7 +4164,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title].join('') : object.movie.original_title + 'collaps');
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -4719,17 +4743,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -4743,7 +4770,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -5538,17 +5564,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -5562,7 +5591,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -6050,17 +6078,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -6074,7 +6105,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -6832,17 +6862,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -6856,7 +6889,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -7464,17 +7496,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -7488,7 +7523,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -8069,17 +8103,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -8093,7 +8130,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -8751,17 +8787,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -8769,7 +8808,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -9524,17 +9562,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -9542,7 +9583,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -10082,17 +10122,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -10106,7 +10149,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -10682,17 +10724,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -10700,7 +10745,6 @@
           var hash = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -11186,17 +11230,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -11204,7 +11251,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.data_id);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -11688,17 +11734,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -11706,7 +11755,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -12167,17 +12215,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -12185,7 +12236,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -12800,17 +12850,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -12824,7 +12877,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           element.template = item;
@@ -13559,17 +13611,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -13583,7 +13638,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -14415,17 +14469,20 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем при каждом открытии
             item.poster = '';
-            var _mov = object.movie || {};
-            if (_mov.poster_path) {
-                item.poster = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
-            } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0) {
-                item.poster = _mov.poster;
-            } else if (_mov.background_image) {
-                item.poster = _mov.background_image;
-            } else if (_mov.img) {
-                item.poster = _mov.img;
+
+            if (object.movie) {
+                if (object.movie.poster_path) {
+                    item.poster = 'https://image.tmdb.org/t/p/w342' + object.movie.poster_path;
+                } else if (object.movie.poster) {
+                    item.poster = object.movie.poster;
+                } else if (object.movie.background_image) {
+                    item.poster = object.movie.background_image;
+                } else if (object.movie.img) {
+                    item.poster = object.movie.img;
+                } else {
+                    item.poster = 'https://via.placeholder.com/300x450?text=No+Poster';
+                }
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -14433,7 +14490,6 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
-          item.find('img').first().attr('src', element.poster || '');
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
