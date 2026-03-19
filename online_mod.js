@@ -2157,17 +2157,6 @@
               }
             }
 
-            // Если есть только один результат и у нас есть TMDB id — доверяем ему
-            if (!is_sure && cards.length == 1 && !object.clarification) {
-              var _tmdbOrigTitle = object.movie.original_title || object.movie.original_name || '';
-              var _tmdbYear = parseInt((object.movie.release_date || object.movie.first_air_date || '').slice(0,4));
-              if (_tmdbOrigTitle && cards[0].orig_title) {
-                var _origMatch = component.containsAnyTitle([cards[0].orig_title], [_tmdbOrigTitle]);
-                var _yearMatch = !_tmdbYear || !cards[0].year || Math.abs(cards[0].year - _tmdbYear) <= 1;
-                if (_origMatch && _yearMatch) is_sure = true;
-              }
-            }
-
             if (cards.length == 1 && is_sure) getPage(cards[0].link);else if (items.length) {
               _this.wait_similars = true;
               items.forEach(function (c) {
@@ -3081,20 +3070,6 @@
                 if (select_title) {
                   is_sure |= component.equalTitle(cards[0].title, select_title);
                 }
-              }
-            }
-
-            // Автовыбор по оригинальному названию TMDB
-            if (!is_sure && cards.length >= 1 && !object.clarification) {
-              var _tmdbOrig = object.movie.original_title || object.movie.original_name || '';
-              var _tmdbYr = parseInt((object.movie.release_date || object.movie.first_air_date || '').slice(0,4));
-              if (_tmdbOrig) {
-                var _matched = cards.filter(function(c) {
-                  var _origOk = c.orig_title && component.containsAnyTitle([c.orig_title], [_tmdbOrig]);
-                  var _yearOk = !_tmdbYr || !c.year || Math.abs(c.year - _tmdbYr) <= 1;
-                  return _origOk && _yearOk;
-                });
-                if (_matched.length === 1) { is_sure = true; cards = _matched; }
               }
             }
 
@@ -6206,20 +6181,6 @@
                 if (select_title) {
                   is_sure |= component.equalAnyTitle([cards[0].title, cards[0].orig_title], [select_title]);
                 }
-              }
-            }
-
-            // Автовыбор по оригинальному названию TMDB
-            if (!is_sure && cards.length >= 1 && !object.clarification) {
-              var _tmdbOrig = object.movie.original_title || object.movie.original_name || '';
-              var _tmdbYr = parseInt((object.movie.release_date || object.movie.first_air_date || '').slice(0,4));
-              if (_tmdbOrig) {
-                var _matched = cards.filter(function(c) {
-                  var _origOk = c.orig_title && component.containsAnyTitle([c.orig_title], [_tmdbOrig]);
-                  var _yearOk = !_tmdbYr || !c.year || Math.abs(c.year - _tmdbYr) <= 1;
-                  return _origOk && _yearOk;
-                });
-                if (_matched.length === 1) { is_sure = true; cards = _matched; }
               }
             }
 
