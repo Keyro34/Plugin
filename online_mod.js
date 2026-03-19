@@ -1080,7 +1080,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -1105,6 +1105,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -1728,7 +1732,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -1753,6 +1757,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -2832,7 +2840,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -2857,6 +2865,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -3659,7 +3671,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -3684,6 +3696,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title, 'kinobase'].join('') : object.movie.original_title + element.quality + 'kinobase');
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -4121,7 +4137,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -4140,6 +4156,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title].join('') : object.movie.original_title + 'collaps');
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -4719,7 +4739,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -4744,6 +4764,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -5538,7 +5562,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -5563,6 +5587,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -6050,7 +6078,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -6075,6 +6103,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -6832,7 +6864,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -6857,6 +6889,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -7464,7 +7500,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -7489,6 +7525,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -8069,7 +8109,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -8094,6 +8134,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -8751,7 +8795,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -8770,6 +8814,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -9524,7 +9572,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -9543,6 +9591,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -10082,7 +10134,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -10107,6 +10159,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -10682,7 +10738,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -10701,6 +10757,10 @@
           var hash = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -11186,7 +11246,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -11205,6 +11265,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.data_id);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -11688,7 +11752,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -11707,6 +11771,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -12167,7 +12235,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -12186,6 +12254,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -12772,6 +12844,10 @@
 
             if (dst && dst.length) {
               var src = Lampa.Template.get('online_mod', element).find('.online__quality');
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
 
               if (src && src.length) {
                 if (Lampa.Timeline.details) {
@@ -12800,7 +12876,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -12825,6 +12901,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           element.template = item;
@@ -13559,7 +13639,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -13584,6 +13664,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -14415,7 +14499,7 @@
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            // Гарантированно обновляем постер при каждом открытии
+            // Гарантированно сбрасываем и обновляем постер при каждом открытии
             item.poster = '';
             if (object.movie) {
                 if (object.movie.poster_path) {
@@ -14434,6 +14518,10 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Гарантированно обновляем src изображения после рендера шаблона
+          if (element.poster) {
+            item.find('.online__still-img').attr('src', element.poster).css('opacity','1');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
