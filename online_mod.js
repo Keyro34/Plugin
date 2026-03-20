@@ -1078,23 +1078,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -1133,15 +1123,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -1729,23 +1729,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -1784,15 +1774,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -2836,23 +2836,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -2891,15 +2881,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -3666,23 +3666,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -4131,23 +4121,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -4732,23 +4712,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -4787,15 +4757,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -5554,23 +5534,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -5609,15 +5579,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -6069,23 +6049,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -6124,15 +6094,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -6854,23 +6834,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -6909,15 +6879,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -7489,23 +7469,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -7544,15 +7514,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -8097,23 +8077,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -8152,15 +8122,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -8782,23 +8762,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -8831,15 +8801,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -9558,23 +9538,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -9607,15 +9577,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -10119,23 +10099,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -10174,15 +10144,25 @@
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
             // Берём постер из объекта фильма Lampa
-            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                      object.movie.background_image || object.movie.img || '';
-            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
+            var _mp = '';
+            var _m = object.movie;
+            // Берём постер ТОЛЬКО из текущего фильма через poster_path
+            if (_m.poster_path) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
+            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
+              _mp = _m.poster;
+            } else if (_m.background_image) {
+              _mp = _m.background_image;
+            } else if (_m.img) {
+              _mp = _m.img;
             }
             if (_mp) {
               item.find('.online__still-img')
                   .attr('src', _mp)
                   .css('opacity','1');
+            } else {
+              // Постер не найден — скрываем блок с картинкой
+              item.find('.omcard__img').hide();
             }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
@@ -10722,23 +10702,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -11229,23 +11199,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -11734,23 +11694,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -12216,23 +12166,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -12852,23 +12792,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -13614,23 +13544,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
@@ -14473,23 +14393,13 @@
 
       function append(items) {
         component.reset();
-        // === ПОСТЕР: ставим только если контент совпадает ===
-        var _currentId = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+        // === ДОБАВЛЯЕМ ПОСТЕР ===
         items.forEach(function(item) {
-            if (item._posterOwner !== _currentId) {
-                // Другой фильм/сериал — обновляем постер из текущего
-                item.poster = '';
-                var _m = object.movie;
-                if (_m.poster_path) {
-                    item.poster = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-                } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-                    item.poster = _m.poster;
-                } else if (_m.background_image) {
-                    item.poster = _m.background_image;
-                } else if (_m.img) {
-                    item.poster = _m.img;
-                }
-                item._posterOwner = _currentId;
+            if (!item.poster || item.poster === '') {
+                item.poster = object.movie.poster || 
+                              object.movie.background_image || 
+                              object.movie.img || 
+                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
             }
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
