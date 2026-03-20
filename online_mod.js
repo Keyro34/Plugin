@@ -1132,7 +1132,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
@@ -1790,7 +1790,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
@@ -2904,7 +2904,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
@@ -4787,7 +4787,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
@@ -5616,7 +5616,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
@@ -6138,7 +6138,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
@@ -6930,7 +6930,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
@@ -7572,7 +7572,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
@@ -8187,7 +8187,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
@@ -8873,7 +8873,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
@@ -9656,7 +9656,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
@@ -10230,7 +10230,7 @@
             ).toString().trim();
 
             if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — убираем картинку
+              // IMDb не совпадает — это другой фильм, убираем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
