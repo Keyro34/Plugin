@@ -1098,6 +1098,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -1739,6 +1744,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -2836,6 +2846,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -3656,6 +3671,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title, 'kinobase'].join('') : object.movie.original_title + element.quality + 'kinobase');
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -4105,6 +4125,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.title].join('') : object.movie.original_title + 'collaps');
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -4702,6 +4727,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -5514,6 +5544,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -6019,6 +6054,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -6794,6 +6834,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -7419,6 +7464,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -8017,6 +8067,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -8686,6 +8741,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -9452,6 +9512,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -10009,6 +10074,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -10596,6 +10666,11 @@
           var hash = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(object.movie.original_title + page_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -11093,6 +11168,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title].join('') : object.movie.original_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.data_id);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -11588,6 +11668,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -12060,6 +12145,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -12692,6 +12782,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           element.template = item;
@@ -13444,6 +13539,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -14287,6 +14387,11 @@
           var hash = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title].join('') : object.movie.original_title + element.orig_title);
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
+          // Если не эпизод сериала - скрываем картинку
+          if (!element.season) {
+            item.find('.online-prestige__img').hide();
+            item.find('.online-prestige__body').css('padding-left', '16px');
+          }
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, element.orig_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.orig_title + element.title);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
@@ -16957,6 +17062,9 @@
         '  outline: 2px solid rgba(255,255,255,0.15);',
         '  outline-offset: -1px;',
         '}',
+        /* Карточка без картинки (озвучка/качество) */
+        '.omcard .online-prestige__img[style*="display: none"],'
+        '.omcard .online-prestige__img[style*="display:none"] { display:none!important; }',
       ].join('\n');
       document.head.appendChild(style);
     }
