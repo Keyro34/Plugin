@@ -1122,27 +1122,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -1773,27 +1810,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -2880,27 +2954,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -4756,27 +4867,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -5578,27 +5726,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -6093,27 +6278,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -6878,27 +7100,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -7513,27 +7772,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -8121,27 +8417,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -8800,27 +9133,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -9576,27 +9946,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -10143,27 +10550,64 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-            // Берём постер из объекта фильма Lampa
-            var _mp = '';
-            var _m = object.movie;
-            // Берём постер ТОЛЬКО из текущего фильма через poster_path
-            if (_m.poster_path) {
-              _mp = 'https://image.tmdb.org/t/p/w342' + _m.poster_path;
-            } else if (_m.poster && _m.poster.indexOf('via.placeholder') < 0) {
-              _mp = _m.poster;
-            } else if (_m.background_image) {
-              _mp = _m.background_image;
-            } else if (_m.img) {
-              _mp = _m.img;
-            }
-            if (_mp) {
-              item.find('.online__still-img')
-                  .attr('src', _mp)
-                  .css('opacity','1');
-            } else {
-              // Постер не найден — скрываем блок с картинкой
-              item.find('.omcard__img').hide();
-            }
+
+            // Ищем постер ТОЛЬКО для текущего фильма по его id/title
+            // Используем уникальный ключ текущего объекта
+            var _movieKey = (object.movie.id || '') + '|' + (object.movie.original_title || object.movie.title || '');
+            var _imgEl = item.find('.online__still-img');
+
+            // Сначала скрываем — покажем только когда найдём правильный постер
+            _imgEl.css('opacity', '0');
+
+            (function(_key, _img, _mov) {
+              // Если в глобальном кэше уже есть постер для этого фильма — сразу ставим
+              if (!window._moviePosterCache) window._moviePosterCache = {};
+
+              if (window._moviePosterCache[_key]) {
+                _img.attr('src', window._moviePosterCache[_key]).css('opacity', '1');
+                return;
+              }
+
+              // Строим URL постера из текущего object.movie
+              var _url = '';
+              if (_mov.poster_path) {
+                _url = 'https://image.tmdb.org/t/p/w342' + _mov.poster_path;
+              } else if (_mov.poster && _mov.poster.indexOf('placeholder') < 0 && _mov.poster.indexOf('://') !== -1) {
+                _url = _mov.poster;
+              } else if (_mov.background_image && _mov.background_image.indexOf('://') !== -1) {
+                _url = _mov.background_image;
+              } else if (_mov.img && _mov.img.indexOf('://') !== -1) {
+                _url = _mov.img;
+              }
+
+              if (_url) {
+                // Проверяем что картинка загружается (не старая)
+                window._moviePosterCache[_key] = _url;
+                _img.attr('src', _url).css('opacity', '1');
+              } else if (_mov.id) {
+                // Запрашиваем через TMDB API
+                var _type = _mov.number_of_seasons ? 'tv' : 'movie';
+                var _apiBase = typeof Lampa.TMDB !== 'undefined'
+                  ? Lampa.TMDB.api(_type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru')
+                  : 'https://api.themoviedb.org/3/' + _type + '/' + _mov.id + '?api_key=4ef0d7355d9ffb5151e987764708ce96&language=ru';
+                var _xhr = new XMLHttpRequest();
+                _xhr.open('GET', _apiBase, true);
+                _xhr.timeout = 8000;
+                _xhr.onload = function() {
+                  try {
+                    var _data = JSON.parse(_xhr.responseText);
+                    var _pp = _data.poster_path || '';
+                    if (_pp) {
+                      var _found = 'https://image.tmdb.org/t/p/w342' + _pp;
+                      window._moviePosterCache[_key] = _found;
+                      _img.attr('src', _found).css('opacity', '1');
+                    }
+                  } catch(e) {}
+                };
+                _xhr.send();
+              }
+            })(_movieKey, _imgEl, object.movie);
+
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
