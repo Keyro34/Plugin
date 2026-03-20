@@ -17062,9 +17062,6 @@
         '  outline: 2px solid rgba(255,255,255,0.15);',
         '  outline-offset: -1px;',
         '}',
-        /* Карточка без картинки (озвучка/качество) */
-        '.omcard .online-prestige__img[style*="display: none"],'
-        '.omcard .online-prestige__img[style*="display:none"] { display:none!important; }',
       ].join('\n');
       document.head.appendChild(style);
     }
