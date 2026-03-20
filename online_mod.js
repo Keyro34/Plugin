@@ -1078,15 +1078,35 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
-        });
+
+        // ── Данные текущего фильма ────────────────────────────────
+        var _curImdb  = (object.movie.imdb_id  || '').toString().trim();
+        var _curTitle = (object.movie.original_title || object.movie.title || object.movie.name || '').toLowerCase().trim();
+        var _curYear  = parseInt((object.movie.release_date || object.movie.first_air_date || '0').slice(0,4)) || 0;
+
+        // Правильный постер текущего фильма
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+
+        // ── Фильтрация: убираем нерелевантные элементы ───────────
+        if (_curImdb) {
+          // Если знаем imdb_id — оставляем только совпадающие или без imdb (fallback)
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true; // нет imdb — оставляем (fallback)
+            return _elImdb === _curImdb;
+          });
+        }
+
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -1107,52 +1127,41 @@
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
           }
 
-          // Синхронизируем наш прогресс-бар с данными просмотра
+          // Синхронизируем прогресс-бар
           if (view && view.percent) {
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
-          // ── Сериал или фильм ────────────────────────────────────
+          // ── Сериал или фильм ──────────────────────────────────────
           var _isEpisode = !!(element.season || element.episode);
           if (_isEpisode) {
-            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            // Эпизод сериала: номер поверх скриншота 16:9
             item.find('.omcard__epnum').text(element.episode || '');
             item.find('.omcard__img').addClass('omcard__img--episode');
           } else {
-            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            // Фильм/озвучка: книжный постер 2:3
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
 
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
+            // Проверяем релевантность постера через imdb_id
+            var _elImdb = ((element.media && element.media.imdb_id) || element.imdb_id || '').toString().trim();
+            var _imdbMatch = !_curImdb || !_elImdb || (_curImdb === _elImdb);
 
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
+            if (_imdbMatch && _curPoster) {
+              // Постер актуален — показываем
+              item.find('.online__still-img')
+                  .attr('src', _curPoster)
+                  .css('opacity', '1');
+            } else if (!_imdbMatch) {
+              // Не совпадает — скрываем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
             }
 
-            // Название озвучки вместо title фильма
+            // Название озвучки
             var _voiceTitle = element.title || '';
-            var _filmTitle = object.movie.title || object.movie.name || '';
+            var _filmTitle  = object.movie.title || object.movie.name || '';
             if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
               item.find('.online-prestige__title.online__title').text(_voiceTitle);
             }
@@ -1736,15 +1745,35 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
-        });
+
+        // ── Данные текущего фильма ────────────────────────────────
+        var _curImdb  = (object.movie.imdb_id  || '').toString().trim();
+        var _curTitle = (object.movie.original_title || object.movie.title || object.movie.name || '').toLowerCase().trim();
+        var _curYear  = parseInt((object.movie.release_date || object.movie.first_air_date || '0').slice(0,4)) || 0;
+
+        // Правильный постер текущего фильма
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+
+        // ── Фильтрация: убираем нерелевантные элементы ───────────
+        if (_curImdb) {
+          // Если знаем imdb_id — оставляем только совпадающие или без imdb (fallback)
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true; // нет imdb — оставляем (fallback)
+            return _elImdb === _curImdb;
+          });
+        }
+
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -1765,52 +1794,41 @@
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
           }
 
-          // Синхронизируем наш прогресс-бар с данными просмотра
+          // Синхронизируем прогресс-бар
           if (view && view.percent) {
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
-          // ── Сериал или фильм ────────────────────────────────────
+          // ── Сериал или фильм ──────────────────────────────────────
           var _isEpisode = !!(element.season || element.episode);
           if (_isEpisode) {
-            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            // Эпизод сериала: номер поверх скриншота 16:9
             item.find('.omcard__epnum').text(element.episode || '');
             item.find('.omcard__img').addClass('omcard__img--episode');
           } else {
-            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            // Фильм/озвучка: книжный постер 2:3
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
 
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
+            // Проверяем релевантность постера через imdb_id
+            var _elImdb = ((element.media && element.media.imdb_id) || element.imdb_id || '').toString().trim();
+            var _imdbMatch = !_curImdb || !_elImdb || (_curImdb === _elImdb);
 
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
+            if (_imdbMatch && _curPoster) {
+              // Постер актуален — показываем
+              item.find('.online__still-img')
+                  .attr('src', _curPoster)
+                  .css('opacity', '1');
+            } else if (!_imdbMatch) {
+              // Не совпадает — скрываем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
             }
 
-            // Название озвучки вместо title фильма
+            // Название озвучки
             var _voiceTitle = element.title || '';
-            var _filmTitle = object.movie.title || object.movie.name || '';
+            var _filmTitle  = object.movie.title || object.movie.name || '';
             if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
               item.find('.online-prestige__title.online__title').text(_voiceTitle);
             }
@@ -2850,15 +2868,35 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
-        });
+
+        // ── Данные текущего фильма ────────────────────────────────
+        var _curImdb  = (object.movie.imdb_id  || '').toString().trim();
+        var _curTitle = (object.movie.original_title || object.movie.title || object.movie.name || '').toLowerCase().trim();
+        var _curYear  = parseInt((object.movie.release_date || object.movie.first_air_date || '0').slice(0,4)) || 0;
+
+        // Правильный постер текущего фильма
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+
+        // ── Фильтрация: убираем нерелевантные элементы ───────────
+        if (_curImdb) {
+          // Если знаем imdb_id — оставляем только совпадающие или без imdb (fallback)
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true; // нет imdb — оставляем (fallback)
+            return _elImdb === _curImdb;
+          });
+        }
+
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -2879,52 +2917,41 @@
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
           }
 
-          // Синхронизируем наш прогресс-бар с данными просмотра
+          // Синхронизируем прогресс-бар
           if (view && view.percent) {
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
-          // ── Сериал или фильм ────────────────────────────────────
+          // ── Сериал или фильм ──────────────────────────────────────
           var _isEpisode = !!(element.season || element.episode);
           if (_isEpisode) {
-            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            // Эпизод сериала: номер поверх скриншота 16:9
             item.find('.omcard__epnum').text(element.episode || '');
             item.find('.omcard__img').addClass('omcard__img--episode');
           } else {
-            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            // Фильм/озвучка: книжный постер 2:3
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
 
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
+            // Проверяем релевантность постера через imdb_id
+            var _elImdb = ((element.media && element.media.imdb_id) || element.imdb_id || '').toString().trim();
+            var _imdbMatch = !_curImdb || !_elImdb || (_curImdb === _elImdb);
 
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
+            if (_imdbMatch && _curPoster) {
+              // Постер актуален — показываем
+              item.find('.online__still-img')
+                  .attr('src', _curPoster)
+                  .css('opacity', '1');
+            } else if (!_imdbMatch) {
+              // Не совпадает — скрываем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
             }
 
-            // Название озвучки вместо title фильма
+            // Название озвучки
             var _voiceTitle = element.title || '';
-            var _filmTitle = object.movie.title || object.movie.name || '';
+            var _filmTitle  = object.movie.title || object.movie.name || '';
             if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
               item.find('.online-prestige__title.online__title').text(_voiceTitle);
             }
@@ -3687,14 +3714,29 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        // === ПОСТЕР: всегда берём актуальный из текущего фильма ===
+        var _curImdb = (object.movie.imdb_id || '').toString().trim();
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+        // Фильтрация по imdb_id если известен
+        if (_curImdb) {
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true;
+            return _elImdb === _curImdb;
+          });
+        }
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
+          item.poster = _curPoster;
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -4142,14 +4184,29 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        // === ПОСТЕР: всегда берём актуальный из текущего фильма ===
+        var _curImdb = (object.movie.imdb_id || '').toString().trim();
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+        // Фильтрация по imdb_id если известен
+        if (_curImdb) {
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true;
+            return _elImdb === _curImdb;
+          });
+        }
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
+          item.poster = _curPoster;
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -4733,15 +4790,35 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
-        });
+
+        // ── Данные текущего фильма ────────────────────────────────
+        var _curImdb  = (object.movie.imdb_id  || '').toString().trim();
+        var _curTitle = (object.movie.original_title || object.movie.title || object.movie.name || '').toLowerCase().trim();
+        var _curYear  = parseInt((object.movie.release_date || object.movie.first_air_date || '0').slice(0,4)) || 0;
+
+        // Правильный постер текущего фильма
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+
+        // ── Фильтрация: убираем нерелевантные элементы ───────────
+        if (_curImdb) {
+          // Если знаем imdb_id — оставляем только совпадающие или без imdb (fallback)
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true; // нет imdb — оставляем (fallback)
+            return _elImdb === _curImdb;
+          });
+        }
+
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -4762,52 +4839,41 @@
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
           }
 
-          // Синхронизируем наш прогресс-бар с данными просмотра
+          // Синхронизируем прогресс-бар
           if (view && view.percent) {
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
-          // ── Сериал или фильм ────────────────────────────────────
+          // ── Сериал или фильм ──────────────────────────────────────
           var _isEpisode = !!(element.season || element.episode);
           if (_isEpisode) {
-            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            // Эпизод сериала: номер поверх скриншота 16:9
             item.find('.omcard__epnum').text(element.episode || '');
             item.find('.omcard__img').addClass('omcard__img--episode');
           } else {
-            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            // Фильм/озвучка: книжный постер 2:3
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
 
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
+            // Проверяем релевантность постера через imdb_id
+            var _elImdb = ((element.media && element.media.imdb_id) || element.imdb_id || '').toString().trim();
+            var _imdbMatch = !_curImdb || !_elImdb || (_curImdb === _elImdb);
 
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
+            if (_imdbMatch && _curPoster) {
+              // Постер актуален — показываем
+              item.find('.online__still-img')
+                  .attr('src', _curPoster)
+                  .css('opacity', '1');
+            } else if (!_imdbMatch) {
+              // Не совпадает — скрываем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
             }
 
-            // Название озвучки вместо title фильма
+            // Название озвучки
             var _voiceTitle = element.title || '';
-            var _filmTitle = object.movie.title || object.movie.name || '';
+            var _filmTitle  = object.movie.title || object.movie.name || '';
             if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
               item.find('.online-prestige__title.online__title').text(_voiceTitle);
             }
@@ -5562,15 +5628,35 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
-        });
+
+        // ── Данные текущего фильма ────────────────────────────────
+        var _curImdb  = (object.movie.imdb_id  || '').toString().trim();
+        var _curTitle = (object.movie.original_title || object.movie.title || object.movie.name || '').toLowerCase().trim();
+        var _curYear  = parseInt((object.movie.release_date || object.movie.first_air_date || '0').slice(0,4)) || 0;
+
+        // Правильный постер текущего фильма
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+
+        // ── Фильтрация: убираем нерелевантные элементы ───────────
+        if (_curImdb) {
+          // Если знаем imdb_id — оставляем только совпадающие или без imdb (fallback)
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true; // нет imdb — оставляем (fallback)
+            return _elImdb === _curImdb;
+          });
+        }
+
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -5591,52 +5677,41 @@
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
           }
 
-          // Синхронизируем наш прогресс-бар с данными просмотра
+          // Синхронизируем прогресс-бар
           if (view && view.percent) {
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
-          // ── Сериал или фильм ────────────────────────────────────
+          // ── Сериал или фильм ──────────────────────────────────────
           var _isEpisode = !!(element.season || element.episode);
           if (_isEpisode) {
-            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            // Эпизод сериала: номер поверх скриншота 16:9
             item.find('.omcard__epnum').text(element.episode || '');
             item.find('.omcard__img').addClass('omcard__img--episode');
           } else {
-            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            // Фильм/озвучка: книжный постер 2:3
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
 
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
+            // Проверяем релевантность постера через imdb_id
+            var _elImdb = ((element.media && element.media.imdb_id) || element.imdb_id || '').toString().trim();
+            var _imdbMatch = !_curImdb || !_elImdb || (_curImdb === _elImdb);
 
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
+            if (_imdbMatch && _curPoster) {
+              // Постер актуален — показываем
+              item.find('.online__still-img')
+                  .attr('src', _curPoster)
+                  .css('opacity', '1');
+            } else if (!_imdbMatch) {
+              // Не совпадает — скрываем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
             }
 
-            // Название озвучки вместо title фильма
+            // Название озвучки
             var _voiceTitle = element.title || '';
-            var _filmTitle = object.movie.title || object.movie.name || '';
+            var _filmTitle  = object.movie.title || object.movie.name || '';
             if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
               item.find('.online-prestige__title.online__title').text(_voiceTitle);
             }
@@ -6084,15 +6159,35 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
-        });
+
+        // ── Данные текущего фильма ────────────────────────────────
+        var _curImdb  = (object.movie.imdb_id  || '').toString().trim();
+        var _curTitle = (object.movie.original_title || object.movie.title || object.movie.name || '').toLowerCase().trim();
+        var _curYear  = parseInt((object.movie.release_date || object.movie.first_air_date || '0').slice(0,4)) || 0;
+
+        // Правильный постер текущего фильма
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+
+        // ── Фильтрация: убираем нерелевантные элементы ───────────
+        if (_curImdb) {
+          // Если знаем imdb_id — оставляем только совпадающие или без imdb (fallback)
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true; // нет imdb — оставляем (fallback)
+            return _elImdb === _curImdb;
+          });
+        }
+
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -6113,52 +6208,41 @@
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
           }
 
-          // Синхронизируем наш прогресс-бар с данными просмотра
+          // Синхронизируем прогресс-бар
           if (view && view.percent) {
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
-          // ── Сериал или фильм ────────────────────────────────────
+          // ── Сериал или фильм ──────────────────────────────────────
           var _isEpisode = !!(element.season || element.episode);
           if (_isEpisode) {
-            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            // Эпизод сериала: номер поверх скриншота 16:9
             item.find('.omcard__epnum').text(element.episode || '');
             item.find('.omcard__img').addClass('omcard__img--episode');
           } else {
-            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            // Фильм/озвучка: книжный постер 2:3
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
 
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
+            // Проверяем релевантность постера через imdb_id
+            var _elImdb = ((element.media && element.media.imdb_id) || element.imdb_id || '').toString().trim();
+            var _imdbMatch = !_curImdb || !_elImdb || (_curImdb === _elImdb);
 
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
+            if (_imdbMatch && _curPoster) {
+              // Постер актуален — показываем
+              item.find('.online__still-img')
+                  .attr('src', _curPoster)
+                  .css('opacity', '1');
+            } else if (!_imdbMatch) {
+              // Не совпадает — скрываем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
             }
 
-            // Название озвучки вместо title фильма
+            // Название озвучки
             var _voiceTitle = element.title || '';
-            var _filmTitle = object.movie.title || object.movie.name || '';
+            var _filmTitle  = object.movie.title || object.movie.name || '';
             if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
               item.find('.online-prestige__title.online__title').text(_voiceTitle);
             }
@@ -6876,15 +6960,35 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
-        });
+
+        // ── Данные текущего фильма ────────────────────────────────
+        var _curImdb  = (object.movie.imdb_id  || '').toString().trim();
+        var _curTitle = (object.movie.original_title || object.movie.title || object.movie.name || '').toLowerCase().trim();
+        var _curYear  = parseInt((object.movie.release_date || object.movie.first_air_date || '0').slice(0,4)) || 0;
+
+        // Правильный постер текущего фильма
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+
+        // ── Фильтрация: убираем нерелевантные элементы ───────────
+        if (_curImdb) {
+          // Если знаем imdb_id — оставляем только совпадающие или без imdb (fallback)
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true; // нет imdb — оставляем (fallback)
+            return _elImdb === _curImdb;
+          });
+        }
+
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -6905,52 +7009,41 @@
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
           }
 
-          // Синхронизируем наш прогресс-бар с данными просмотра
+          // Синхронизируем прогресс-бар
           if (view && view.percent) {
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
-          // ── Сериал или фильм ────────────────────────────────────
+          // ── Сериал или фильм ──────────────────────────────────────
           var _isEpisode = !!(element.season || element.episode);
           if (_isEpisode) {
-            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            // Эпизод сериала: номер поверх скриншота 16:9
             item.find('.omcard__epnum').text(element.episode || '');
             item.find('.omcard__img').addClass('omcard__img--episode');
           } else {
-            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            // Фильм/озвучка: книжный постер 2:3
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
 
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
+            // Проверяем релевантность постера через imdb_id
+            var _elImdb = ((element.media && element.media.imdb_id) || element.imdb_id || '').toString().trim();
+            var _imdbMatch = !_curImdb || !_elImdb || (_curImdb === _elImdb);
 
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
+            if (_imdbMatch && _curPoster) {
+              // Постер актуален — показываем
+              item.find('.online__still-img')
+                  .attr('src', _curPoster)
+                  .css('opacity', '1');
+            } else if (!_imdbMatch) {
+              // Не совпадает — скрываем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
             }
 
-            // Название озвучки вместо title фильма
+            // Название озвучки
             var _voiceTitle = element.title || '';
-            var _filmTitle = object.movie.title || object.movie.name || '';
+            var _filmTitle  = object.movie.title || object.movie.name || '';
             if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
               item.find('.online-prestige__title.online__title').text(_voiceTitle);
             }
@@ -7518,15 +7611,35 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
-        });
+
+        // ── Данные текущего фильма ────────────────────────────────
+        var _curImdb  = (object.movie.imdb_id  || '').toString().trim();
+        var _curTitle = (object.movie.original_title || object.movie.title || object.movie.name || '').toLowerCase().trim();
+        var _curYear  = parseInt((object.movie.release_date || object.movie.first_air_date || '0').slice(0,4)) || 0;
+
+        // Правильный постер текущего фильма
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+
+        // ── Фильтрация: убираем нерелевантные элементы ───────────
+        if (_curImdb) {
+          // Если знаем imdb_id — оставляем только совпадающие или без imdb (fallback)
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true; // нет imdb — оставляем (fallback)
+            return _elImdb === _curImdb;
+          });
+        }
+
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -7547,52 +7660,41 @@
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
           }
 
-          // Синхронизируем наш прогресс-бар с данными просмотра
+          // Синхронизируем прогресс-бар
           if (view && view.percent) {
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
-          // ── Сериал или фильм ────────────────────────────────────
+          // ── Сериал или фильм ──────────────────────────────────────
           var _isEpisode = !!(element.season || element.episode);
           if (_isEpisode) {
-            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            // Эпизод сериала: номер поверх скриншота 16:9
             item.find('.omcard__epnum').text(element.episode || '');
             item.find('.omcard__img').addClass('omcard__img--episode');
           } else {
-            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            // Фильм/озвучка: книжный постер 2:3
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
 
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
+            // Проверяем релевантность постера через imdb_id
+            var _elImdb = ((element.media && element.media.imdb_id) || element.imdb_id || '').toString().trim();
+            var _imdbMatch = !_curImdb || !_elImdb || (_curImdb === _elImdb);
 
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
+            if (_imdbMatch && _curPoster) {
+              // Постер актуален — показываем
+              item.find('.online__still-img')
+                  .attr('src', _curPoster)
+                  .css('opacity', '1');
+            } else if (!_imdbMatch) {
+              // Не совпадает — скрываем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
             }
 
-            // Название озвучки вместо title фильма
+            // Название озвучки
             var _voiceTitle = element.title || '';
-            var _filmTitle = object.movie.title || object.movie.name || '';
+            var _filmTitle  = object.movie.title || object.movie.name || '';
             if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
               item.find('.online-prestige__title.online__title').text(_voiceTitle);
             }
@@ -8133,15 +8235,35 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
-        });
+
+        // ── Данные текущего фильма ────────────────────────────────
+        var _curImdb  = (object.movie.imdb_id  || '').toString().trim();
+        var _curTitle = (object.movie.original_title || object.movie.title || object.movie.name || '').toLowerCase().trim();
+        var _curYear  = parseInt((object.movie.release_date || object.movie.first_air_date || '0').slice(0,4)) || 0;
+
+        // Правильный постер текущего фильма
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+
+        // ── Фильтрация: убираем нерелевантные элементы ───────────
+        if (_curImdb) {
+          // Если знаем imdb_id — оставляем только совпадающие или без imdb (fallback)
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true; // нет imdb — оставляем (fallback)
+            return _elImdb === _curImdb;
+          });
+        }
+
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -8162,52 +8284,41 @@
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
           }
 
-          // Синхронизируем наш прогресс-бар с данными просмотра
+          // Синхронизируем прогресс-бар
           if (view && view.percent) {
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
-          // ── Сериал или фильм ────────────────────────────────────
+          // ── Сериал или фильм ──────────────────────────────────────
           var _isEpisode = !!(element.season || element.episode);
           if (_isEpisode) {
-            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            // Эпизод сериала: номер поверх скриншота 16:9
             item.find('.omcard__epnum').text(element.episode || '');
             item.find('.omcard__img').addClass('omcard__img--episode');
           } else {
-            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            // Фильм/озвучка: книжный постер 2:3
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
 
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
+            // Проверяем релевантность постера через imdb_id
+            var _elImdb = ((element.media && element.media.imdb_id) || element.imdb_id || '').toString().trim();
+            var _imdbMatch = !_curImdb || !_elImdb || (_curImdb === _elImdb);
 
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
+            if (_imdbMatch && _curPoster) {
+              // Постер актуален — показываем
+              item.find('.online__still-img')
+                  .attr('src', _curPoster)
+                  .css('opacity', '1');
+            } else if (!_imdbMatch) {
+              // Не совпадает — скрываем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
             }
 
-            // Название озвучки вместо title фильма
+            // Название озвучки
             var _voiceTitle = element.title || '';
-            var _filmTitle = object.movie.title || object.movie.name || '';
+            var _filmTitle  = object.movie.title || object.movie.name || '';
             if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
               item.find('.online-prestige__title.online__title').text(_voiceTitle);
             }
@@ -8825,14 +8936,29 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        // === ПОСТЕР: всегда берём актуальный из текущего фильма ===
+        var _curImdb = (object.movie.imdb_id || '').toString().trim();
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+        // Фильтрация по imdb_id если известен
+        if (_curImdb) {
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true;
+            return _elImdb === _curImdb;
+          });
+        }
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
+          item.poster = _curPoster;
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -8863,34 +8989,17 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
-
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
-              item.find('.online__still-img')
-                  .attr('src', '')
-                  .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -9608,14 +9717,29 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        // === ПОСТЕР: всегда берём актуальный из текущего фильма ===
+        var _curImdb = (object.movie.imdb_id || '').toString().trim();
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+        // Фильтрация по imdb_id если известен
+        if (_curImdb) {
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true;
+            return _elImdb === _curImdb;
+          });
+        }
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
+          item.poster = _curPoster;
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -9646,34 +9770,17 @@
             // Фильм/озвучка: книжный постер 2:3, номер не нужен
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
-
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
-
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
-              item.find('.online__still-img')
-                  .attr('src', '')
-                  .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
+            // Берём постер из объекта фильма Lampa
+            var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
+                      object.movie.background_image || object.movie.img || '';
+            if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
+              _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
             }
-
+            if (_mp) {
+              item.find('.online__still-img')
+                  .attr('src', _mp)
+                  .css('opacity','1');
+            }
             // Название озвучки вместо title фильма
             var _voiceTitle = element.title || '';
             var _filmTitle = object.movie.title || object.movie.name || '';
@@ -10176,15 +10283,35 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
-        items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
-        });
+
+        // ── Данные текущего фильма ────────────────────────────────
+        var _curImdb  = (object.movie.imdb_id  || '').toString().trim();
+        var _curTitle = (object.movie.original_title || object.movie.title || object.movie.name || '').toLowerCase().trim();
+        var _curYear  = parseInt((object.movie.release_date || object.movie.first_air_date || '0').slice(0,4)) || 0;
+
+        // Правильный постер текущего фильма
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+
+        // ── Фильтрация: убираем нерелевантные элементы ───────────
+        if (_curImdb) {
+          // Если знаем imdb_id — оставляем только совпадающие или без imdb (fallback)
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true; // нет imdb — оставляем (fallback)
+            return _elImdb === _curImdb;
+          });
+        }
+
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
         items.forEach(function (element) {
@@ -10205,52 +10332,41 @@
             item.find('.online__quality').append(Lampa.Timeline.details(view, ' / '));
           }
 
-          // Синхронизируем наш прогресс-бар с данными просмотра
+          // Синхронизируем прогресс-бар
           if (view && view.percent) {
             item.find('.online__progress-bar').css('width', Math.min(100, view.percent * 100) + '%');
           }
 
-          // ── Сериал или фильм ────────────────────────────────────
+          // ── Сериал или фильм ──────────────────────────────────────
           var _isEpisode = !!(element.season || element.episode);
           if (_isEpisode) {
-            // Сериал: номер эпизода поверх скриншота, пропорция 16:9
+            // Эпизод сериала: номер поверх скриншота 16:9
             item.find('.omcard__epnum').text(element.episode || '');
             item.find('.omcard__img').addClass('omcard__img--episode');
           } else {
-            // Фильм/озвучка: книжный постер 2:3, номер не нужен
+            // Фильм/озвучка: книжный постер 2:3
             item.find('.omcard__img').addClass('omcard__img--movie');
             item.find('.omcard__epnum').hide();
 
-            // Сравниваем IMDb текущего фильма с IMDb из источника
-            var currentImdb = (object.movie.imdb_id || '').toString().trim();
-            var elementImdb = (
-              (element.media && element.media.imdb_id) ||
-              element.imdb_id ||
-              ''
-            ).toString().trim();
+            // Проверяем релевантность постера через imdb_id
+            var _elImdb = ((element.media && element.media.imdb_id) || element.imdb_id || '').toString().trim();
+            var _imdbMatch = !_curImdb || !_elImdb || (_curImdb === _elImdb);
 
-            if (currentImdb && elementImdb && currentImdb !== elementImdb) {
-              // IMDb не совпадает — это другой фильм, убираем картинку
+            if (_imdbMatch && _curPoster) {
+              // Постер актуален — показываем
+              item.find('.online__still-img')
+                  .attr('src', _curPoster)
+                  .css('opacity', '1');
+            } else if (!_imdbMatch) {
+              // Не совпадает — скрываем картинку
               item.find('.online__still-img')
                   .attr('src', '')
                   .css('opacity', '0');
-            } else {
-              // IMDb совпал или неизвестен — показываем постер
-              var _mp = element.poster || object.movie.poster || object.movie.poster_path ||
-                        object.movie.background_image || object.movie.img || '';
-              if (_mp && _mp.charAt(0) === '/' && _mp.indexOf('://') === -1) {
-                _mp = 'https://image.tmdb.org/t/p/w342' + _mp;
-              }
-              if (_mp) {
-                item.find('.online__still-img')
-                    .attr('src', _mp)
-                    .css('opacity', '1');
-              }
             }
 
-            // Название озвучки вместо title фильма
+            // Название озвучки
             var _voiceTitle = element.title || '';
-            var _filmTitle = object.movie.title || object.movie.name || '';
+            var _filmTitle  = object.movie.title || object.movie.name || '';
             if (_voiceTitle && _filmTitle && _voiceTitle !== _filmTitle) {
               item.find('.online-prestige__title.online__title').text(_voiceTitle);
             }
@@ -10786,14 +10902,29 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        // === ПОСТЕР: всегда берём актуальный из текущего фильма ===
+        var _curImdb = (object.movie.imdb_id || '').toString().trim();
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+        // Фильтрация по imdb_id если известен
+        if (_curImdb) {
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true;
+            return _elImdb === _curImdb;
+          });
+        }
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
+          item.poster = _curPoster;
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -11283,14 +11414,29 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        // === ПОСТЕР: всегда берём актуальный из текущего фильма ===
+        var _curImdb = (object.movie.imdb_id || '').toString().trim();
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+        // Фильтрация по imdb_id если известен
+        if (_curImdb) {
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true;
+            return _elImdb === _curImdb;
+          });
+        }
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
+          item.poster = _curPoster;
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -11778,14 +11924,29 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        // === ПОСТЕР: всегда берём актуальный из текущего фильма ===
+        var _curImdb = (object.movie.imdb_id || '').toString().trim();
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+        // Фильтрация по imdb_id если известен
+        if (_curImdb) {
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true;
+            return _elImdb === _curImdb;
+          });
+        }
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
+          item.poster = _curPoster;
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -12250,14 +12411,29 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        // === ПОСТЕР: всегда берём актуальный из текущего фильма ===
+        var _curImdb = (object.movie.imdb_id || '').toString().trim();
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+        // Фильтрация по imdb_id если известен
+        if (_curImdb) {
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true;
+            return _elImdb === _curImdb;
+          });
+        }
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
+          item.poster = _curPoster;
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
@@ -12876,14 +13052,29 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        // === ПОСТЕР: всегда берём актуальный из текущего фильма ===
+        var _curImdb = (object.movie.imdb_id || '').toString().trim();
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+        // Фильтрация по imdb_id если известен
+        if (_curImdb) {
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true;
+            return _elImdb === _curImdb;
+          });
+        }
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
+          item.poster = _curPoster;
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -13628,14 +13819,29 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        // === ПОСТЕР: всегда берём актуальный из текущего фильма ===
+        var _curImdb = (object.movie.imdb_id || '').toString().trim();
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+        // Фильтрация по imdb_id если известен
+        if (_curImdb) {
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true;
+            return _elImdb === _curImdb;
+          });
+        }
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
+          item.poster = _curPoster;
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         var last_episode = component.getLastEpisode(items);
@@ -14477,14 +14683,29 @@
 
       function append(items) {
         component.reset();
-        // === ДОБАВЛЯЕМ ПОСТЕР ===
+        // === ПОСТЕР: всегда берём актуальный из текущего фильма ===
+        var _curImdb = (object.movie.imdb_id || '').toString().trim();
+        var _curPoster = '';
+        var _cm = object.movie;
+        if (_cm.poster_path) {
+          _curPoster = 'https://image.tmdb.org/t/p/w342' + _cm.poster_path;
+        } else if (_cm.poster && _cm.poster.indexOf('placeholder') < 0 && _cm.poster.indexOf('://') !== -1) {
+          _curPoster = _cm.poster;
+        } else if (_cm.background_image) {
+          _curPoster = _cm.background_image;
+        } else if (_cm.img) {
+          _curPoster = _cm.img;
+        }
+        // Фильтрация по imdb_id если известен
+        if (_curImdb) {
+          items = items.filter(function(el) {
+            var _elImdb = ((el.media && el.media.imdb_id) || el.imdb_id || '').toString().trim();
+            if (!_elImdb) return true;
+            return _elImdb === _curImdb;
+          });
+        }
         items.forEach(function(item) {
-            if (!item.poster || item.poster === '') {
-                item.poster = object.movie.poster || 
-                              object.movie.background_image || 
-                              object.movie.img || 
-                              'https://via.placeholder.com/64x96/1a1a1a/ffffff?text=Нет+постера';
-            }
+          item.poster = _curPoster;
         });
         var viewed = Lampa.Storage.cache('online_view', 5000, []);
         items.forEach(function (element) {
