@@ -15522,11 +15522,14 @@
         if (json.length === 1) {
           var _autoElem = json[0];
           var _autoYear = _autoElem.start_date || _autoElem.year || '';
+          // Помечаем как similars-переход — источник использует это для прямого открытия
+          _autoElem.is_similars = true;
           _this5.activity.loader(true);
           _this5.reset();
           object.search = _autoElem.title || _autoElem.ru_title || _autoElem.nameRu || _autoElem.en_title || _autoElem.nameEn || _autoElem.orig_title || _autoElem.nameOriginal;
           object.search_date = _autoYear;
           selected_id = _autoElem.id;
+          _this5.wait_similars = true;
           _this5.extendChoice();
           sources[balanser].search(object, _autoElem.kp_id || _autoElem.kinopoisk_id || _autoElem.kinopoiskId || _autoElem.filmId || _autoElem.imdb_id, [_autoElem]);
           return;
