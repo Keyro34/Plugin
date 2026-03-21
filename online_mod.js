@@ -8925,21 +8925,63 @@
         object = _object;
         select_title = object.search || object.movie.title;
 
+        var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
+        var search_year = parseInt((search_date + '').slice(0, 4)) || 0;
+
+        // Поиск по названию+год через Vibix API (fallback)
+        var searchByTitle = function searchByTitle(onEmpty) {
+          if (!select_title) { onEmpty(); return; }
+          var title_query = encodeURIComponent(select_title);
+          var title_api = 'search?query=' + title_query;
+          vibix_api_search(title_api, function (json) {
+            var items = json && (json.results || json.data || json);
+            if (!items || !items.length || !items.forEach) { onEmpty(); return; }
+            // Фильтрация по году
+            var filtered = items;
+            if (search_year) {
+              var by_year = items.filter(function(i) {
+                var y = parseInt((i.year || i.release_date || i.first_air_date || '').toString().slice(0,4));
+                return y && Math.abs(y - search_year) <= 1;
+              });
+              if (by_year.length) filtered = by_year;
+            }
+            var best = filtered[0];
+            if (best && best.iframe_url) {
+              getPage(best, onEmpty);
+            } else if (best && best.id) {
+              // попробовать через kp/ или imdb/ если есть id
+              var fallback_api = best.kinopoisk_id ? 'kp/' + encodeURIComponent(best.kinopoisk_id) : best.imdb_id ? 'imdb/' + encodeURIComponent(best.imdb_id) : null;
+              if (fallback_api) {
+                vibix_api_search(fallback_api, function(j2) { getPage(j2, onEmpty); }, onEmpty);
+              } else { onEmpty(); }
+            } else { onEmpty(); }
+          }, function() { onEmpty(); });
+        };
+
         var empty = function empty() {
           component.emptyForQuery(select_title);
         };
 
         var error = component.empty.bind(component);
-        var api = (+kinopoisk_id ? 'kp/' : 'imdb/') + encodeURIComponent(kinopoisk_id);
-        vibix_api_search(api, function (json) {
-          getPage(json, function () {
-            if (!object.clarification && object.movie.imdb_id && kinopoisk_id != object.movie.imdb_id) {
-              vibix_api_search('imdb/' + encodeURIComponent(object.movie.imdb_id), function (json) {
-                getPage(json, empty);
-              }, error);
-            } else empty();
-          });
-        }, error);
+
+        var tryImdb = function tryImdb() {
+          if (!object.clarification && object.movie.imdb_id && kinopoisk_id != object.movie.imdb_id) {
+            vibix_api_search('imdb/' + encodeURIComponent(object.movie.imdb_id), function (json) {
+              getPage(json, function() { searchByTitle(empty); });
+            }, function() { searchByTitle(empty); });
+          } else {
+            searchByTitle(empty);
+          }
+        };
+
+        if (kinopoisk_id) {
+          var api = (+kinopoisk_id ? 'kp/' : 'imdb/') + encodeURIComponent(kinopoisk_id);
+          vibix_api_search(api, function (json) {
+            getPage(json, tryImdb);
+          }, function() { tryImdb(); });
+        } else {
+          tryImdb();
+        }
       };
 
       this.extendChoice = function (saved) {
@@ -15087,6 +15129,13 @@
             _this4.extendChoice();
 
             sources[balanser].search(object);
+          } else if (kp_sources.indexOf(balanser) >= 0) {
+            // Нет KP/IMDB ID — ищем по названию через VCDN, потом KP
+            var title_fallback = function title_fallback() {
+              _this4.extendChoice();
+              sources[balanser].search(object, 0);
+            };
+            kp_search(function() { vcdn_search(title_fallback); });
           } else {
             if (balanser == 'lumex' || balanser == 'lumex2') {
               var fallback = function fallback() {
