@@ -15383,8 +15383,10 @@
         var _tmdbApiKey = '4ef0d7355d9ffb5151e987764708ce96';
         var _tmdbCache = {};
 
-        function _fetchTmdbPoster(title, origTitle, year, imgEl) {
-          var cacheKey = (origTitle || title) + '|' + (year || '');
+        function _fetchTmdbPoster(title, origTitle, year, imgEl, elemImdbId) {
+          // Приоритет 1: поиск по imdb_id через TMDB /find (самый точный)
+          var lookupImdb = elemImdbId || '';
+          var cacheKey = lookupImdb ? ('imdb|' + lookupImdb) : ((origTitle || title) + '|' + (year || ''));
 
           // Уже в кэше
           if (_tmdbCache[cacheKey]) {
@@ -15462,10 +15464,84 @@
             var s = steps[i];
             searchOne(s.t, s.tp, s.y, applyPoster, function() { runStep(i + 1); });
           }
-          runStep(0);
+
+          // Если есть imdb_id — сначала пробуем TMDB /find (быстро и точно)
+          if (lookupImdb) {
+            var findBase = 'find/' + encodeURIComponent(lookupImdb) + '?api_key=' + apiKey + '&external_source=imdb_id';
+            var findUrl = typeof Lampa.TMDB !== 'undefined'
+              ? Lampa.TMDB.api(findBase)
+              : 'https://api.themoviedb.org/3/' + findBase;
+            var findXhr = new XMLHttpRequest();
+            findXhr.open('GET', findUrl, true);
+            findXhr.timeout = 8000;
+            findXhr.onload = function() {
+              try {
+                var fd = JSON.parse(findXhr.responseText);
+                var results = (fd.movie_results || []).concat(fd.tv_results || []);
+                if (results.length && results[0].poster_path) {
+                  applyPoster(results[0].poster_path);
+                } else {
+                  runStep(0); // fallback к поиску по названию
+                }
+              } catch(e) { runStep(0); }
+            };
+            findXhr.onerror = findXhr.ontimeout = function() { runStep(0); };
+            findXhr.send();
+          } else {
+            runStep(0);
+          }
         }
 
         var _isSerial = !!(object && object.movie && object.movie.number_of_seasons);
+
+        // ── IMDB_ID FILTER ──────────────────────────────────────────────────
+        // Если у текущего фильма есть imdb_id — оставляем только совпадающие элементы.
+        // Если у элемента нет imdb_id — проверяем по названию + году как fallback.
+        var _currentImdb = object && object.movie && (object.movie.imdb_id || '');
+        var _currentTitle = object && object.movie && (object.movie.title || object.movie.name || '');
+        var _currentYear  = object && object.movie && (
+          (object.movie.release_date || object.movie.first_air_date || '').slice(0, 4)
+        );
+
+        function _normalizeTitle(t) {
+          return (t || '').toLowerCase().replace(/[\s\-_:.,!?'"«»()]/g, '');
+        }
+
+        function _imdbMatch(elem) {
+          var elemImdb = elem.imdb_id || (elem.media && elem.media.imdb_id) || '';
+          // Точное совпадение по imdb_id
+          if (_currentImdb && elemImdb) {
+            return _currentImdb === elemImdb;
+          }
+          // У элемента нет imdb_id — fallback: название + год
+          if (_currentImdb && !elemImdb) {
+            var elemTitle = elem.title || elem.ru_title || elem.nameRu || elem.en_title || elem.nameEn || elem.orig_title || '';
+            var elemYear  = (elem.start_date || elem.year || '') + '';
+            var titleOk = _normalizeTitle(elemTitle) === _normalizeTitle(_currentTitle);
+            var yearOk  = !_currentYear || !elemYear || _currentYear === elemYear.slice(0, 4);
+            return titleOk && yearOk;
+          }
+          // У текущего фильма нет imdb_id — не фильтруем, показываем всё
+          return true;
+        }
+
+        // Делим на точные совпадения и fallback-совпадения
+        var _exactMatches    = [];
+        var _fallbackMatches = [];
+        json.forEach(function(elem) {
+          var elemImdb = elem.imdb_id || (elem.media && elem.media.imdb_id) || '';
+          if (!_currentImdb) {
+            _exactMatches.push(elem);          // нет imdb у фильма — всё в список
+          } else if (_currentImdb && elemImdb && _currentImdb === elemImdb) {
+            _exactMatches.push(elem);          // точное imdb совпадение
+          } else if (_imdbMatch(elem)) {
+            _fallbackMatches.push(elem);       // title+year fallback
+          }
+          // else — полностью исключаем нерелевантный элемент
+        });
+        // Точные imdb-совпадения идут первыми
+        json = _exactMatches.concat(_fallbackMatches);
+        // ────────────────────────────────────────────────────────────────────
 
         json.forEach(function (elem) {
           var title = elem.title || elem.ru_title || elem.nameRu || elem.en_title || elem.nameEn || elem.orig_title || elem.nameOriginal;
@@ -15490,11 +15566,26 @@
 
           var item = Lampa.Template.get('online_mod_folder', elem);
 
+          // Визуальная разметка релевантности
+          var elemImdb2 = elem.imdb_id || (elem.media && elem.media.imdb_id) || '';
+          var isExactImdb = _currentImdb && elemImdb2 && _currentImdb === elemImdb2;
+          var isFallback  = _currentImdb && !elemImdb2; // нет imdb у элемента — fallback
+
+          if (isFallback) {
+            // Снижаем визуальный приоритет: полупрозрачность рамки
+            item.css('opacity', '0.75');
+            item.attr('title', 'Совпадение по названию (imdb_id отсутствует)');
+          }
+
           // Ищем индивидуальный постер через TMDB
           if (title) {
             var imgEl = item.find('.folder__poster');
             if (!imgEl.length) imgEl = item.find('img').first();
-            _fetchTmdbPoster(title, orig_title, year ? parseInt(year) : 0, imgEl);
+            if (isFallback) {
+              // Для fallback: не показываем постер до подтверждения — ставим placeholder
+              imgEl.css('opacity', '0.5');
+            }
+            _fetchTmdbPoster(title, orig_title, year ? parseInt(year) : 0, imgEl, elem.imdb_id || '');
           }
 
           item.on('hover:enter', function () {
