@@ -1,4 +1,4 @@
-//05.03.2026 - Fix
+//20.03.2026 - Fix
 
 (function () {
     'use strict';
@@ -8925,63 +8925,21 @@
         object = _object;
         select_title = object.search || object.movie.title;
 
-        var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
-        var search_year = parseInt((search_date + '').slice(0, 4)) || 0;
-
-        // Поиск по названию+год через Vibix API (fallback)
-        var searchByTitle = function searchByTitle(onEmpty) {
-          if (!select_title) { onEmpty(); return; }
-          var title_query = encodeURIComponent(select_title);
-          var title_api = 'search?query=' + title_query;
-          vibix_api_search(title_api, function (json) {
-            var items = json && (json.results || json.data || json);
-            if (!items || !items.length || !items.forEach) { onEmpty(); return; }
-            // Фильтрация по году
-            var filtered = items;
-            if (search_year) {
-              var by_year = items.filter(function(i) {
-                var y = parseInt((i.year || i.release_date || i.first_air_date || '').toString().slice(0,4));
-                return y && Math.abs(y - search_year) <= 1;
-              });
-              if (by_year.length) filtered = by_year;
-            }
-            var best = filtered[0];
-            if (best && best.iframe_url) {
-              getPage(best, onEmpty);
-            } else if (best && best.id) {
-              // попробовать через kp/ или imdb/ если есть id
-              var fallback_api = best.kinopoisk_id ? 'kp/' + encodeURIComponent(best.kinopoisk_id) : best.imdb_id ? 'imdb/' + encodeURIComponent(best.imdb_id) : null;
-              if (fallback_api) {
-                vibix_api_search(fallback_api, function(j2) { getPage(j2, onEmpty); }, onEmpty);
-              } else { onEmpty(); }
-            } else { onEmpty(); }
-          }, function() { onEmpty(); });
-        };
-
         var empty = function empty() {
           component.emptyForQuery(select_title);
         };
 
         var error = component.empty.bind(component);
-
-        var tryImdb = function tryImdb() {
-          if (!object.clarification && object.movie.imdb_id && kinopoisk_id != object.movie.imdb_id) {
-            vibix_api_search('imdb/' + encodeURIComponent(object.movie.imdb_id), function (json) {
-              getPage(json, function() { searchByTitle(empty); });
-            }, function() { searchByTitle(empty); });
-          } else {
-            searchByTitle(empty);
-          }
-        };
-
-        if (kinopoisk_id) {
-          var api = (+kinopoisk_id ? 'kp/' : 'imdb/') + encodeURIComponent(kinopoisk_id);
-          vibix_api_search(api, function (json) {
-            getPage(json, tryImdb);
-          }, function() { tryImdb(); });
-        } else {
-          tryImdb();
-        }
+        var api = (+kinopoisk_id ? 'kp/' : 'imdb/') + encodeURIComponent(kinopoisk_id);
+        vibix_api_search(api, function (json) {
+          getPage(json, function () {
+            if (!object.clarification && object.movie.imdb_id && kinopoisk_id != object.movie.imdb_id) {
+              vibix_api_search('imdb/' + encodeURIComponent(object.movie.imdb_id), function (json) {
+                getPage(json, empty);
+              }, error);
+            } else empty();
+          });
+        }, error);
       };
 
       this.extendChoice = function (saved) {
@@ -14714,6 +14672,10 @@
         this.activity.loader(true);
 
         filter.onSearch = function (value) {
+          var _id = Lampa.Utils.hash(object.movie.number_of_seasons ? object.movie.original_name : object.movie.original_title);
+          var _all = Lampa.Storage.get('online_mod_clarification_search', '{}');
+          _all[_id] = value;
+          Lampa.Storage.set('online_mod_clarification_search', _all);
           Lampa.Activity.replace({
             search: value,
             search_date: '',
@@ -14728,6 +14690,10 @@
         filter.onSelect = function (type, a, b) {
           if (type == 'filter') {
             if (a.reset) {
+              var _rid = Lampa.Utils.hash(object.movie.number_of_seasons ? object.movie.original_name : object.movie.original_title);
+              var _rall = Lampa.Storage.get('online_mod_clarification_search', '{}');
+              delete _rall[_rid];
+              Lampa.Storage.set('online_mod_clarification_search', _rall);
               if (extended) sources[balanser].reset();else _this.start();
             } else if (a.stype == 'source') {
               _this.changeBalanser(filter_sources[b.index]);
@@ -15129,13 +15095,6 @@
             _this4.extendChoice();
 
             sources[balanser].search(object);
-          } else if (kp_sources.indexOf(balanser) >= 0) {
-            // Нет KP/IMDB ID — ищем по названию через VCDN, потом KP
-            var title_fallback = function title_fallback() {
-              _this4.extendChoice();
-              sources[balanser].search(object, 0);
-            };
-            kp_search(function() { vcdn_search(title_fallback); });
           } else {
             if (balanser == 'lumex' || balanser == 'lumex2') {
               var fallback = function fallback() {
@@ -15416,21 +15375,6 @@
 
       this.similars = function (json, search_more, more_params) {
         var _this5 = this;
-
-        // АВТО-ВЫБОР: если найдена ровно одна карточка и нет кнопки "показать ещё" — открываем сразу
-        if (json && json.length === 1 && !search_more) {
-          var _autoElem = json[0];
-          var _autoTitle = _autoElem.title || _autoElem.ru_title || _autoElem.nameRu || _autoElem.en_title || _autoElem.nameEn || _autoElem.orig_title || _autoElem.nameOriginal;
-          var _autoYear  = _autoElem.start_date || _autoElem.year || '';
-          _this5.activity.loader(true);
-          _this5.reset();
-          object.search      = _autoTitle;
-          object.search_date = _autoYear;
-          selected_id        = _autoElem.id;
-          _this5.extendChoice();
-          sources[balanser].search(object, _autoElem.kp_id || _autoElem.kinopoisk_id || _autoElem.kinopoiskId || _autoElem.filmId || _autoElem.imdb_id, [_autoElem]);
-          return;
-        }
 
         // Получаем постер из данных текущего фильма/сериала (TMDB или другой источник)
         var _moviePoster = (function() {
@@ -17174,6 +17118,12 @@
       });
     }
 
+    function getClarificationSearch(movie) {
+      var id = Lampa.Utils.hash(movie.number_of_seasons ? movie.original_name : movie.original_title);
+      var all = Lampa.Storage.get('online_mod_clarification_search', '{}');
+      return all[id] || null;
+    }
+
     function loadOnline(object) {
       if (online_loading) return;
       online_loading = true;
@@ -17183,15 +17133,17 @@
           online_loading = false;
           resetTemplates();
           Lampa.Component.add('online_mod', component);
+          var savedSearch = getClarificationSearch(object);
           Lampa.Activity.push({
             url: '',
             title: Lampa.Lang.translate('online_mod_title_full'),
             component: 'online_mod',
-            search: object.title,
-            search_one: object.title,
-            search_two: object.original_title,
+            search: savedSearch ? savedSearch : (object.title || object.name),
+            search_one: object.title || object.name,
+            search_two: object.original_title || object.original_name,
             movie: object,
-            page: 1
+            page: 1,
+            clarification: savedSearch ? true : false
           });
         });
       });
@@ -17223,6 +17175,7 @@
       var button = "<div class=\"full-start__button selector view--online_mod\" data-subtitle=\"online_mod " + mod_version + "\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:svgjs=\"http://svgjs.com/svgjs\" version=\"1.1\" width=\"512\" height=\"512\" x=\"0\" y=\"0\" viewBox=\"0 0 244 260\" style=\"enable-background:new 0 0 512 512\" xml:space=\"preserve\" class=\"\">\n        <g xmlns=\"http://www.w3.org/2000/svg\">\n            <path d=\"M242,88v170H10V88h41l-38,38h37.1l38-38h38.4l-38,38h38.4l38-38h38.3l-38,38H204L242,88L242,88z M228.9,2l8,37.7l0,0 L191.2,10L228.9,2z M160.6,56l-45.8-29.7l38-8.1l45.8,29.7L160.6,56z M84.5,72.1L38.8,42.4l38-8.1l45.8,29.7L84.5,72.1z M10,88 L2,50.2L47.8,80L10,88z\" fill=\"currentColor\"/>\n        </g></svg>\n\n        <span>#{online_mod_title}</span>\n        </div>";
       Lampa.Listener.follow('full', function (e) {
         if (e.type == 'complite') {
+          if (e.object.activity.render().find('.view--online_mod').length) return;
           var btn = $(Lampa.Lang.translate(button));
           online_loading = false;
           btn.on('hover:enter', function () {
