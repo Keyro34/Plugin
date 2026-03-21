@@ -14959,10 +14959,36 @@
               }
             }
 
-            if (cards.length == 1 && is_sure) {
-              _this4.extendChoice();
+            // Автовыбор: если нашли точное совпадение по imdb_id или kinopoisk_id среди нескольких карточек
+            if (!is_imdb && cards.length > 1) {
+              var imdb_id = object.movie.imdb_id;
+              var kp_id = +object.movie.kinopoisk_id;
+              if (!object.clarification && (imdb_id || kp_id)) {
+                var exact = cards.filter(function (c) {
+                  return imdb_id && (c.imdb_id || c.imdbId) == imdb_id || kp_id && (c.kp_id || c.kinopoisk_id || c.kinopoiskId || c.filmId) == kp_id;
+                });
+                if (exact.length === 1) {
+                  cards = exact;
+                  is_sure = true;
+                  is_imdb = true;
+                }
+              }
+            }
 
-              sources[balanser].search(object, cards[0].kp_id || cards[0].kinopoisk_id || cards[0].kinopoiskId || cards[0].filmId || cards[0].imdb_id, cards);
+            var autoCard = null;
+            if (cards.length == 1 && is_sure) {
+              autoCard = cards[0];
+            } else if (cards.length == 1 && !object.clarification) {
+              // Единственный результат — берём без лишних вопросов
+              autoCard = cards[0];
+            }
+
+            if (autoCard) {
+              _this4.extendChoice();
+              object.search = autoCard.title || autoCard.ru_title || autoCard.nameRu || object.search;
+              object.search_date = autoCard.start_date || autoCard.year || object.search_date;
+              selected_id = autoCard.id;
+              sources[balanser].search(object, autoCard.kp_id || autoCard.kinopoisk_id || autoCard.kinopoiskId || autoCard.filmId || autoCard.imdb_id, cards);
             } else {
               items.forEach(function (c) {
                 if (c.episodes) {
