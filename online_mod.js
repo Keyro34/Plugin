@@ -15368,6 +15368,21 @@
       this.similars = function (json, search_more, more_params) {
         var _this5 = this;
 
+        // АВТО-ВЫБОР: если найдена ровно одна карточка и нет кнопки "показать ещё" — открываем сразу
+        if (json && json.length === 1 && !search_more) {
+          var _autoElem = json[0];
+          var _autoTitle = _autoElem.title || _autoElem.ru_title || _autoElem.nameRu || _autoElem.en_title || _autoElem.nameEn || _autoElem.orig_title || _autoElem.nameOriginal;
+          var _autoYear  = _autoElem.start_date || _autoElem.year || '';
+          _this5.activity.loader(true);
+          _this5.reset();
+          object.search      = _autoTitle;
+          object.search_date = _autoYear;
+          selected_id        = _autoElem.id;
+          _this5.extendChoice();
+          sources[balanser].search(object, _autoElem.kp_id || _autoElem.kinopoisk_id || _autoElem.kinopoiskId || _autoElem.filmId || _autoElem.imdb_id, [_autoElem]);
+          return;
+        }
+
         // Получаем постер из данных текущего фильма/сериала (TMDB или другой источник)
         var _moviePoster = (function() {
           var mov = object && object.movie;
@@ -15383,10 +15398,8 @@
         var _tmdbApiKey = '4ef0d7355d9ffb5151e987764708ce96';
         var _tmdbCache = {};
 
-        function _fetchTmdbPoster(title, origTitle, year, imgEl, elemImdbId) {
-          // Приоритет 1: поиск по imdb_id через TMDB /find (самый точный)
-          var lookupImdb = elemImdbId || '';
-          var cacheKey = lookupImdb ? ('imdb|' + lookupImdb) : ((origTitle || title) + '|' + (year || ''));
+        function _fetchTmdbPoster(title, origTitle, year, imgEl) {
+          var cacheKey = (origTitle || title) + '|' + (year || '');
 
           // Уже в кэше
           if (_tmdbCache[cacheKey]) {
@@ -15464,77 +15477,10 @@
             var s = steps[i];
             searchOne(s.t, s.tp, s.y, applyPoster, function() { runStep(i + 1); });
           }
-
-          // Если есть imdb_id — сначала пробуем TMDB /find (быстро и точно)
-          if (lookupImdb) {
-            var findBase = 'find/' + encodeURIComponent(lookupImdb) + '?api_key=' + apiKey + '&external_source=imdb_id';
-            var findUrl = typeof Lampa.TMDB !== 'undefined'
-              ? Lampa.TMDB.api(findBase)
-              : 'https://api.themoviedb.org/3/' + findBase;
-            var findXhr = new XMLHttpRequest();
-            findXhr.open('GET', findUrl, true);
-            findXhr.timeout = 8000;
-            findXhr.onload = function() {
-              try {
-                var fd = JSON.parse(findXhr.responseText);
-                var results = (fd.movie_results || []).concat(fd.tv_results || []);
-                if (results.length && results[0].poster_path) {
-                  applyPoster(results[0].poster_path);
-                } else {
-                  runStep(0); // fallback к поиску по названию
-                }
-              } catch(e) { runStep(0); }
-            };
-            findXhr.onerror = findXhr.ontimeout = function() { runStep(0); };
-            findXhr.send();
-          } else {
-            runStep(0);
-          }
+          runStep(0);
         }
 
         var _isSerial = !!(object && object.movie && object.movie.number_of_seasons);
-
-        // ── IMDB_ID SORT + AUTO-SELECT ──────────────────────────────────────
-        var _currentImdb = object && object.movie && (object.movie.imdb_id || '');
-        var _currentTitle = object && object.movie && (object.movie.title || object.movie.name || '');
-        var _currentYear  = object && object.movie && (
-          (object.movie.release_date || object.movie.first_air_date || '').slice(0, 4)
-        );
-
-        function _normalizeTitle(t) {
-          return (t || '').toLowerCase().replace(/[\s\-_:.,!?'"«»()]/g, '');
-        }
-
-        // Сортируем: точные imdb-совпадения вперёд, затем остальные
-        var _exactMatches    = [];
-        var _fallbackMatches = [];
-        json.forEach(function(elem) {
-          var elemImdb = elem.imdb_id || (elem.media && elem.media.imdb_id) || '';
-          if (_currentImdb && elemImdb && _currentImdb === elemImdb) {
-            _exactMatches.push(elem);
-          } else {
-            _fallbackMatches.push(elem);
-          }
-        });
-        json = _exactMatches.concat(_fallbackMatches);
-
-        // АВТОВЫБОР: если остался ровно 1 элемент — сразу открываем без показа списка
-        if (json.length === 1) {
-          var _autoElem = json[0];
-          var _autoYear = _autoElem.start_date || _autoElem.year || '';
-          // Помечаем как similars-переход — источник использует это для прямого открытия
-          _autoElem.is_similars = true;
-          _this5.activity.loader(true);
-          _this5.reset();
-          object.search = _autoElem.title || _autoElem.ru_title || _autoElem.nameRu || _autoElem.en_title || _autoElem.nameEn || _autoElem.orig_title || _autoElem.nameOriginal;
-          object.search_date = _autoYear;
-          selected_id = _autoElem.id;
-          _this5.wait_similars = true;
-          _this5.extendChoice();
-          sources[balanser].search(object, _autoElem.kp_id || _autoElem.kinopoisk_id || _autoElem.kinopoiskId || _autoElem.filmId || _autoElem.imdb_id, [_autoElem]);
-          return;
-        }
-        // ────────────────────────────────────────────────────────────────────
 
         json.forEach(function (elem) {
           var title = elem.title || elem.ru_title || elem.nameRu || elem.en_title || elem.nameEn || elem.orig_title || elem.nameOriginal;
@@ -15559,11 +15505,11 @@
 
           var item = Lampa.Template.get('online_mod_folder', elem);
 
-          // Ищем индивидуальный постер через TMDB (приоритет: /find по imdb_id, потом по названию)
+          // Ищем индивидуальный постер через TMDB
           if (title) {
             var imgEl = item.find('.folder__poster');
             if (!imgEl.length) imgEl = item.find('img').first();
-            _fetchTmdbPoster(title, orig_title, year ? parseInt(year) : 0, imgEl, elem.imdb_id || '');
+            _fetchTmdbPoster(title, orig_title, year ? parseInt(year) : 0, imgEl);
           }
 
           item.on('hover:enter', function () {
