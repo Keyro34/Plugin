@@ -13,6 +13,66 @@
       return str.indexOf(searchString, start) === start;
     }
 
+    function normalize(str) {
+        return (str || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9а-яё]/gi, '');
+    }
+
+    function getType(movie) {
+        return movie.name ? 'tv' : 'movie';
+    }
+
+    function findBestMatch(items, movie) {
+        if (!items || !items.length) return null;
+
+        var movieType  = getType(movie);
+        var movieTitle = normalize(movie.title || movie.name);
+        var movieOrig  = normalize(movie.original_title || movie.original_name);
+        var movieYear  = (movie.release_date || movie.first_air_date || '').slice(0,4);
+
+        var best = null;
+        var bestScore = 0;
+
+        items.forEach(function(i) {
+            var score = 0;
+
+            // 1. TMDB (максимальный приоритет)
+            if (i.tmdb_id && movie.id && i.tmdb_id == movie.id) {
+                score += 100;
+            }
+
+            // 2. Тип (фильм/сериал)
+            if (i.type && i.type == movieType) {
+                score += 20;
+            }
+
+            var title = normalize(i.title);
+            var orig  = normalize(i.original_title);
+
+            // 3. Название
+            if (title == movieTitle || orig == movieOrig) {
+                score += 40;
+            } else if (title.includes(movieTitle) || movieTitle.includes(title)) {
+                score += 20;
+            }
+
+            // 4. Год (с допуском ±1)
+            if (i.year && movieYear) {
+                var diff = Math.abs(i.year - movieYear);
+                if (diff === 0) score += 20;
+                else if (diff === 1) score += 10;
+            }
+
+            if (score > bestScore) {
+                bestScore = score;
+                best = i;
+            }
+        });
+
+        return best || items[0];
+    }
+
     var myIp = '';
     var currentFanserialsHost = decodeSecret([95, 57, 28, 42, 55, 125, 28, 124, 75, 83, 86, 35, 27, 63, 54, 46, 82, 63, 9, 27, 81, 56, 6], atob('RnVja0Zhbg=='));
 
@@ -1076,66 +1136,6 @@
        */
 
 
-      function normalize(str) {
-          return (str || '')
-              .toLowerCase()
-              .replace(/[^a-z0-9а-яё]/gi, '');
-      }
-
-      function getType(movie){
-          return movie.name ? 'tv' : 'movie';
-      }
-
-      function findBestMatch(items, movie) {
-          if (!items || !items.length) return null;
-
-          var movieType = getType(movie);
-          var movieTitle = normalize(movie.title || movie.name);
-          var movieOrig  = normalize(movie.original_title || movie.original_name);
-          var movieYear  = (movie.release_date || movie.first_air_date || '').slice(0,4);
-
-          var best = null;
-          var bestScore = 0;
-
-          items.forEach(function(i){
-              var score = 0;
-
-              // 1. TMDB (максимальный приоритет)
-              if (i.tmdb_id && movie.id && i.tmdb_id == movie.id) {
-                  score += 100;
-              }
-
-              // 2. Тип (фильм/сериал)
-              if (i.type && i.type == movieType) {
-                  score += 20;
-              }
-
-              var title = normalize(i.title);
-              var orig  = normalize(i.original_title);
-
-              // 3. Название
-              if (title == movieTitle || orig == movieOrig) {
-                  score += 40;
-              } else if (title.includes(movieTitle) || movieTitle.includes(title)) {
-                  score += 20;
-              }
-
-              // 4. Год (с допуском)
-              if (i.year && movieYear) {
-                  var diff = Math.abs(i.year - movieYear);
-                  if (diff === 0) score += 20;
-                  else if (diff === 1) score += 10;
-              }
-
-              if (score > bestScore) {
-                  bestScore = score;
-                  best = i;
-              }
-          });
-
-          return best || items[0];
-      }
-
       function append(items) {
         component.reset();
         // === ДОБАВЛЯЕМ ПОСТЕР ===
@@ -1163,6 +1163,7 @@
           element.year = (object.movie.release_date || '').slice(0,4);
           element.original_title = object.movie.original_title || object.movie.original_name || '';
           element.type = object.movie.name ? 'tv' : 'movie';
+          item.attr('data-tmdb', element.tmdb_id);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
           if (_tl) { _tl.css('display','none'); item.append(_tl); }
@@ -1485,13 +1486,12 @@
                 component.render().find('.online_mod').each(function(){
                     var el = $(this);
 
-                    // сравниваем по title (или добавь data-id если есть)
-                    if (el.text().toLowerCase().includes((best.title || '').toLowerCase())) {
+                    if (el.attr('data-tmdb') == best.tmdb_id) {
                         el.trigger('hover:enter');
                         return false;
                     }
                 });
-            }, 100);
+            }, 200);
         }
 
         component.start(true);
@@ -15594,6 +15594,39 @@
 
           _this5.append(item);
         });
+
+        // Автовыбор лучшего совпадения (не срабатывает если пользователь сам ввёл поиск)
+        if (object && object.movie && !object.clarification) {
+            var _similarsItems = json.map(function(elem) {
+                return {
+                    title:          elem.title || '',
+                    original_title: elem.orig_title || elem.original_title || '',
+                    year:           parseInt(elem.start_date || elem.year || 0) || 0,
+                    type:           elem.seasons_count ? 'tv' : 'movie',
+                    tmdb_id:        null
+                };
+            });
+            var _best = findBestMatch(_similarsItems, object.movie);
+            if (_best) {
+                var _bestIdx = _similarsItems.indexOf(_best);
+                if (_bestIdx >= 0) {
+                    setTimeout(function() {
+                        var _el = json[_bestIdx];
+                        if (_el) {
+                            _this5.activity.loader(true);
+                            _this5.reset();
+                            object.search = _el.title;
+                            object.search_date = _el.start_date || _el.year || '';
+                            selected_id = _el.id;
+                            _this5.extendChoice();
+                            sources[balanser].search(object,
+                                _el.kp_id || _el.kinopoisk_id || _el.kinopoiskId || _el.filmId || _el.imdb_id,
+                                [_el]);
+                        }
+                    }, 200);
+                }
+            }
+        }
 
         if (search_more) {
           var elem = {
