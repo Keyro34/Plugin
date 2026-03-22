@@ -14754,9 +14754,10 @@
         this.activity.loader(true);
 
         filter.onSearch = function (value) {
+          var _year = (object.movie.release_date || object.movie.first_air_date || '').slice(0, 4);
           Lampa.Activity.replace({
             search: value,
-            search_date: '',
+            search_date: _year || '',
             clarification: true
           });
         };
