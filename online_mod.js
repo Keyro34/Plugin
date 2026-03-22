@@ -60,9 +60,8 @@
             // 4. Год (с допуском ±1)
             if (i.year && movieYear) {
                 var diff = Math.abs(i.year - movieYear);
-                if (diff === 0) score += 40;
-                else if (diff === 1) score += 15;
-                else if (diff >= 2) score -= 20;
+                if (diff === 0) score += 20;
+                else if (diff === 1) score += 10;
             }
 
             if (score > bestScore) {
@@ -2285,43 +2284,59 @@
               }
             }
 
-            if (cards.length == 1 && is_sure) {
-              if (search_year && cards[0].year) {
-                is_sure = cards[0].year > search_year - 2 && cards[0].year < search_year + 2;
-              }
+            if (cards.length) {
+                // ── АВТО-ВЫБОР САМОЙ ПОДХОДЯЩЕЙ КАРТОЧКИ ─────────────────────
+                var movieYear  = parseInt((object.movie.release_date || object.movie.first_air_date || '0000').slice(0,4));
+                var isTV       = !!object.movie.name;
+                var bestCard   = null;
+                var bestScore  = -1;
 
-              if (is_sure) {
-                is_sure = false;
+                cards.forEach(function(c) {
+                    var score = 0;
 
-                if (orig_titles.length) {
-                  is_sure |= component.equalAnyTitle([cards[0].orig_title, cards[0].title], orig_titles);
-                }
+                    // 1. Год (самое важное)
+                    if (c.year && movieYear) {
+                        var diff = Math.abs(c.year - movieYear);
+                        if (diff === 0) score += 60;
+                        else if (diff === 1) score += 40;
+                        else if (diff < 5) score += 20;
+                    }
 
-                if (select_title) {
-                  is_sure |= component.equalAnyTitle([cards[0].title, cards[0].orig_title], [select_title]);
-                }
-              }
-            }
+                    // 2. Название
+                    if (c.title) {
+                        var normC = normalize(c.title);
+                        var normS = normalize(select_title);
+                        if (normC === normS) score += 40;
+                        else if (normC.includes(normS) || normS.includes(normC)) score += 20;
+                    }
 
-            if (cards.length == 1 && is_sure) getPage(cards[0].link);else if (items.length) {
-              _this.wait_similars = true;
-              items.forEach(function (c) {
-                c.is_similars = true;
-              });
+                    // 3. Если ищем сериал — повышаем карточки с "сериал"
+                    if (isTV && c.title && c.title.toLowerCase().includes('сериал')) score += 50;
 
-              if (have_more) {
-                component.similars(items, search_more, {
-                  items: [],
-                  query: query,
-                  page: 1
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestCard = c;
+                    }
                 });
-              } else {
-                component.similars(items);
-              }
 
-              component.loading(false);
+                // Если уверены в выборе — сразу открываем!
+                if (bestCard && bestScore > 35) {
+                    getPage(bestCard.link);
+                }
+                // Иначе показываем список (редко)
+                else {
+                    _this.wait_similars = true;
+                    items.forEach(function (c) { c.is_similars = true; });
+                    if (have_more) {
+                        component.similars(items, search_more, {items: [], query: query, page: 1});
+                    } else {
+                        component.similars(items);
+                    }
+                    component.loading(false);
+                }
+            } else if (error_message) {
+                component.empty(error_message);
             } else component.emptyForQuery(select_title);
-          } else if (error_message) component.empty(error_message);else component.emptyForQuery(select_title);
         };
 
         var query_search = function query_search(query, data, callback) {
@@ -14754,10 +14769,9 @@
         this.activity.loader(true);
 
         filter.onSearch = function (value) {
-          var _year = (object.movie.release_date || object.movie.first_air_date || '').slice(0, 4);
           Lampa.Activity.replace({
             search: value,
-            search_date: _year || '',
+            search_date: '',
             clarification: true
           });
         };
@@ -15560,7 +15574,6 @@
           if (elem.episodes_count) info.push(Lampa.Lang.translate('online_mod_episodes_count') + ': ' + elem.episodes_count);
           elem.title = title;
           elem.quality = year ? (year + '').slice(0, 4) : '----';
-          elem._year_parsed = parseInt((year + '').slice(0, 4)) || 0;
           elem.info = info.length ? ' / ' + info.join(' / ') : '';
 
           // Начальный постер из данных элемента или текущего фильма
@@ -15604,7 +15617,7 @@
                 return {
                     title:          elem.title || '',
                     original_title: elem.orig_title || elem.original_title || '',
-                    year:           elem._year_parsed || parseInt((elem.start_date || elem.year || 0) + '') || 0,
+                    year:           parseInt(elem.start_date || elem.year || 0) || 0,
                     type:           elem.seasons_count ? 'tv' : 'movie',
                     tmdb_id:        null
                 };
