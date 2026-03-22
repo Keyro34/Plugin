@@ -1076,32 +1076,64 @@
        */
 
 
+      function normalize(str) {
+          return (str || '')
+              .toLowerCase()
+              .replace(/[^a-z0-9а-яё]/gi, '');
+      }
+
+      function getType(movie){
+          return movie.name ? 'tv' : 'movie';
+      }
+
       function findBestMatch(items, movie) {
           if (!items || !items.length) return null;
 
-          // 1. По TMDB id (самый точный)
-          var byId = items.find(function(i){
-              return i.tmdb_id && movie.id && i.tmdb_id == movie.id;
-          });
-          if (byId) return byId;
-
-          // 2. По названию + году
-          var movieTitle = (movie.title || movie.name || '').toLowerCase();
+          var movieType = getType(movie);
+          var movieTitle = normalize(movie.title || movie.name);
+          var movieOrig  = normalize(movie.original_title || movie.original_name);
           var movieYear  = (movie.release_date || movie.first_air_date || '').slice(0,4);
 
-          var byTitleYear = items.find(function(i){
-              var t = (i.title || '').toLowerCase();
-              return t === movieTitle && (!movieYear || (i.year && i.year == movieYear));
-          });
-          if (byTitleYear) return byTitleYear;
+          var best = null;
+          var bestScore = 0;
 
-          // 3. Просто по названию (fallback)
-          var byTitle = items.find(function(i){
-              var t = (i.title || '').toLowerCase();
-              return t === movieTitle;
+          items.forEach(function(i){
+              var score = 0;
+
+              // 1. TMDB (максимальный приоритет)
+              if (i.tmdb_id && movie.id && i.tmdb_id == movie.id) {
+                  score += 100;
+              }
+
+              // 2. Тип (фильм/сериал)
+              if (i.type && i.type == movieType) {
+                  score += 20;
+              }
+
+              var title = normalize(i.title);
+              var orig  = normalize(i.original_title);
+
+              // 3. Название
+              if (title == movieTitle || orig == movieOrig) {
+                  score += 40;
+              } else if (title.includes(movieTitle) || movieTitle.includes(title)) {
+                  score += 20;
+              }
+
+              // 4. Год (с допуском)
+              if (i.year && movieYear) {
+                  var diff = Math.abs(i.year - movieYear);
+                  if (diff === 0) score += 20;
+                  else if (diff === 1) score += 10;
+              }
+
+              if (score > bestScore) {
+                  bestScore = score;
+                  best = i;
+              }
           });
 
-          return byTitle || items[0];
+          return best || items[0];
       }
 
       function append(items) {
@@ -1128,8 +1160,9 @@
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
           element.tmdb_id = object.movie.id;
-          item.attr('data-tmdb', element.tmdb_id);
           element.year = (object.movie.release_date || '').slice(0,4);
+          element.original_title = object.movie.original_title || object.movie.original_name || '';
+          element.type = object.movie.name ? 'tv' : 'movie';
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
           if (_tl) { _tl.css('display','none'); item.append(_tl); }
@@ -1452,12 +1485,13 @@
                 component.render().find('.online_mod').each(function(){
                     var el = $(this);
 
-                    if (el.attr('data-tmdb') == best.tmdb_id) {
+                    // сравниваем по title (или добавь data-id если есть)
+                    if (el.text().toLowerCase().includes((best.title || '').toLowerCase())) {
                         el.trigger('hover:enter');
                         return false;
                     }
                 });
-            }, 200);
+            }, 100);
         }
 
         component.start(true);
