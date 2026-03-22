@@ -2203,25 +2203,28 @@
               }
             }
 
-            if (cards.length == 1 && is_sure) {
+            // Если после всех фильтров осталась одна карточка — открываем сразу
+            if (cards.length == 1) {
+              var year_ok = true;
               if (search_year && cards[0].year) {
-                is_sure = cards[0].year > search_year - 2 && cards[0].year < search_year + 2;
+                year_ok = cards[0].year > search_year - 3 && cards[0].year < search_year + 3;
               }
-
-              if (is_sure) {
-                is_sure = false;
-
-                if (orig_titles.length) {
-                  is_sure |= component.equalAnyTitle([cards[0].orig_title, cards[0].title], orig_titles);
-                }
-
-                if (select_title) {
-                  is_sure |= component.equalAnyTitle([cards[0].title, cards[0].orig_title], [select_title]);
-                }
+              if (year_ok) {
+                getPage(cards[0].link);
+                return;
               }
             }
 
-            if (cards.length == 1 && is_sure) getPage(cards[0].link);else if (items.length) {
+            // Если несколько карточек, но точное совпадение по году — берём её
+            if (cards.length > 1 && search_year && !object.clarification) {
+              var exact_year = cards.filter(function(c) { return c.year == search_year; });
+              if (exact_year.length == 1) {
+                getPage(exact_year[0].link);
+                return;
+              }
+            }
+
+            if (items.length) {
               _this.wait_similars = true;
               items.forEach(function (c) {
                 c.is_similars = true;
@@ -14672,6 +14675,10 @@
         this.activity.loader(true);
 
         filter.onSearch = function (value) {
+          var _id = Lampa.Utils.hash(object.movie.number_of_seasons ? object.movie.original_name : object.movie.original_title);
+          var _all = Lampa.Storage.get('online_mod_clarification_search', '{}');
+          _all[_id] = value;
+          Lampa.Storage.set('online_mod_clarification_search', _all);
           Lampa.Activity.replace({
             search: value,
             search_date: '',
@@ -14686,9 +14693,13 @@
         filter.onSelect = function (type, a, b) {
           if (type == 'filter') {
             if (a.reset) {
+              var _rid = Lampa.Utils.hash(object.movie.number_of_seasons ? object.movie.original_name : object.movie.original_title);
+              var _rall = Lampa.Storage.get('online_mod_clarification_search', '{}');
+              delete _rall[_rid];
+              Lampa.Storage.set('online_mod_clarification_search', _rall);
               if (extended) sources[balanser].reset();else _this.start();
             } else if (a.stype == 'source') {
-              _autoTriggered = true; // пользователь сам выбирает — авто не нужен
+              _autoTriggered = true;
               _this.changeBalanser(filter_sources[b.index]);
             } else if (a.stype == 'quality') {
               _autoTriggered = true;
@@ -14696,7 +14707,7 @@
 
               _this.updateQualityFilter();
             } else {
-              _autoTriggered = true; // сезон/озвучка — пользователь сам
+              _autoTriggered = true;
               sources[balanser].filter(type, a, b);
             }
           } else if (type == 'sort') {
@@ -15565,43 +15576,25 @@
           this.activity.loader(false);
           if (Lampa.Activity.active().activity === this.activity && this.inActivity()) this.activity.toggle();
 
-          // --- Авто-выбор после загрузки ---
           if (!_autoTriggered && _autoItems.length > 0) {
-            // Проверяем: это экран эпизодов/озвучек (не similars).
-            // Similars добавляются через this.similars(), у их элементов нет hover:enter → getStream.
-            // Признак "настоящий контент": у элемента есть класс selector и он не folder (similars используют online_mod_folder).
             var _items = _autoItems;
             clearTimeout(_autoTimer);
             _autoTimer = setTimeout(function() {
               if (_autoTriggered) return;
-
-              // Ищем первый элемент, который НЕ является карточкой similars
-              // similars используют шаблон online_mod_folder, контент — online_mod
               var _contentItems = _items.filter(function(el) {
                 return !el.hasClass('online-folder') && !el.hasClass('online-prestige--folder') && el.find('.online__quality').length > 0;
               });
-
-              if (!_contentItems.length) {
-                // Все элементы — similars, не трогаем
-                return;
-              }
-
+              if (!_contentItems.length) return;
               _autoTriggered = true;
-
-              // Для сериала — ищем последний просмотренный или первый
               var _target = null;
               var _isSerial = !!(object && object.movie && object.movie.number_of_seasons);
-
               if (_isSerial) {
-                // Последний с меткой просмотра
                 var _withView = _contentItems.filter(function(el) {
                   return el.find('.torrent-item__viewed').length > 0;
                 });
                 if (_withView.length) _target = _withView[_withView.length - 1];
               }
-
               if (!_target) _target = _contentItems[0];
-
               if (_target) {
                 last = _target[0];
                 _target.trigger('hover:enter');
@@ -15754,12 +15747,9 @@
        */
 
 
-      // --- Авто-выбор: флаги и счётчик ---
-      var _autoItems = [];          // накапливаем DOM-элементы после reset
-      var _autoTriggered = false;   // сработал ли уже автовыбор в этом цикле
+      var _autoItems = [];
+      var _autoTriggered = false;
       var _autoTimer = null;
-
-      // Сброс состояния авто-выбора (вызывается в this.reset)
       var _autoReset = function() {
         _autoItems = [];
         _autoTriggered = false;
@@ -15772,11 +15762,7 @@
           scroll.update($(e.target), true);
         });
         scroll.append(item);
-
-        // Накапливаем элементы для авто-выбора
-        if (!_autoTriggered) {
-          _autoItems.push(item);
-        }
+        if (!_autoTriggered) _autoItems.push(item);
       };
       /**
        * Меню
@@ -17178,6 +17164,12 @@
       });
     }
 
+    function getClarificationSearch(movie) {
+      var id = Lampa.Utils.hash(movie.number_of_seasons ? movie.original_name : movie.original_title);
+      var all = Lampa.Storage.get('online_mod_clarification_search', '{}');
+      return all[id] || null;
+    }
+
     function loadOnline(object) {
       if (online_loading) return;
       online_loading = true;
@@ -17187,15 +17179,17 @@
           online_loading = false;
           resetTemplates();
           Lampa.Component.add('online_mod', component);
+          var savedSearch = getClarificationSearch(object);
           Lampa.Activity.push({
             url: '',
             title: Lampa.Lang.translate('online_mod_title_full'),
             component: 'online_mod',
-            search: object.title,
-            search_one: object.title,
-            search_two: object.original_title,
+            search: savedSearch ? savedSearch : (object.title || object.name),
+            search_one: object.title || object.name,
+            search_two: object.original_title || object.original_name,
             movie: object,
-            page: 1
+            page: 1,
+            clarification: savedSearch ? true : false
           });
         });
       });
@@ -17227,6 +17221,7 @@
       var button = "<div class=\"full-start__button selector view--online_mod\" data-subtitle=\"online_mod " + mod_version + "\">\n        <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:svgjs=\"http://svgjs.com/svgjs\" version=\"1.1\" width=\"512\" height=\"512\" x=\"0\" y=\"0\" viewBox=\"0 0 244 260\" style=\"enable-background:new 0 0 512 512\" xml:space=\"preserve\" class=\"\">\n        <g xmlns=\"http://www.w3.org/2000/svg\">\n            <path d=\"M242,88v170H10V88h41l-38,38h37.1l38-38h38.4l-38,38h38.4l38-38h38.3l-38,38H204L242,88L242,88z M228.9,2l8,37.7l0,0 L191.2,10L228.9,2z M160.6,56l-45.8-29.7l38-8.1l45.8,29.7L160.6,56z M84.5,72.1L38.8,42.4l38-8.1l45.8,29.7L84.5,72.1z M10,88 L2,50.2L47.8,80L10,88z\" fill=\"currentColor\"/>\n        </g></svg>\n\n        <span>#{online_mod_title}</span>\n        </div>";
       Lampa.Listener.follow('full', function (e) {
         if (e.type == 'complite') {
+          if (e.object.activity.render().find('.view--online_mod').length) return;
           var btn = $(Lampa.Lang.translate(button));
           online_loading = false;
           btn.on('hover:enter', function () {
