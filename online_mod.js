@@ -60,8 +60,9 @@
             // 4. Год (с допуском ±1)
             if (i.year && movieYear) {
                 var diff = Math.abs(i.year - movieYear);
-                if (diff === 0) score += 20;
-                else if (diff === 1) score += 10;
+                if (diff === 0) score += 40;
+                else if (diff === 1) score += 15;
+                else if (diff >= 2) score -= 20;
             }
 
             if (score > bestScore) {
@@ -15558,6 +15559,7 @@
           if (elem.episodes_count) info.push(Lampa.Lang.translate('online_mod_episodes_count') + ': ' + elem.episodes_count);
           elem.title = title;
           elem.quality = year ? (year + '').slice(0, 4) : '----';
+          elem._year_parsed = parseInt((year + '').slice(0, 4)) || 0;
           elem.info = info.length ? ' / ' + info.join(' / ') : '';
 
           // Начальный постер из данных элемента или текущего фильма
@@ -15601,7 +15603,7 @@
                 return {
                     title:          elem.title || '',
                     original_title: elem.orig_title || elem.original_title || '',
-                    year:           parseInt(elem.start_date || elem.year || 0) || 0,
+                    year:           elem._year_parsed || parseInt((elem.start_date || elem.year || 0) + '') || 0,
                     type:           elem.seasons_count ? 'tv' : 'movie',
                     tmdb_id:        null
                 };
