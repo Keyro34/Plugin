@@ -2199,29 +2199,28 @@
                 if (!_tmp2.length) _tmp2 = cards.filter(function (c) {
                   return c.year && c.year > search_year - 2 && c.year < search_year + 2;
                 });
-                if (_tmp2.length) cards = _tmp2;
+                // Год-фильтр сузил до 1 — это достаточно надёжно
+                if (_tmp2.length == 1) { cards = _tmp2; is_sure = true; }
+                else if (_tmp2.length) cards = _tmp2;
               }
             }
 
-            // Если после всех фильтров осталась одна карточка — открываем сразу
+            // Если осталась 1 карточка — открываем сразу (год уже проверен выше)
             if (cards.length == 1) {
-              var year_ok = true;
+              // Дополнительно: год не должен сильно расходиться
+              var yr_ok = true;
               if (search_year && cards[0].year) {
-                year_ok = cards[0].year > search_year - 3 && cards[0].year < search_year + 3;
+                yr_ok = Math.abs(cards[0].year - search_year) <= 3;
               }
-              if (year_ok) {
+              if (yr_ok) {
                 getPage(cards[0].link);
-                return;
-              }
-            }
-
-            // Если несколько карточек, но точное совпадение по году — берём её
-            if (cards.length > 1 && search_year && !object.clarification) {
-              var exact_year = cards.filter(function(c) { return c.year == search_year; });
-              if (exact_year.length == 1) {
-                getPage(exact_year[0].link);
-                return;
-              }
+              } else if (items.length) {
+                _this.wait_similars = true;
+                items.forEach(function(c){ c.is_similars = true; });
+                component.similars(items);
+                component.loading(false);
+              } else component.emptyForQuery(select_title);
+              return;
             }
 
             if (items.length) {
@@ -14704,7 +14703,6 @@
             } else if (a.stype == 'quality') {
               _autoTriggered = true;
               forcedQuality = b.title;
-
               _this.updateQualityFilter();
             } else {
               _autoTriggered = true;
@@ -15575,7 +15573,6 @@
         } else {
           this.activity.loader(false);
           if (Lampa.Activity.active().activity === this.activity && this.inActivity()) this.activity.toggle();
-
           if (!_autoTriggered && _autoItems.length > 0) {
             var _items = _autoItems;
             clearTimeout(_autoTimer);
@@ -15595,10 +15592,7 @@
                 if (_withView.length) _target = _withView[_withView.length - 1];
               }
               if (!_target) _target = _contentItems[0];
-              if (_target) {
-                last = _target[0];
-                _target.trigger('hover:enter');
-              }
+              if (_target) { last = _target[0]; _target.trigger('hover:enter'); }
             }, 200);
           }
         }
@@ -15750,11 +15744,7 @@
       var _autoItems = [];
       var _autoTriggered = false;
       var _autoTimer = null;
-      var _autoReset = function() {
-        _autoItems = [];
-        _autoTriggered = false;
-        clearTimeout(_autoTimer);
-      };
+      var _autoReset = function() { _autoItems = []; _autoTriggered = false; clearTimeout(_autoTimer); };
 
       this.append = function (item) {
         item.on('hover:focus', function (e) {
