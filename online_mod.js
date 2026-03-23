@@ -29,7 +29,7 @@
         var movieType  = getType(movie);
         var movieTitle = normalize(movie.title || movie.name);
         var movieOrig  = normalize(movie.original_title || movie.original_name);
-        var movieYear  = (movie.release_date || movie.first_air_date || '').slice(0,4);
+        var movieYear  = parseInt((movie.release_date || movie.first_air_date || '').slice(0,4));
 
         var best = null;
         var bestScore = 0;
@@ -37,31 +37,38 @@
         items.forEach(function(i) {
             var score = 0;
 
-            // 1. TMDB (максимальный приоритет)
+            var title = normalize(i.title);
+            var orig  = normalize(i.original_title);
+            var year  = parseInt(i.year);
+
+            // 1. TMDB (абсолютный приоритет)
             if (i.tmdb_id && movie.id && i.tmdb_id == movie.id) {
-                score += 100;
+                score += 1000;
             }
 
             // 2. Тип (фильм/сериал)
             if (i.type && i.type == movieType) {
-                score += 20;
+                score += 50;
             }
 
-            var title = normalize(i.title);
-            var orig  = normalize(i.original_title);
+            // бонус если сериал явно указан
+            if (movieType === 'tv' && i.title && i.title.toLowerCase().indexOf('сериал') !== -1) {
+                score += 50;
+            }
 
-            // 3. Название
-            if (title == movieTitle || orig == movieOrig) {
-                score += 40;
+            // 3. Название (важнее года!)
+            if (title === movieTitle || orig === movieOrig) {
+                score += 80;
             } else if (title.includes(movieTitle) || movieTitle.includes(title)) {
-                score += 20;
+                score += 40;
             }
 
-            // 4. Год (с допуском ±1)
-            if (i.year && movieYear) {
-                var diff = Math.abs(i.year - movieYear);
-                if (diff === 0) score += 20;
-                else if (diff === 1) score += 10;
+            // 4. Год
+            if (year && movieYear) {
+                var diff = Math.abs(year - movieYear);
+                if (diff === 0) score += 60;
+                else if (diff === 1) score += 40;
+                else if (diff < 5) score += 20;
             }
 
             if (score > bestScore) {
@@ -2272,7 +2279,7 @@
                 }
               }
 
-              if (search_year) {
+              if (cards.length > 1 && search_year) {
                 var _tmp2 = cards.filter(function (c) {
                   return c.year == search_year;
                 });
@@ -2280,11 +2287,7 @@
                 if (!_tmp2.length) _tmp2 = cards.filter(function (c) {
                   return c.year && c.year > search_year - 2 && c.year < search_year + 2;
                 });
-
-                if (_tmp2.length) {
-                  cards = _tmp2;
-                  if (cards.length == 1) is_sure = true;
-                }
+                if (_tmp2.length) cards = _tmp2;
               }
             }
 
@@ -14757,10 +14760,9 @@
         this.activity.loader(true);
 
         filter.onSearch = function (value) {
-          var _year = (object.movie.release_date || object.movie.first_air_date || '').slice(0, 4);
           Lampa.Activity.replace({
             search: value,
-            search_date: _year || '',
+            search_date: '',
             clarification: true
           });
         };
