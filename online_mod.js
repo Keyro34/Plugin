@@ -29,50 +29,48 @@
         var movieType  = getType(movie);
         var movieTitle = normalize(movie.title || movie.name);
         var movieOrig  = normalize(movie.original_title || movie.original_name);
-        var movieYear  = parseInt((movie.release_date || movie.first_air_date || '').slice(0,4)) || 0;
+        var movieYear  = (movie.release_date || movie.first_air_date || '').slice(0,4);
 
-        // 1. ФИЛЬТР ПО ТИПУ
-        var filtered = items.filter(function(i) {
-            return !i.type || i.type === movieType;
-        });
-        if (!filtered.length) filtered = items;
+        var best = null;
+        var bestScore = 0;
 
-        // 2. ТОЧНОЕ СОВПАДЕНИЕ НАЗВАНИЯ (сначала полное, потом частичное)
-        var byTitle = filtered.filter(function(i) {
-            var t = normalize(i.title);
-            var o = normalize(i.original_title);
-            return t === movieTitle || o === movieOrig;
-        });
+        items.forEach(function(i) {
+            var score = 0;
 
-        if (!byTitle.length) {
-            byTitle = filtered.filter(function(i) {
-                var t = normalize(i.title);
-                return t.includes(movieTitle) || movieTitle.includes(t);
-            });
-        }
+            // 1. TMDB (максимальный приоритет)
+            if (i.tmdb_id && movie.id && i.tmdb_id == movie.id) {
+                score += 100;
+            }
 
-        if (!byTitle.length) return filtered[0];
+            // 2. Тип (фильм/сериал)
+            if (i.type && i.type == movieType) {
+                score += 20;
+            }
 
-        // 3. ВСЕГДА БЕРЁМ САМЫЙ БЛИЗКИЙ ГОД (даже если разница 20 лет)
-        if (movieYear) {
-            var closest = null;
-            var minDiff = 999;
+            var title = normalize(i.title);
+            var orig  = normalize(i.original_title);
 
-            byTitle.forEach(function(i) {
-                if (!i.year) return;
+            // 3. Название
+            if (title == movieTitle || orig == movieOrig) {
+                score += 40;
+            } else if (title.includes(movieTitle) || movieTitle.includes(title)) {
+                score += 20;
+            }
+
+            // 4. Год (с допуском ±1)
+            if (i.year && movieYear) {
                 var diff = Math.abs(i.year - movieYear);
-                // при равенстве берём более новый
-                if (diff < minDiff || (diff === minDiff && i.year > (closest ? closest.year : 0))) {
-                    minDiff = diff;
-                    closest = i;
-                }
-            });
+                if (diff === 0) score += 20;
+                else if (diff === 1) score += 10;
+            }
 
-            if (closest) return closest;
-        }
+            if (score > bestScore) {
+                bestScore = score;
+                best = i;
+            }
+        });
 
-        // если годов нет — просто первый по названию
-        return byTitle[0];
+        return best || items[0];
     }
 
     var myIp = '';
