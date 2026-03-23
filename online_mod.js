@@ -29,7 +29,7 @@
         var movieType  = getType(movie);
         var movieTitle = normalize(movie.title || movie.name);
         var movieOrig  = normalize(movie.original_title || movie.original_name);
-        var movieYear  = parseInt((movie.release_date || movie.first_air_date || '').slice(0,4));
+        var movieYear  = (movie.release_date || movie.first_air_date || '').slice(0,4);
 
         var best = null;
         var bestScore = 0;
@@ -37,45 +37,31 @@
         items.forEach(function(i) {
             var score = 0;
 
+            // 1. TMDB (максимальный приоритет)
+            if (i.tmdb_id && movie.id && i.tmdb_id == movie.id) {
+                score += 100;
+            }
+
+            // 2. Тип (фильм/сериал)
+            if (i.type && i.type == movieType) {
+                score += 20;
+            }
+
             var title = normalize(i.title);
             var orig  = normalize(i.original_title);
-            var year  = parseInt(i.year);
-
-            var exactTitle = (title === movieTitle || orig === movieOrig);
-
-            // 1. TMDB — абсолютный приоритет
-            if (i.tmdb_id && movie.id && i.tmdb_id == movie.id) {
-                score += 1000;
-            }
-
-            // 2. Тип
-            if (i.type && i.type == movieType) {
-                score += 50;
-            }
 
             // 3. Название
-            if (exactTitle) {
-                score += 100;
-            } else if (title.includes(movieTitle) || movieTitle.includes(title)) {
+            if (title == movieTitle || orig == movieOrig) {
                 score += 40;
+            } else if (title.includes(movieTitle) || movieTitle.includes(title)) {
+                score += 20;
             }
 
-            // ❗ 4. ГОД — КЛЮЧЕВОЙ ФИКС
-            if (exactTitle) {
-                if (year && movieYear) {
-                    var diff = Math.abs(year - movieYear);
-
-                    if (diff === 0) score += 50;
-                    else if (diff === 1) score += 20;
-                    else score -= 100; // ❗ жёсткий штраф
-                }
-            } else {
-                if (year && movieYear) {
-                    var diff = Math.abs(year - movieYear);
-
-                    if (diff === 0) score += 20;
-                    else if (diff === 1) score += 10;
-                }
+            // 4. Год (с допуском ±1)
+            if (i.year && movieYear) {
+                var diff = Math.abs(i.year - movieYear);
+                if (diff === 0) score += 20;
+                else if (diff === 1) score += 10;
             }
 
             if (score > bestScore) {
@@ -84,10 +70,7 @@
             }
         });
 
-        // ❗ если лучший вариант сильно плохой — не брать
-        if (bestScore < 50) return null;
-
-        return best;
+        return best || items[0];
     }
 
     var myIp = '';
