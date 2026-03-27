@@ -1367,16 +1367,11 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие; вышедшие но без источника — полная яркость
-              var _isFutureEp2 = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > now.getFullYear() + 1) return false;
-                return airDate > now;
-              })();
-              if (_isFutureEp2) {
-                fakeItem.css('opacity','0.5');
+              // Затемняем ВСЕ — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
+              if (isFuture) {
                 var daysLeft = Math.ceil((airDate - now) / 86400000);
                 if (daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -1459,17 +1454,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -2014,17 +2004,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -3120,17 +3105,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -3885,17 +3865,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -4345,17 +4320,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -5001,17 +4971,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -5795,17 +5760,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -6305,17 +6265,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -7100,17 +7055,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -7730,17 +7680,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -8333,17 +8278,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -8985,17 +8925,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -9756,17 +9691,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -10340,17 +10270,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -10871,17 +10796,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -11392,17 +11312,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -11871,17 +11786,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -12348,17 +12258,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -13010,17 +12915,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -13764,17 +13664,12 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Затемняем только будущие эпизоды; вышедшие но отсутствующие в источнике — полная яркость
+              // Затемняем ВСЕ карточки из TMDB — их нет в источнике
+              fakeItem.css('opacity','0.5');
+
+              // "Осталось дней" только для будущих
               var _now2 = new Date();
-              var _isFutureEp = (function() {
-                if (!ep.air_date) return false;
-                if (!/20\d{2}/.test(ep.air_date)) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
-                if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
-                return airDate > _now2;
-              })();
-              if (_isFutureEp) {
-                fakeItem.css('opacity','0.5');
+              if (airDate && airDate > _now2) {
                 var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
                 if (_daysLeft > 0) {
                   fakeItem.find('.online__days-left')
@@ -16955,8 +16850,10 @@
                 .css('display','block');
           }
           item.css('opacity','0.5');
+        } else if (!fromSource && airDate && !isFuture) {
+          // Вышел но не в источнике — тоже затемняем
+          item.css('opacity','0.5');
         }
-        // Вышедшие но отсутствующие в источнике — НЕ затемняем (они реально доступны или скоро будут)
       });
     }
 
