@@ -254,7 +254,7 @@
       var user_proxy2 = (proxy_other_url || proxy2) + param_ip;
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
       if (name === 'lumex_api') return user_proxy2;
-      if (name === 'filmix_site') return Lampa.Platform.is('android') ? '' : (proxy_other && proxy_secret_ip || user_proxy1);
+      if (name === 'filmix_site') return proxy_other && proxy_secret_ip || user_proxy1;
       if (name === 'filmix_abuse') return '';
       if (name === 'zetflix') return '';
       if (name === 'allohacdn') return proxy_secret;
@@ -271,7 +271,7 @@
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
-        if (name === 'filmix') return Lampa.Platform.is('android') ? user_proxy2 : (proxy_other && proxy_secret_ip || user_proxy1);
+        if (name === 'filmix') return proxy_other && proxy_secret_ip || user_proxy1;
         if (name === 'videodb') return user_proxy2;
         if (name === 'fancdn') return user_proxy3;
         if (name === 'fancdn2') return user_proxy2;
@@ -457,6 +457,60 @@
       }
 
       return false;
+    }
+
+
+    // Filmix proxy fallback: кэшируем рабочий прокси, при редиректе пробуем следующий
+    var filmixProxyCache = {
+      index: 0,
+      working: null,
+      list: null,
+      reset: function() { this.index = 0; this.working = null; this.list = null; }
+    };
+
+    function getFilmixProxyList() {
+      var ip = getMyIp() || '';
+      var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
+      var proxy1a = 'https://cors.nb557.workers.dev/' + param_ip;
+      var proxy1b = 'https://cors.fx666.workers.dev/' + param_ip;
+      var proxy2  = 'https://apn-latest.onrender.com/' + (param_ip ? '' : 'ip/') + param_ip;
+      var proxy3  = 'https://cors557.deno.dev/' + param_ip;
+      return [proxy1a, proxy1b, proxy2, proxy3];
+    }
+
+    function isRedirectError(a) {
+      var msg = (a && (a.message || a.statusText || (a + ''))) || '';
+      return msg.toLowerCase().indexOf('redirect') !== -1;
+    }
+
+    function filmixNativeWithFallback(network, buildUrl, success, error, post, headers) {
+      if (!filmixProxyCache.list) filmixProxyCache.list = getFilmixProxyList();
+
+      function tryProxy(idx) {
+        if (idx >= filmixProxyCache.list.length) {
+          // все прокси провалились — пробуем без прокси (прямой запрос)
+          network.clear();
+          network.timeout(15000);
+          network['native'](buildUrl(''), success, function(a, c) {
+            if (error) error(a, c);
+          }, post, headers);
+          return;
+        }
+        var prox = filmixProxyCache.list[idx];
+        var url = buildUrl(prox);
+        network.clear();
+        network.timeout(15000);
+        network['native'](url, function(json) {
+          filmixProxyCache.working = prox;
+          filmixProxyCache.index = idx;
+          if (success) success(json);
+        }, function(a, c) {
+          console.log('Filmix proxy fallback failed idx=' + idx, a);
+          tryProxy(idx + 1);
+        }, post, headers);
+      }
+
+      tryProxy(filmixProxyCache.working ? filmixProxyCache.index : 0);
     }
 
     var Utils = {
@@ -5186,18 +5240,31 @@
         };
 
         var apiSearch = function apiSearch(abuse) {
-          var url = embed + 'search' + (abuse ? abuse_token : dev_token);
-          url = Lampa.Utils.addUrlComponent(url, 'story=' + encodeURIComponent(clean_title));
-          url = abuse ? component.proxyLink(url, prox3, '', '') : component.proxyLink(url, prox, prox_enc, 'enc2t');
-          network.clear();
-          network.timeout(15000);
-          network["native"](url, function (json) {
-            if (json && json.length && json.forEach) display(json);else siteSearch();
-          }, function (a, c) {
-            if (!abuse && abuse_token) apiSearch(true);else siteSearch();
-          }, false, {
-            headers: headers
-          });
+          var base_url = embed + 'search' + (abuse ? abuse_token : dev_token);
+          base_url = Lampa.Utils.addUrlComponent(base_url, 'story=' + encodeURIComponent(clean_title));
+          if (abuse) {
+            var url = component.proxyLink(base_url, prox3, '', '');
+            network.clear();
+            network.timeout(15000);
+            network["native"](url, function (json) {
+              if (json && json.length && json.forEach) display(json);else siteSearch();
+            }, function (a, c) {
+              siteSearch();
+            }, false, { headers: headers });
+          } else {
+            filmixNativeWithFallback(
+              network,
+              function(prox) { return proxyLink(base_url, prox, prox_enc, 'enc2t'); },
+              function(json) {
+                if (json && json.length && json.forEach) display(json);else siteSearch();
+              },
+              function(a, c) {
+                if (abuse_token) apiSearch(true);else siteSearch();
+              },
+              false,
+              { headers: headers }
+            );
+          }
         };
 
         decodeSecretToken(function () {
@@ -5232,30 +5299,42 @@
         } else end_search();
 
         function end_search() {
-          var url = embed + 'post/' + filmix_id + (abuse ? abuse_token : dev_token);
-          url = abuse ? component.proxyLink(url, prox3, '', '') : component.proxyLink(url, prox, prox_enc, 'enc2t');
+          var base_url = embed + 'post/' + filmix_id + (abuse ? abuse_token : dev_token);
 
           var not_found = function not_found(str) {
             if (abuse && abuse_error) success(abuse_error);else if (!abuse && abuse_token) find(filmix_id, true, null, true);else if (str) component.empty(str);else component.emptyForQuery(select_title);
           };
 
-          network.clear();
-          network.timeout(15000);
-          network["native"](url, function (found) {
+          var onSuccess = function(found) {
             var pl_links = found && found.player_links || {};
-
             if (pl_links.movie && Object.keys(pl_links.movie).length > 0 || pl_links.playlist && Object.keys(pl_links.playlist).length > 0) {
               if (!abuse && abuse_token && checkAbuse(found)) find(filmix_id, true, found);else success(found, low_quality);
             } else {
               console.log('Filmix', 'not found:', filmix_id, pl_links.movie, pl_links.playlist);
               not_found();
             }
-          }, function (a, c) {
+          };
+
+          var onError = function(a, c) {
             console.log('Filmix', 'error:', filmix_id, network.errorDecode(a, c));
             not_found(network.errorDecode(a, c));
-          }, false, {
-            headers: headers
-          });
+          };
+
+          if (abuse) {
+            var url = component.proxyLink(base_url, prox3, '', '');
+            network.clear();
+            network.timeout(15000);
+            network["native"](url, onSuccess, onError, false, { headers: headers });
+          } else {
+            filmixNativeWithFallback(
+              network,
+              function(prox) { return proxyLink(base_url, prox, prox_enc, 'enc2t'); },
+              onSuccess,
+              onError,
+              false,
+              { headers: headers }
+            );
+          }
         }
       }
 
