@@ -5179,7 +5179,7 @@
           network["native"](component.proxyLink(url, prox2, prox2_enc, 'enc2t'), function (json) {
             display(json && json.posts || []);
           }, function (a, c) {
-            component.empty(network.errorDecode(a, c));
+            try { component.empty(network.errorDecode(a, c)); } catch(e) { component.emptyForQuery(select_title); }
           }, false, {
             headers: headers2
           });
@@ -17409,7 +17409,7 @@
           showStatus();
         }
       }, function (a, c) {
-        Lampa.Noty.show(network.errorDecode(a, c));
+        try { if (a || c) Lampa.Noty.show(network.errorDecode(a, c)); } catch(e) { console.log('Filmix checkPro error', e); }
       }, false, {
         headers: filmix_headers
       });
