@@ -181,7 +181,8 @@
     }
 
     function filmixAppHost() {
-      return 'http://filmixapp.cyou';
+      return 'https://filmix.my';
+      //return 'http://filmixapp.cyou';
     }
 
     function filmixToken(dev_id, token) {
@@ -5179,7 +5180,7 @@
           network["native"](component.proxyLink(url, prox2, prox2_enc, 'enc2t'), function (json) {
             display(json && json.posts || []);
           }, function (a, c) {
-            try { component.empty(network.errorDecode(a, c)); } catch(e) { component.emptyForQuery(select_title); }
+            component.empty(network.errorDecode(a, c));
           }, false, {
             headers: headers2
           });
@@ -17409,7 +17410,7 @@
           showStatus();
         }
       }, function (a, c) {
-        try { if (a || c) Lampa.Noty.show(network.errorDecode(a, c)); } catch(e) { console.log('Filmix checkPro error', e); }
+        Lampa.Noty.show(network.errorDecode(a, c));
       }, false, {
         headers: filmix_headers
       });
