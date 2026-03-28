@@ -1367,19 +1367,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые эпизоды которых нет в источнике — не показываем
-              // Будущие — показываем затемнёнными
-              var _isReallyFuture = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              // Прошлые эпизоды которых нет в источнике — не добавляем
+              // (серия уже вышла, просто этот источник её не загрузил)
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut1 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > now.getFullYear() + 1) return false;
                 return airDate > now;
               })();
+              if (!_isFut1) return;
 
-              if (!_isReallyFuture) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия — затемняем, нельзя открыть
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var daysLeft = Math.ceil((airDate - now) / 86400000);
               if (daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -1461,19 +1460,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -2017,19 +2015,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -3124,19 +3121,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -3890,19 +3886,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -4351,19 +4346,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -5008,19 +5002,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -5803,19 +5796,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -6314,19 +6306,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -7110,19 +7101,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -7741,19 +7731,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -8345,19 +8334,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -8998,19 +8986,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -9770,19 +9757,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -10355,19 +10341,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -10887,19 +10872,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -11409,19 +11393,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -11889,19 +11872,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -12367,19 +12349,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -13030,19 +13011,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
@@ -13785,19 +13765,18 @@
                 fakeItem.find('.online-prestige__time.online__time').text(_ts);
               }
 
-              // Прошлые без источника — не показываем; будущие — затемняем
+              // Прошлые без источника — не добавляем
               var _now2 = new Date();
-              var _isReallyFuture2 = (function() {
-                if (!ep.air_date) return false;
-                if (!(/20\d{2}/.test(ep.air_date))) return false;
-                if (!airDate || isNaN(airDate.getTime())) return false;
+              if (!airDate || isNaN(airDate.getTime())) return;
+              var _isFut2 = (function() {
+                if (!ep.air_date || !(/20\d{2}/.test(ep.air_date))) return false;
                 if (airDate.getFullYear() > _now2.getFullYear() + 1) return false;
                 return airDate > _now2;
               })();
+              if (!_isFut2) return;
 
-              if (!_isReallyFuture2) return;
-
-              fakeItem.css('opacity','0.5');
+              // Будущая серия
+              fakeItem.css({'opacity':'0.4','pointer-events':'none'});
               var _daysLeft = Math.ceil((airDate - _now2) / 86400000);
               if (_daysLeft > 0) {
                 fakeItem.find('.online__days-left')
