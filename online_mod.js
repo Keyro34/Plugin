@@ -18080,9 +18080,42 @@
       });
     }
 
+    function patchLampaReguest() {
+      // Глобальный патч: защищает все errorDecode от undefined аргументов
+      // Это фиксит краш "Cannot read properties of undefined (reading 'undefined')"
+      // который возникает в network.native.headers [as error] по всему плагину
+      try {
+        var proto = Lampa.Reguest && Lampa.Reguest.prototype;
+        if (proto && proto.errorDecode) {
+          var _orig_errorDecode = proto.errorDecode;
+          proto.errorDecode = function(a, c) {
+            try {
+              if (a === undefined && c === undefined) return '';
+              return _orig_errorDecode.call(this, a, c);
+            } catch(e) {
+              console.log('errorDecode patch caught:', e);
+              return '';
+            }
+          };
+        }
+        if (proto && proto['native']) {
+          var _orig_native = proto['native'];
+          proto['native'] = function(url, success, error, data, params) {
+            var _safeError = error ? function(a, c) {
+              try { error(a, c); } catch(e) { console.log('network.native error handler crash:', e, url); }
+            } : error;
+            return _orig_native.call(this, url, success, _safeError, data, params);
+          };
+        }
+      } catch(e) {
+        console.log('patchLampaReguest failed:', e);
+      }
+    }
+
     function startPlugin() {
       if (Utils.isDebug3()) return;
       logApp();
+      patchLampaReguest();
       initStorage();
       initLang();
       initMain();
