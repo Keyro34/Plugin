@@ -17578,13 +17578,8 @@
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
-        // Нет прокси и нет returnHeaders (старый Android) — пробуем cookie-прокси как fallback
-        prox = Utils.proxy('cookie');
-        if (!prox) {
-          Lampa.Noty.show(Lampa.Lang.translate('online_mod_proxy_need') || 'Нужен прокси для получения куки HDrezka');
-          if (error) error();
-          return;
-        }
+        if (error) error();
+        return;
       }
 
       var user_agent = Utils.baseUserAgent();
@@ -17780,13 +17775,7 @@
           if (error) error();
         }
       }, function (a, c) {
-        try {
-          var msg = (a || c) ? network.errorDecode(a, c) : '';
-          if (msg) Lampa.Noty.show(msg);
-          else Lampa.Noty.show(Lampa.Lang.translate('network_noconnect') || 'Ошибка подключения к HDrezka');
-        } catch(e) {
-          Lampa.Noty.show('Ошибка подключения к HDrezka');
-        }
+        Lampa.Noty.show(network.errorDecode(a, c));
         if (error) error();
       }, postdata, {
         headers: headers,
