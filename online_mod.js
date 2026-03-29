@@ -17123,7 +17123,7 @@
             <div class="online-prestige__img omcard__img">
               <img class="online__still-img" alt="" src="{poster}"
                    style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;font-size:1em!important;opacity:1;transition:opacity 0.3s;"
-                   onerror="this.style.opacity='0.05';">
+                   onerror="this.style.display='none';">
               <div class="online-prestige__episode-number omcard__epnum"></div>
             </div>
 
