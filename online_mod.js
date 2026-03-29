@@ -17578,8 +17578,13 @@
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
-        if (error) error();
-        return;
+        // Нет прокси и нет returnHeaders (старый Android) — пробуем cookie-прокси как fallback
+        prox = Utils.proxy('cookie');
+        if (!prox) {
+          Lampa.Noty.show(Lampa.Lang.translate('online_mod_proxy_need') || 'Нужен прокси для получения куки HDrezka');
+          if (error) error();
+          return;
+        }
       }
 
       var user_agent = Utils.baseUserAgent();
@@ -17775,7 +17780,13 @@
           if (error) error();
         }
       }, function (a, c) {
-        Lampa.Noty.show(network.errorDecode(a, c));
+        try {
+          var msg = (a || c) ? network.errorDecode(a, c) : '';
+          if (msg) Lampa.Noty.show(msg);
+          else Lampa.Noty.show(Lampa.Lang.translate('network_noconnect') || 'Ошибка подключения к HDrezka');
+        } catch(e) {
+          Lampa.Noty.show('Ошибка подключения к HDrezka');
+        }
         if (error) error();
       }, postdata, {
         headers: headers,
@@ -18080,42 +18091,9 @@
       });
     }
 
-    function patchLampaReguest() {
-      // Глобальный патч: защищает все errorDecode от undefined аргументов
-      // Это фиксит краш "Cannot read properties of undefined (reading 'undefined')"
-      // который возникает в network.native.headers [as error] по всему плагину
-      try {
-        var proto = Lampa.Reguest && Lampa.Reguest.prototype;
-        if (proto && proto.errorDecode) {
-          var _orig_errorDecode = proto.errorDecode;
-          proto.errorDecode = function(a, c) {
-            try {
-              if (a === undefined && c === undefined) return '';
-              return _orig_errorDecode.call(this, a, c);
-            } catch(e) {
-              console.log('errorDecode patch caught:', e);
-              return '';
-            }
-          };
-        }
-        if (proto && proto['native']) {
-          var _orig_native = proto['native'];
-          proto['native'] = function(url, success, error, data, params) {
-            var _safeError = error ? function(a, c) {
-              try { error(a, c); } catch(e) { console.log('network.native error handler crash:', e, url); }
-            } : error;
-            return _orig_native.call(this, url, success, _safeError, data, params);
-          };
-        }
-      } catch(e) {
-        console.log('patchLampaReguest failed:', e);
-      }
-    }
-
     function startPlugin() {
       if (Utils.isDebug3()) return;
       logApp();
-      patchLampaReguest();
       initStorage();
       initLang();
       initMain();
