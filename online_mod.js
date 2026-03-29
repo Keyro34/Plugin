@@ -16198,7 +16198,7 @@
       Lampa.Params.trigger('online_mod_proxy_anilibria', false);
       Lampa.Params.trigger('online_mod_proxy_anilibria2', false);
       Lampa.Params.trigger('online_mod_proxy_animelib', false);
-      Lampa.Params.trigger('online_mod_proxy_kodik', false);
+      Lampa.Params.trigger('online_mod_proxy_kodik', Lampa.Platform.is('android'));
       Lampa.Params.trigger('online_mod_proxy_kinopub', false);
       Lampa.Params.trigger('online_mod_proxy_alloha', false);
       Lampa.Params.trigger('online_mod_proxy_hdvb', false);
