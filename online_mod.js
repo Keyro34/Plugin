@@ -236,11 +236,10 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = new Date().getHours() % 2 ? 'https://cors.nb557.workers.dev/' : 'https://cors.fx666.workers.dev/';
+      var proxy1 = 'https://cors.lampa.workers.dev/';
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
-      var proxy4 = 'https://cors.lampa.workers.dev/';
       var proxy_secret = '';
       var proxy_secret_ip = '';
 
@@ -272,20 +271,7 @@
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
-        if (name === 'filmix') {
-          if (Lampa.Platform.is('android')) {
-            // На Android: пробуем proxy2, proxy3, proxy4 — избегаем proxy1 который даёт redirects
-            var filmix_proxies = [
-              (proxy_other_url || proxy2_base + (param_ip ? '' : 'ip/')) + param_ip,
-              (proxy_other_url || proxy3) + param_ip,
-              (proxy_other_url || proxy4) + param_ip
-            ];
-            var cached = Lampa.Storage.get('filmix_working_proxy', '');
-            if (cached && filmix_proxies.indexOf(cached) !== -1) return cached;
-            return filmix_proxies[0];
-          }
-          return proxy_other && proxy_secret_ip || user_proxy1;
-        }
+        if (name === 'filmix') return proxy_other && proxy_secret_ip || user_proxy1;
         if (name === 'videodb') return user_proxy2;
         if (name === 'fancdn') return user_proxy3;
         if (name === 'fancdn2') return user_proxy2;
@@ -5199,33 +5185,16 @@
           });
         };
 
-        var androidFilmixProxies = Lampa.Platform.is('android') ? [
-          'https://apn-latest.onrender.com/ip/',
-          'https://cors557.deno.dev/',
-          'https://cors.lampa.workers.dev/',
-          '' // без прокси как последний вариант
-        ] : null;
-
-        var apiSearch = function apiSearch(abuse, proxyIdx) {
-          if (proxyIdx === undefined) proxyIdx = 0;
-          var base_url = embed + 'search' + (abuse ? abuse_token : dev_token);
-          base_url = Lampa.Utils.addUrlComponent(base_url, 'story=' + encodeURIComponent(clean_title));
-          var cur_prox = androidFilmixProxies ? androidFilmixProxies[proxyIdx] : prox;
-          var url = abuse ? component.proxyLink(base_url, prox3, '', '') : component.proxyLink(base_url, cur_prox, cur_prox ? prox_enc : '', 'enc2t');
+        var apiSearch = function apiSearch(abuse) {
+          var url = embed + 'search' + (abuse ? abuse_token : dev_token);
+          url = Lampa.Utils.addUrlComponent(url, 'story=' + encodeURIComponent(clean_title));
+          url = abuse ? component.proxyLink(url, prox3, '', '') : component.proxyLink(url, prox, prox_enc, 'enc2t');
           network.clear();
           network.timeout(15000);
           network["native"](url, function (json) {
-            if (androidFilmixProxies && cur_prox !== undefined) Lampa.Storage.set('filmix_working_proxy', cur_prox);
             if (json && json.length && json.forEach) display(json);else siteSearch();
           }, function (a, c) {
-            if (!abuse && androidFilmixProxies && proxyIdx + 1 < androidFilmixProxies.length) {
-              console.log('Filmix proxy failed, trying next:', proxyIdx + 1);
-              apiSearch(false, proxyIdx + 1);
-            } else if (!abuse && abuse_token) {
-              apiSearch(true);
-            } else {
-              siteSearch();
-            }
+            if (!abuse && abuse_token) apiSearch(true);else siteSearch();
           }, false, {
             headers: headers
           });
@@ -17154,7 +17123,7 @@
             <div class="online-prestige__img omcard__img">
               <img class="online__still-img" alt="" src="{poster}"
                    style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;font-size:1em!important;opacity:1;transition:opacity 0.3s;"
-                   onerror="this.style.opacity='0.05';">
+                   onerror="this.style.display='none';">
               <div class="online-prestige__episode-number omcard__epnum"></div>
             </div>
 
