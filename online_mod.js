@@ -236,7 +236,7 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = new Date().getHours() % 2 ? 'https://cors.nb557.workers.dev/' : 'https://cors.fx666.workers.dev/';
+      var proxy1 = 'https://cors.lampa.workers.dev/';
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
@@ -17123,7 +17123,7 @@
             <div class="online-prestige__img omcard__img">
               <img class="online__still-img" alt="" src="{poster}"
                    style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;font-size:1em!important;opacity:1;transition:opacity 0.3s;"
-                   onerror="this.style.display='none';">
+                   onerror="this.style.opacity='0.05';">
               <div class="online-prestige__episode-number omcard__epnum"></div>
             </div>
 
