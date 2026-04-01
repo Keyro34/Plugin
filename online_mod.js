@@ -255,7 +255,7 @@
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
       if (name === 'lumex_api') return user_proxy2;
       if (name === 'filmix_site') return proxy_other && proxy_secret_ip || user_proxy1;
-      if (name === 'filmix_abuse') return user_proxy3;
+      if (name === 'filmix_abuse') return user_proxy2;
       if (name === 'zetflix') return '';
       if (name === 'allohacdn') return proxy_secret;
       if (name === 'cookie') return user_proxy1;
@@ -5232,48 +5232,30 @@
         } else end_search();
 
         function end_search() {
-          var base_url = embed + 'post/' + filmix_id + (abuse ? abuse_token : dev_token);
+          var url = embed + 'post/' + filmix_id + (abuse ? abuse_token : dev_token);
+          url = abuse ? component.proxyLink(url, prox3, '', '') : component.proxyLink(url, prox, prox_enc, 'enc2t');
 
           var not_found = function not_found(str) {
             if (abuse && abuse_error) success(abuse_error);else if (!abuse && abuse_token) find(filmix_id, true, null, true);else if (str) component.empty(str);else component.emptyForQuery(select_title);
           };
 
-          var on_success = function on_success(found) {
+          network.clear();
+          network.timeout(15000);
+          network["native"](url, function (found) {
             var pl_links = found && found.player_links || {};
+
             if (pl_links.movie && Object.keys(pl_links.movie).length > 0 || pl_links.playlist && Object.keys(pl_links.playlist).length > 0) {
               if (!abuse && abuse_token && checkAbuse(found)) find(filmix_id, true, found);else success(found, low_quality);
             } else {
-              console.log('Filmix', 'not found:', filmix_id);
+              console.log('Filmix', 'not found:', filmix_id, pl_links.movie, pl_links.playlist);
               not_found();
             }
-          };
-
-          if (abuse) {
-            var abuse_proxies = [prox3, prox];
-            function try_abuse(idx) {
-              var a_url = component.proxyLink(base_url, abuse_proxies[idx], '', '');
-              console.log('Filmix abuse try proxy idx=' + idx, a_url.substring(0, 80));
-              network.clear();
-              network.timeout(15000);
-              network["native"](a_url, on_success, function(a, c) {
-                console.log('Filmix abuse proxy failed idx=' + idx, network.errorDecode(a, c));
-                if (idx + 1 < abuse_proxies.length) {
-                  try_abuse(idx + 1);
-                } else {
-                  not_found(network.errorDecode(a, c));
-                }
-              }, false, { headers: headers });
-            }
-            try_abuse(0);
-          } else {
-            var url = component.proxyLink(base_url, prox, prox_enc, 'enc2t');
-            network.clear();
-            network.timeout(15000);
-            network["native"](url, on_success, function(a, c) {
-              console.log('Filmix', 'error:', filmix_id, network.errorDecode(a, c));
-              not_found(network.errorDecode(a, c));
-            }, false, { headers: headers });
-          }
+          }, function (a, c) {
+            console.log('Filmix', 'error:', filmix_id, network.errorDecode(a, c));
+            not_found(network.errorDecode(a, c));
+          }, false, {
+            headers: headers
+          });
         }
       }
 
@@ -5403,6 +5385,8 @@
             ++seas_num;
 
             for (var voice_id in season) {
+              // Пропускаем заблокированные озвучки
+              if (voice_id === 'Заблокировано правообладателем!') continue;
               var episodes = season[voice_id];
               var items = [];
               var epis_num = 0;
@@ -5505,12 +5489,15 @@
             if (_max_quality) {
               var file_url = _stream_url.replace(/\[[\d,]*\](\.mp4)/i, '%s$1');
 
-              movies.push({
-                translation: _file.translation,
-                file: file_url,
-                quality: _max_quality,
-                qualities: _quality_eps
-              });
+              // Пропускаем заблокированные правообладателем
+              if (_file.translation !== 'Заблокировано правообладателем!') {
+                movies.push({
+                  translation: _file.translation,
+                  file: file_url,
+                  quality: _max_quality,
+                  qualities: _quality_eps
+                });
+              }
             }
           }
 
