@@ -255,7 +255,7 @@
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
       if (name === 'lumex_api') return user_proxy2;
       if (name === 'filmix_site') return proxy_other && proxy_secret_ip || user_proxy1;
-      if (name === 'filmix_abuse') return user_proxy2;
+      if (name === 'filmix_abuse') return user_proxy3;
       if (name === 'zetflix') return '';
       if (name === 'allohacdn') return proxy_secret;
       if (name === 'cookie') return user_proxy1;
@@ -5232,30 +5232,52 @@
         } else end_search();
 
         function end_search() {
-          var url = embed + 'post/' + filmix_id + (abuse ? abuse_token : dev_token);
-          url = abuse ? component.proxyLink(url, prox3, '', '') : component.proxyLink(url, prox, prox_enc, 'enc2t');
+          var base_url = embed + 'post/' + filmix_id + (abuse ? abuse_token : dev_token);
 
           var not_found = function not_found(str) {
             if (abuse && abuse_error) success(abuse_error);else if (!abuse && abuse_token) find(filmix_id, true, null, true);else if (str) component.empty(str);else component.emptyForQuery(select_title);
           };
 
-          network.clear();
-          network.timeout(15000);
-          network["native"](url, function (found) {
+          var on_success = function on_success(found) {
             var pl_links = found && found.player_links || {};
-
             if (pl_links.movie && Object.keys(pl_links.movie).length > 0 || pl_links.playlist && Object.keys(pl_links.playlist).length > 0) {
               if (!abuse && abuse_token && checkAbuse(found)) find(filmix_id, true, found);else success(found, low_quality);
             } else {
-              console.log('Filmix', 'not found:', filmix_id, pl_links.movie, pl_links.playlist);
+              console.log('Filmix', 'not found:', filmix_id);
               not_found();
             }
-          }, function (a, c) {
-            console.log('Filmix', 'error:', filmix_id, network.errorDecode(a, c));
-            not_found(network.errorDecode(a, c));
-          }, false, {
-            headers: headers
-          });
+          };
+
+          if (abuse) {
+            // Abuse: пробуем proxy3, потом proxy1 как fallback
+            var abuse_proxies = [prox3, prox];
+            var abuse_idx = 0;
+
+            function try_abuse(idx) {
+              var a_url = component.proxyLink(base_url, abuse_proxies[idx], '', '');
+              console.log('Filmix abuse try proxy idx=' + idx, a_url.substring(0, 80));
+              network.clear();
+              network.timeout(15000);
+              network["native"](a_url, on_success, function(a, c) {
+                console.log('Filmix abuse proxy failed idx=' + idx, network.errorDecode(a, c));
+                if (idx + 1 < abuse_proxies.length) {
+                  try_abuse(idx + 1);
+                } else {
+                  not_found(network.errorDecode(a, c));
+                }
+              }, false, { headers: headers });
+            }
+
+            try_abuse(0);
+          } else {
+            var url = component.proxyLink(base_url, prox, prox_enc, 'enc2t');
+            network.clear();
+            network.timeout(15000);
+            network["native"](url, on_success, function(a, c) {
+              console.log('Filmix', 'error:', filmix_id, network.errorDecode(a, c));
+              not_found(network.errorDecode(a, c));
+            }, false, { headers: headers });
+          }
         }
       }
 
@@ -5319,57 +5341,43 @@
       function checkAbuse(data) {
         var pl_links = data.player_links || {};
 
-        // Логирование для отладки
-        console.log('Filmix checkAbuse: movie keys=', pl_links.movie ? Object.keys(pl_links.movie) : 'none');
-        if (pl_links.playlist) {
-          for (var _s in pl_links.playlist) {
-            for (var _v in pl_links.playlist[_s]) {
-              console.log('Filmix checkAbuse: playlist season=' + _s + ' voice=' + _v);
-            }
-          }
-        }
-
         // Проверка фильмов
         if (pl_links.movie && Object.keys(pl_links.movie).length > 0) {
           for (var ID in pl_links.movie) {
             var file = pl_links.movie[ID];
             var stream_url = file.link || '';
-            console.log('Filmix checkAbuse movie: translation=' + file.translation + ' url=' + stream_url.substring(0, 60));
             if (file.translation === 'Заблокировано правообладателем!' && stream_url.indexOf('/abuse_') !== -1) {
               var found = stream_url.match(/https?:\/\/[^\/]+(\/s\/[^\/]*\/)/);
               if (found) {
                 secret = '$1' + found[1];
                 secret_url = '';
-                console.log('Filmix', 'abuse movie triggered:', data.id);
+                console.log('Filmix', 'abuse movie:', data.id);
                 return true;
               }
             }
           }
         }
 
-        // Проверка сериалов (playlist) — voice_id это название озвучки
+        // Проверка сериалов (playlist)
         if (pl_links.playlist && Object.keys(pl_links.playlist).length > 0) {
           for (var season_id in pl_links.playlist) {
             var season = pl_links.playlist[season_id];
             for (var voice_id in season) {
-              var isBlocked = voice_id === 'Заблокировано правообладателем!';
-              console.log('Filmix checkAbuse playlist: voice=' + voice_id + ' blocked=' + isBlocked);
-              if (isBlocked) {
+              if (voice_id === 'Заблокировано правообладателем!') {
                 var episodes = season[voice_id];
                 for (var ep_id in episodes) {
                   var ep = episodes[ep_id];
                   var ep_url = ep.link || '';
-                  console.log('Filmix checkAbuse playlist ep: url=' + ep_url.substring(0, 60));
                   if (ep_url.indexOf('/abuse_') !== -1) {
                     var ep_found = ep_url.match(/https?:\/\/[^\/]+(\/s\/[^\/]*\/)/);
                     if (ep_found) {
                       secret = '$1' + ep_found[1];
                       secret_url = '';
-                      console.log('Filmix', 'abuse playlist triggered:', data.id, voice_id);
+                      console.log('Filmix', 'abuse playlist:', data.id, voice_id);
                       return true;
                     }
                   }
-                  // не break — проверяем все эпизоды
+                  break; // достаточно первого эпизода
                 }
               }
             }
