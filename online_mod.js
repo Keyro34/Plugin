@@ -181,7 +181,7 @@
     }
 
     function filmixAppHost() {
-      return 'https://filmixapp.cyou';
+      return 'http://filmixapp.cyou';
     }
 
     function filmixToken(dev_id, token) {
@@ -5385,8 +5385,6 @@
             ++seas_num;
 
             for (var voice_id in season) {
-              // Пропускаем заблокированные озвучки
-              if (voice_id === 'Заблокировано правообладателем!') continue;
               var episodes = season[voice_id];
               var items = [];
               var epis_num = 0;
@@ -5489,15 +5487,12 @@
             if (_max_quality) {
               var file_url = _stream_url.replace(/\[[\d,]*\](\.mp4)/i, '%s$1');
 
-              // Пропускаем заблокированные правообладателем
-              if (_file.translation !== 'Заблокировано правообладателем!') {
-                movies.push({
-                  translation: _file.translation,
-                  file: file_url,
-                  quality: _max_quality,
-                  qualities: _quality_eps
-                });
-              }
+              movies.push({
+                translation: _file.translation,
+                file: file_url,
+                quality: _max_quality,
+                qualities: _quality_eps
+              });
             }
           }
 
