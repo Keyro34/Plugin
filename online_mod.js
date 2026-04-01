@@ -5319,43 +5319,57 @@
       function checkAbuse(data) {
         var pl_links = data.player_links || {};
 
+        // Логирование для отладки
+        console.log('Filmix checkAbuse: movie keys=', pl_links.movie ? Object.keys(pl_links.movie) : 'none');
+        if (pl_links.playlist) {
+          for (var _s in pl_links.playlist) {
+            for (var _v in pl_links.playlist[_s]) {
+              console.log('Filmix checkAbuse: playlist season=' + _s + ' voice=' + _v);
+            }
+          }
+        }
+
         // Проверка фильмов
         if (pl_links.movie && Object.keys(pl_links.movie).length > 0) {
           for (var ID in pl_links.movie) {
             var file = pl_links.movie[ID];
             var stream_url = file.link || '';
+            console.log('Filmix checkAbuse movie: translation=' + file.translation + ' url=' + stream_url.substring(0, 60));
             if (file.translation === 'Заблокировано правообладателем!' && stream_url.indexOf('/abuse_') !== -1) {
               var found = stream_url.match(/https?:\/\/[^\/]+(\/s\/[^\/]*\/)/);
               if (found) {
                 secret = '$1' + found[1];
                 secret_url = '';
-                console.log('Filmix', 'abuse movie:', data.id);
+                console.log('Filmix', 'abuse movie triggered:', data.id);
                 return true;
               }
             }
           }
         }
 
-        // Проверка сериалов (playlist)
+        // Проверка сериалов (playlist) — voice_id это название озвучки
         if (pl_links.playlist && Object.keys(pl_links.playlist).length > 0) {
           for (var season_id in pl_links.playlist) {
             var season = pl_links.playlist[season_id];
             for (var voice_id in season) {
-              if (voice_id === 'Заблокировано правообладателем!') {
+              var isBlocked = voice_id === 'Заблокировано правообладателем!';
+              console.log('Filmix checkAbuse playlist: voice=' + voice_id + ' blocked=' + isBlocked);
+              if (isBlocked) {
                 var episodes = season[voice_id];
                 for (var ep_id in episodes) {
                   var ep = episodes[ep_id];
                   var ep_url = ep.link || '';
+                  console.log('Filmix checkAbuse playlist ep: url=' + ep_url.substring(0, 60));
                   if (ep_url.indexOf('/abuse_') !== -1) {
                     var ep_found = ep_url.match(/https?:\/\/[^\/]+(\/s\/[^\/]*\/)/);
                     if (ep_found) {
                       secret = '$1' + ep_found[1];
                       secret_url = '';
-                      console.log('Filmix', 'abuse playlist:', data.id, voice_id);
+                      console.log('Filmix', 'abuse playlist triggered:', data.id, voice_id);
                       return true;
                     }
                   }
-                  break; // достаточно первого эпизода
+                  // не break — проверяем все эпизоды
                 }
               }
             }
