@@ -181,7 +181,7 @@
     }
 
     function filmixAppHost() {
-      return 'http://filmixapp.cyou';
+      return 'https://filmixapp.cyou';
     }
 
     function filmixToken(dev_id, token) {
@@ -5249,10 +5249,7 @@
           };
 
           if (abuse) {
-            // Abuse: пробуем proxy3, потом proxy1 как fallback
             var abuse_proxies = [prox3, prox];
-            var abuse_idx = 0;
-
             function try_abuse(idx) {
               var a_url = component.proxyLink(base_url, abuse_proxies[idx], '', '');
               console.log('Filmix abuse try proxy idx=' + idx, a_url.substring(0, 80));
@@ -5267,7 +5264,6 @@
                 }
               }, false, { headers: headers });
             }
-
             try_abuse(0);
           } else {
             var url = component.proxyLink(base_url, prox, prox_enc, 'enc2t');
