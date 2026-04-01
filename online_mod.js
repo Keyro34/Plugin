@@ -236,7 +236,7 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = 'https://cors.lampa.workers.dev/';
+      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : (new Date().getHours() % 2 ? 'https://cors.nb557.workers.dev/' : 'https://cors.fx666.workers.dev/');
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
@@ -5324,7 +5324,6 @@
           for (var ID in pl_links.movie) {
             var file = pl_links.movie[ID];
             var stream_url = file.link || '';
-
             if (file.translation === 'Заблокировано правообладателем!' && stream_url.indexOf('/abuse_') !== -1) {
               var found = stream_url.match(/https?:\/\/[^\/]+(\/s\/[^\/]*\/)/);
               if (found) {
@@ -5342,7 +5341,6 @@
           for (var season_id in pl_links.playlist) {
             var season = pl_links.playlist[season_id];
             for (var voice_id in season) {
-              // voice_id это название озвучки — проверяем заблокирована ли она
               if (voice_id === 'Заблокировано правообладателем!') {
                 var episodes = season[voice_id];
                 for (var ep_id in episodes) {
@@ -5357,8 +5355,7 @@
                       return true;
                     }
                   }
-                  // достаточно первого эпизода для определения
-                  break;
+                  break; // достаточно первого эпизода
                 }
               }
             }
@@ -16163,7 +16160,7 @@
     function initStorage() {
       if (!Utils.isDebug()) {
         Lampa.Storage.set('online_mod_proxy_lumex', 'false');
-        Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
+        Lampa.Storage.set('online_mod_proxy_rezka2', Lampa.Platform.is('android') ? 'false' : 'true');
         Lampa.Storage.set('online_mod_proxy_kinobase', 'false');
         Lampa.Storage.set('online_mod_proxy_collaps', 'false');
         Lampa.Storage.set('online_mod_proxy_cdnmovies', 'false');
