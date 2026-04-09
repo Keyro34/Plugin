@@ -181,7 +181,7 @@
     }
 
     function filmixAppHost() {
-      return 'http://filmixapp.cyou';
+      return 'https://filmixapp.cyou';
     }
 
     function filmixToken(dev_id, token) {
@@ -236,7 +236,7 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = 'https://api.allorigins.win/raw?url=';
+      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : (new Date().getHours() % 2 ? 'https://cors.nb557.workers.dev/' : 'https://cors.fx666.workers.dev/');
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
@@ -5385,6 +5385,7 @@
             ++seas_num;
 
             for (var voice_id in season) {
+              if (voice_id === 'Заблокировано правообладателем!') continue;
               var episodes = season[voice_id];
               var items = [];
               var epis_num = 0;
@@ -5487,12 +5488,14 @@
             if (_max_quality) {
               var file_url = _stream_url.replace(/\[[\d,]*\](\.mp4)/i, '%s$1');
 
-              movies.push({
-                translation: _file.translation,
-                file: file_url,
-                quality: _max_quality,
-                qualities: _quality_eps
-              });
+              if (_file.translation !== 'Заблокировано правообладателем!') {
+                movies.push({
+                  translation: _file.translation,
+                  file: file_url,
+                  quality: _max_quality,
+                  qualities: _quality_eps
+                });
+              }
             }
           }
 
