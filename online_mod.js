@@ -181,7 +181,7 @@
     }
 
     function filmixAppHost() {
-      return 'https://filmixapp.cyou';
+      return 'http://filmixapp.cyou';
     }
 
     function filmixToken(dev_id, token) {
@@ -5385,7 +5385,6 @@
             ++seas_num;
 
             for (var voice_id in season) {
-              if (voice_id === 'Заблокировано правообладателем!') continue;
               var episodes = season[voice_id];
               var items = [];
               var epis_num = 0;
@@ -5406,7 +5405,7 @@
                   stream_url = component.fixLinkProtocol(stream_url, prefer_http, true);
 
                   if (secret) {
-                    stream_url = stream_url.replace(/(https?:\/\/[^\/]+)\/s\/[^\/]*\//, secret);
+                    stream_url = stream_url.replace(/^https?:\/\//, 'https://abuse-filmix.cyou/');
                     if (secret_url) stream_url = stream_url.replace(/^https?:\/\//, secret_url);
                   }
 
@@ -5488,14 +5487,12 @@
             if (_max_quality) {
               var file_url = _stream_url.replace(/\[[\d,]*\](\.mp4)/i, '%s$1');
 
-              if (_file.translation !== 'Заблокировано правообладателем!') {
-                movies.push({
-                  translation: _file.translation,
-                  file: file_url,
-                  quality: _max_quality,
-                  qualities: _quality_eps
-                });
-              }
+              movies.push({
+                translation: _file.translation,
+                file: file_url,
+                quality: _max_quality,
+                qualities: _quality_eps
+              });
             }
           }
 
