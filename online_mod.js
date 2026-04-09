@@ -5405,7 +5405,7 @@
                   stream_url = component.fixLinkProtocol(stream_url, prefer_http, true);
 
                   if (secret) {
-                    stream_url = stream_url.replace(/^https?:\/\//, 'https://abuse-filmix.cyou/');
+                    stream_url = stream_url.replace(/(https?:\/\/[^\/]+)\/s\/[^\/]*\//, secret);
                     if (secret_url) stream_url = stream_url.replace(/^https?:\/\//, secret_url);
                   }
 
