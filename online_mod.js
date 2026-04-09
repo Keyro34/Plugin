@@ -146,7 +146,7 @@
 
     function rezka2Mirror() {
       var url = Lampa.Storage.get('online_mod_rezka2_mirror', '') + '';
-      if (!url) return 'https://hdrezka.sh';
+      if (!url) return 'https://kvk.zone';
       if (url.indexOf('://') == -1) url = 'https://' + url;
       if (url.charAt(url.length - 1) === '/') url = url.substring(0, url.length - 1);
       return url;
@@ -177,7 +177,7 @@
     }
 
     function filmixHost$1() {
-      return 'https://filmix.ac';
+      return 'https://filmix.my';
     }
 
     function filmixAppHost() {
@@ -236,7 +236,7 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : (new Date().getHours() % 2 ? 'https://cors.nb557.workers.dev/' : 'https://cors.fx666.workers.dev/');
+      var proxy1 = 'https://corsproxy.io/?';
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
