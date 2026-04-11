@@ -255,7 +255,7 @@
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
       if (name === 'lumex_api') return user_proxy2;
       if (name === 'filmix_site') return Lampa.Platform.is('android') ? '' : (proxy_other && proxy_secret_ip || user_proxy1);
-      if (name === 'filmix_abuse') return user_proxy2;
+      if (name === 'filmix_abuse') return proxy_other_url || proxy2_base;
       if (name === 'zetflix') return '';
       if (name === 'allohacdn') return proxy_secret;
       if (name === 'cookie') return user_proxy1;
@@ -271,7 +271,7 @@
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
-        if (name === 'filmix') return Lampa.Platform.is('android') ? (proxy_other_url || proxy2_base) : (proxy_other && proxy_secret_ip || user_proxy1);
+        if (name === 'filmix') return proxy_other_url || proxy2_base;
         if (name === 'videodb') return user_proxy2;
         if (name === 'fancdn') return user_proxy3;
         if (name === 'fancdn2') return user_proxy2;
