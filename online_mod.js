@@ -181,7 +181,7 @@
     }
 
     function filmixAppHost() {
-      return 'http://filmixapp.cyou';
+      return 'http://filmixapp.pro';
     }
 
     function filmixToken(dev_id, token) {
@@ -271,7 +271,7 @@
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
-        if (name === 'filmix') return proxy_other && proxy_secret_ip || user_proxy2;
+        if (name === 'filmix') return proxy_other && proxy_secret_ip || user_proxy1;
         if (name === 'videodb') return user_proxy2;
         if (name === 'fancdn') return user_proxy3;
         if (name === 'fancdn2') return user_proxy2;
