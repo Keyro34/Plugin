@@ -5385,6 +5385,7 @@
             ++seas_num;
 
             for (var voice_id in season) {
+              if (voice_id === 'Заблокировано правообладателем!') continue;
               var episodes = season[voice_id];
               var items = [];
               var epis_num = 0;
@@ -5457,6 +5458,7 @@
 
           for (var ID in pl_links.movie) {
             var _file = pl_links.movie[ID];
+            if (_file.translation === 'Заблокировано правообладателем!') continue;
             var _max_quality = filmix_max_qualitie;
 
             var _stream_url = _file.link || '';
