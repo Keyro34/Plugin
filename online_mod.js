@@ -181,7 +181,7 @@
     }
 
     function filmixAppHost() {
-      return 'https://filmixapp.cyou';
+      return 'http://filmixapp.cyou';
     }
 
     function filmixToken(dev_id, token) {
@@ -255,7 +255,7 @@
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
       if (name === 'lumex_api') return user_proxy2;
       if (name === 'filmix_site') return proxy_other && proxy_secret_ip || user_proxy1;
-      if (name === 'filmix_abuse') return user_proxy1;
+      if (name === 'filmix_abuse') return user_proxy2;
       if (name === 'zetflix') return '';
       if (name === 'allohacdn') return proxy_secret;
       if (name === 'cookie') return user_proxy1;
@@ -271,7 +271,7 @@
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
-        if (name === 'filmix') return proxy_other && proxy_secret_ip || user_proxy1;
+        if (name === 'filmix') return proxy_other && proxy_secret_ip || user_proxy2;
         if (name === 'videodb') return user_proxy2;
         if (name === 'fancdn') return user_proxy3;
         if (name === 'fancdn2') return user_proxy2;
@@ -5188,7 +5188,7 @@
         var apiSearch = function apiSearch(abuse) {
           var url = embed + 'search' + (abuse ? abuse_token : dev_token);
           url = Lampa.Utils.addUrlComponent(url, 'story=' + encodeURIComponent(clean_title));
-          url = abuse ? component.proxyLink(url, prox3, prox_enc, 'enc2t') : component.proxyLink(url, prox, prox_enc, 'enc2t');
+          url = abuse ? component.proxyLink(url, prox3, '', '') : component.proxyLink(url, prox, prox_enc, 'enc2t');
           network.clear();
           network.timeout(15000);
           network["native"](url, function (json) {
@@ -5233,7 +5233,7 @@
 
         function end_search() {
           var url = embed + 'post/' + filmix_id + (abuse ? abuse_token : dev_token);
-          url = abuse ? component.proxyLink(url, prox3, prox_enc, 'enc2t') : component.proxyLink(url, prox, prox_enc, 'enc2t');
+          url = abuse ? component.proxyLink(url, prox3, '', '') : component.proxyLink(url, prox, prox_enc, 'enc2t');
 
           var not_found = function not_found(str) {
             if (abuse && abuse_error) success(abuse_error);else if (!abuse && abuse_token) find(filmix_id, true, null, true);else if (str) component.empty(str);else component.emptyForQuery(select_title);
