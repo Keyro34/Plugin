@@ -181,7 +181,7 @@
     }
 
     function filmixAppHost() {
-      return 'http://filmixapp.cyou';
+      return 'https://filmixapp.cyou';
     }
 
     function filmixToken(dev_id, token) {
@@ -255,7 +255,7 @@
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
       if (name === 'lumex_api') return user_proxy2;
       if (name === 'filmix_site') return proxy_other && proxy_secret_ip || user_proxy1;
-      if (name === 'filmix_abuse') return user_proxy2;
+      if (name === 'filmix_abuse') return user_proxy1;
       if (name === 'zetflix') return '';
       if (name === 'allohacdn') return proxy_secret;
       if (name === 'cookie') return user_proxy1;
@@ -5233,7 +5233,7 @@
 
         function end_search() {
           var url = embed + 'post/' + filmix_id + (abuse ? abuse_token : dev_token);
-          url = abuse ? component.proxyLink(url, prox3, prox_enc, 'enc2t') : component.proxyLink(url, prox, prox_enc, 'enc2t');
+          url = abuse ? component.proxyLink(url, prox3, '', '') : component.proxyLink(url, prox, prox_enc, 'enc2t');
 
           var not_found = function not_found(str) {
             if (abuse && abuse_error) success(abuse_error);else if (!abuse && abuse_token) find(filmix_id, true, null, true);else if (str) component.empty(str);else component.emptyForQuery(select_title);
@@ -5385,7 +5385,6 @@
             ++seas_num;
 
             for (var voice_id in season) {
-              if (voice_id === 'Заблокировано правообладателем!') continue;
               var episodes = season[voice_id];
               var items = [];
               var epis_num = 0;
@@ -5458,7 +5457,6 @@
 
           for (var ID in pl_links.movie) {
             var _file = pl_links.movie[ID];
-            if (_file.translation === 'Заблокировано правообладателем!') continue;
             var _max_quality = filmix_max_qualitie;
 
             var _stream_url = _file.link || '';
