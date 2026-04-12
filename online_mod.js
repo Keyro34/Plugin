@@ -5188,7 +5188,7 @@
         var apiSearch = function apiSearch(abuse) {
           var url = embed + 'search' + (abuse ? abuse_token : dev_token);
           url = Lampa.Utils.addUrlComponent(url, 'story=' + encodeURIComponent(clean_title));
-          url = abuse ? component.proxyLink(url, prox3, '', '') : component.proxyLink(url, prox, prox_enc, 'enc2t');
+          url = abuse ? component.proxyLink(url, prox3, prox_enc, 'enc2t') : component.proxyLink(url, prox, prox_enc, 'enc2t');
           network.clear();
           network.timeout(15000);
           network["native"](url, function (json) {
@@ -5233,7 +5233,7 @@
 
         function end_search() {
           var url = embed + 'post/' + filmix_id + (abuse ? abuse_token : dev_token);
-          url = abuse ? component.proxyLink(url, prox3, '', '') : component.proxyLink(url, prox, prox_enc, 'enc2t');
+          url = abuse ? component.proxyLink(url, prox3, prox_enc, 'enc2t') : component.proxyLink(url, prox, prox_enc, 'enc2t');
 
           var not_found = function not_found(str) {
             if (abuse && abuse_error) success(abuse_error);else if (!abuse && abuse_token) find(filmix_id, true, null, true);else if (str) component.empty(str);else component.emptyForQuery(select_title);
