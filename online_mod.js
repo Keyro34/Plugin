@@ -181,7 +181,7 @@
     }
 
     function filmixAppHost() {
-      return 'http://filmixapp.pro';
+      return 'https://filmix.my';
     }
 
     function filmixToken(dev_id, token) {
