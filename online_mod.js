@@ -5340,12 +5340,9 @@
         if (pl_links.playlist && Object.keys(pl_links.playlist).length > 0) {
           for (var season_id in pl_links.playlist) {
             var season = pl_links.playlist[season_id];
-            // Перебираем все озвучки в сезоне
             for (var voice_id in season) {
-              var episodes = season[voice_id];
-              // voice_id может быть строкой "Заблокировано правообладателем!"
               if (voice_id === 'Заблокировано правообладателем!') {
-                // Ищем первый эпизод с abuse
+                var episodes = season[voice_id];
                 for (var ep_id in episodes) {
                   var ep = episodes[ep_id];
                   var ep_url = ep.link || '';
@@ -5358,21 +5355,7 @@
                       return true;
                     }
                   }
-                }
-              } else {
-                // Обычная озвучка — проверяем эпизоды на всякий случай
-                for (var ep_id in episodes) {
-                  var ep = episodes[ep_id];
-                  var ep_url = ep.link || '';
-                  if (ep_url.indexOf('/abuse_') !== -1) {
-                    var ep_found = ep_url.match(/https?:\/\/[^\/]+(\/s\/[^\/]*\/)/);
-                    if (ep_found) {
-                      secret = '$1' + ep_found[1];
-                      secret_url = '';
-                      console.log('Filmix', 'abuse in normal voice:', data.id, voice_id);
-                      return true;
-                    }
-                  }
+                  break; // достаточно первого эпизода
                 }
               }
             }
@@ -5406,15 +5389,9 @@
               var items = [];
               var epis_num = 0;
 
-              // Пропускаем заблокированные озвучки, если не можем их обработать
-              // Но мы уже установили secret в checkAbuse, так что можно попробовать
               for (var episode_id in episodes) {
                 var file = episodes[episode_id];
                 ++epis_num;
-                
-                // Проверяем, что file действительно объект с качествами
-                if (!file || typeof file !== 'object' || !file.qualities) continue;
-                
                 var quality_eps = file.qualities.filter(function (qualitys) {
                   return !isNaN(qualitys) && qualitys <= filmix_max_qualitie;
                 });
@@ -5447,7 +5424,6 @@
 
                   if (isNaN(seas_id)) seas_id = seas_num;
                   if (isNaN(epis_id)) epis_id = epis_num;
-                  
                   items.push({
                     season: seas_id,
                     episode: epis_id,
