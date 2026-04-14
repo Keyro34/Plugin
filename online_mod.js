@@ -1,4 +1,4 @@
-//20.03.2026 - Fix
+//14.04.2026 - Fix
 
 (function () {
     'use strict';
@@ -2043,7 +2043,7 @@
       var prox = component.proxy('rezka2');
       var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
       var ref = host + '/';
-      var logged_in = !(prox || Lampa.Platform.is('android'));
+      var logged_in = !prox && Lampa.Platform.is('android');
       var user_agent = Utils.baseUserAgent();
       var headers = Lampa.Platform.is('android') ? {
         'Origin': host,
