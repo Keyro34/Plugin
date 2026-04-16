@@ -1,4 +1,4 @@
-//14.04.2026 - Fix
+//16.04.2026 - Fix
 
 (function () {
     'use strict';
@@ -283,7 +283,7 @@
         if (name === 'anilibria') return user_proxy2;
         if (name === 'anilibria2') return user_proxy2;
         if (name === 'animelib') return proxy_secret;
-        if (name === 'kodik') return user_proxy1;
+        if (name === 'kodik') return user_proxy2;
         if (name === 'kinopub') return user_proxy2;
       }
 
@@ -12986,7 +12986,7 @@
       function kodik_api_search(api, callback, error) {
         network.clear();
         network.timeout(10000);
-        network["native"](component.proxyLink(embed + api, prox, '', 'enc2'), function (json) {
+        network["native"](component.proxyLink(embed + api, prox), function (json) {
           if (callback) callback(json);
         }, function (a, c) {
           if (error) error(network.errorDecode(a, c));
@@ -16169,7 +16169,6 @@
         Lampa.Storage.set('online_mod_proxy_fanserials', 'false');
         Lampa.Storage.set('online_mod_proxy_fanserials_cdn', 'false');
         Lampa.Storage.set('online_mod_proxy_animelib', 'false');
-        Lampa.Storage.set('online_mod_proxy_kodik', Lampa.Platform.is('android') ? 'false' : 'true');
       } else if (!Lampa.Platform.is('android')) {
         Lampa.Storage.set('online_mod_proxy_lumex', 'true');
         Lampa.Storage.set('online_mod_proxy_cdnmovies', 'true');
