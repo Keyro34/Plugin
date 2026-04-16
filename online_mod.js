@@ -267,7 +267,7 @@
         if (name === 'iframe') return user_proxy2;
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
-        if (name === 'rezka2') return user_proxy2;
+        if (name === 'rezka2') return user_proxy1;
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
