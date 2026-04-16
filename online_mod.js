@@ -16169,6 +16169,7 @@
         Lampa.Storage.set('online_mod_proxy_fanserials', 'false');
         Lampa.Storage.set('online_mod_proxy_fanserials_cdn', 'false');
         Lampa.Storage.set('online_mod_proxy_animelib', 'false');
+        Lampa.Storage.set('online_mod_proxy_kodik', Lampa.Platform.is('android') ? 'false' : 'true');
       } else if (!Lampa.Platform.is('android')) {
         Lampa.Storage.set('online_mod_proxy_lumex', 'true');
         Lampa.Storage.set('online_mod_proxy_cdnmovies', 'true');
