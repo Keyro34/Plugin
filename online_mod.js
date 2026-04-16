@@ -12986,7 +12986,7 @@
       function kodik_api_search(api, callback, error) {
         network.clear();
         network.timeout(10000);
-        network["native"](component.proxyLink(embed + api, prox), function (json) {
+        network["native"](component.proxyLink(embed + api, prox, '', 'enc2'), function (json) {
           if (callback) callback(json);
         }, function (a, c) {
           if (error) error(network.errorDecode(a, c));
