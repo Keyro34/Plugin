@@ -1,4 +1,4 @@
-//16.04.2026 - Fix
+//14.04.2026 - Fix
 
 (function () {
     'use strict';
@@ -12973,7 +12973,7 @@
       var prefer_mp4 = false;
       var prox = component.proxy('kodik');
       var token = Utils.decodeSecret([124, 125, 1, 86, 90, 64, 12, 123, 108, 59, 122, 125, 82, 3, 90, 23, 90, 122, 60, 110, 43, 123, 84, 3, 91, 71, 88, 112, 111, 57, 122, 121], atob('ZmluZCB5b3VyIG93biB0b2tlbg=='));
-      var embed = 'https://kodikapi.com/search';
+      var embed = 'https://kodik-api.com/search';
       var last_player = '';
       var last_info = '';
       var filter_items = {};
@@ -14457,7 +14457,7 @@
     var proxyInitialized = {};
     var proxyWindow = {};
     var proxyCalls = {};
-    var default_balanser = 'vibix';
+    var default_balanser = 'kodik';
 
     function component(object) {
       var network = new Lampa.Reguest();
@@ -14649,13 +14649,6 @@
         kp: true,
         imdb: true,
         disabled: disable_dbg
-      }, {
-        name: 'vibix',
-        title: 'Vibix',
-        source: new vibix(this, object),
-        search: false,
-        kp: true,
-        imdb: true
       }, {
         name: 'redheadsound',
         title: 'RedHeadSound',
