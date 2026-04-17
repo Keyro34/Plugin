@@ -274,16 +274,16 @@
         if (name === 'filmix') return proxy_other && proxy_secret_ip || user_proxy1;
         if (name === 'videodb') return user_proxy2;
         if (name === 'fancdn') return user_proxy3;
-        if (name === 'fancdn2') return user_proxy2;
+        if (name === 'fancdn2') return user_proxy1;
         if (name === 'fanserials') return user_proxy1;
         if (name === 'fanserials_cdn') return proxy_secret;
-        if (name === 'videoseed') return user_proxy1;
+        if (name === 'videoseed') return proxy_secret;
         if (name === 'vibix') return user_proxy2;
         if (name === 'redheadsound') return user_proxy2;
         if (name === 'anilibria') return user_proxy2;
-        if (name === 'anilibria2') return user_proxy2;
+        if (name === 'anilibria2') return user_proxy1;
         if (name === 'animelib') return proxy_secret;
-        if (name === 'kodik') return user_proxy2;
+        if (name === 'kodik') return user_proxy1;
         if (name === 'kinopub') return user_proxy2;
       }
 
@@ -16183,6 +16183,7 @@
       Lampa.Storage.set('online_mod_proxy_videodb', 'false');
       Lampa.Storage.set('online_mod_proxy_zetflix', 'false');
       Lampa.Storage.set('online_mod_proxy_kinopub', 'true');
+      Lampa.Storage.set('online_mod_proxy_kodik', Lampa.Platform.is('android') ? 'false' : 'true');
       Lampa.Storage.set('online_mod_proxy_alloha', 'false');
       Lampa.Storage.set('online_mod_proxy_hdvb', 'false');
       Lampa.Storage.set('online_mod_proxy_kp', 'false');
