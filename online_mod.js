@@ -17517,6 +17517,7 @@
 
 
     function rezka2Login(success, error) {
+      if (!Lampa.Platform.is('android')) { rezka2FillCookie(success, error); return; }
       var host = Utils.rezka2Mirror();
       var url = host + '/ajax/login/';
       var postdata = 'login_name=' + encodeURIComponent(Lampa.Storage.get('online_mod_rezka2_name', ''));
