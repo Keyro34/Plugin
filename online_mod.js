@@ -146,7 +146,7 @@
 
     function rezka2Mirror() {
       var url = Lampa.Storage.get('online_mod_rezka2_mirror', '') + '';
-      if (!url) return 'https://kvk.zone';
+      if (!url) return 'https://hdrezka.sh';
       if (url.indexOf('://') == -1) url = 'https://' + url;
       if (url.charAt(url.length - 1) === '/') url = url.substring(0, url.length - 1);
       return url;
@@ -266,7 +266,7 @@
       if (Lampa.Storage.field('online_mod_proxy_' + name) === true) {
         if (name === 'iframe') return user_proxy2;
         if (name === 'lumex') return proxy_secret;
-        if (name === 'rezka') return user_proxy1;
+        if (name === 'rezka') return user_proxy2;
         if (name === 'rezka2') return user_proxy1;
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
