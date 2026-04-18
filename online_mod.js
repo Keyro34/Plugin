@@ -2140,7 +2140,7 @@
           var url = more_url + '&q=' + encodeURIComponent(query) + '&page=' + encodeURIComponent(page);
           network.clear();
           network.timeout(10000);
-          network["native"](component.proxyLink(url, prox, prox_enc, prox_enc, 'enc2t'), function (str) {
+          network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
             var links = str.match(/<div class="b-content__inline_item-link">\s*<a [^>]*>[^<]*<\/a>\s*<div>[^<]*<\/div>\s*<\/div>/g);
@@ -17648,9 +17648,9 @@
           cookie = cookies.join('; ');
         }
 
-        if (cookie || sid) {
-          if (sid && cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + sid + (cookie ? '; ' + cookie : '');
+        if (cookie) {
           Lampa.Storage.set('online_mod_rezka2_cookie', cookie);
+          if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + (sid || Utils.randomId(26)) + (cookie ? '; ' + cookie : '');
           var prox_enc2 = prox_enc;
 
           if (prox) {
