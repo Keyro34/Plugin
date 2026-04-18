@@ -236,7 +236,7 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : 'https://cors.nb557.workers.dev/';
+      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : (new Date().getHours() % 2 ? 'https://cors.nb557.workers.dev/' : 'https://cors.fx666.workers.dev/');
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
@@ -266,8 +266,8 @@
       if (Lampa.Storage.field('online_mod_proxy_' + name) === true) {
         if (name === 'iframe') return user_proxy2;
         if (name === 'lumex') return proxy_secret;
-        if (name === 'rezka') return user_proxy1;
-        if (name === 'rezka2') return user_proxy1;
+        if (name === 'rezka') return user_proxy2;
+        if (name === 'rezka2') return user_proxy2;
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
@@ -2039,9 +2039,9 @@
       var select_title = '';
       var prefer_http = Lampa.Storage.field('online_mod_prefer_http') === true;
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
-      var proxy_mirror = true;
+      var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       var prox = component.proxy('rezka2');
-      var host = Utils.rezka2Mirror();
+      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
       var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
@@ -2314,36 +2314,28 @@
         };
 
         var query_search = function query_search(query, data, callback) {
-          var get_url = more_url + '&q=' + encodeURIComponent(query) + '&page=1';
+          var postdata = 'q=' + encodeURIComponent(query);
           network.clear();
           network.timeout(10000);
-          network["native"](component.proxyLink(get_url, prox, prox_enc, 'enc2t'), function (str) {
+          network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
-            var links = str.match(/<div class="b-content__inline_item-link">\s*<a [^>]*>[^<]*<\/a>\s*<div>[^<]*<\/div>\s*<\/div>/g);
-            var have_more = !!str.match(/<a [^>]*>\s*<span class="b-navigation__next\b/);
-            if (links && links.length) {
-              var items = links.map(function (l) {
-                var li = $(l);
-                var link = $('a', li);
-                var info_div = $('div', li);
-                var titl = link.text().trim() || '';
-                var info = info_div.text().trim() || '';
-                var year;
-                var found = info.match(/^(\d{4})\b/);
-                if (found) year = parseInt(found[1]);
-                return { year: year, title: titl, orig_title: '', link: link.attr('href') || '' };
-              });
-              data = data.concat(items);
-            }
+            var links = str.match(/<li><a href=.*?<\/li>/g);
+            var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
+            if (links && links.length) data = data.concat(links);
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
+            if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
+              Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
+            }
+
             if (a.status == 403 && a.responseText) {
               var str = (a.responseText || '').replace(/\n/g, '');
               checkErrorForm(str);
             }
+
             if (error_message) component.empty(error_message);else component.empty(network.errorDecode(a, c));
-          }, false, {
+          }, postdata, {
             dataType: 'text',
             withCredentials: logged_in,
             headers: headers
@@ -17602,8 +17594,8 @@
       var prox = Utils.proxy('rezka2');
       var prox_enc = '';
       var returnHeaders = androidHeaders;
-      var proxy_mirror = true;
-      var host = Utils.rezka2Mirror();
+      var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
+      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
