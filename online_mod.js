@@ -267,7 +267,7 @@
         if (name === 'iframe') return user_proxy2;
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
-        if (name === 'rezka2') return user_proxy1;
+        if (name === 'rezka2') return '';
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
@@ -2140,7 +2140,7 @@
           var url = more_url + '&q=' + encodeURIComponent(query) + '&page=' + encodeURIComponent(page);
           network.clear();
           network.timeout(10000);
-          network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
+          network["native"](component.proxyLink(url, prox, prox_enc, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
             var links = str.match(/<div class="b-content__inline_item-link">\s*<a [^>]*>[^<]*<\/a>\s*<div>[^<]*<\/div>\s*<\/div>/g);
