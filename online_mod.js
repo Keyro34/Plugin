@@ -17589,7 +17589,7 @@
       var prox_enc = '';
       var returnHeaders = androidHeaders;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
+      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
@@ -17614,7 +17614,7 @@
       postdata += '&login_not_save=0';
       network.clear();
       network.timeout(8000);
-      network["native"](Utils.proxyLink(url, prox, prox_enc, 'enc2t'), function (json) {
+      network["native"](Utils.proxyLink(url, prox, prox_enc, 'enc2'), function (json) {
         var cookie = '';
         var values = {};
         var sid = '';
@@ -17661,7 +17661,7 @@
 
           network.clear();
           network.timeout(8000);
-          network["native"](Utils.proxyLink(host + '/', prox, prox_enc2, 'enc2t'), function (str) {
+          network["native"](Utils.proxyLink(host + '/', prox, prox_enc2, 'enc2'), function (str) {
             var json = typeof str === 'string' ? Lampa.Arrays.decodeJson(str, {}) : str;
             var body = (json && json.body || '').replace(/\n/g, '');
             var error_form = body.match(/(<div class="error-code">[^<]*<div>[^<]*<\/div>[^<]*<\/div>)\s*(<div class="error-title">[^<]*<\/div>)/);
@@ -17724,7 +17724,7 @@
 
                 network.clear();
                 network.timeout(8000);
-                network["native"](Utils.proxyLink(host + '/', prox, prox_enc3, 'enc2t'), function (str) {
+                network["native"](Utils.proxyLink(host + '/', prox, prox_enc3, 'enc2'), function (str) {
                   var json = typeof str === 'string' ? Lampa.Arrays.decodeJson(str, {}) : str;
                   var body = (json && json.body || '').replace(/\n/g, '');
                   var error_form = body.match(/(<div class="error-code">[^<]*<div>[^<]*<\/div>[^<]*<\/div>)\s*(<div class="error-title">[^<]*<\/div>)/);
