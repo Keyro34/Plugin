@@ -267,7 +267,7 @@
         if (name === 'iframe') return user_proxy2;
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
-        if (name === 'rezka2') return user_proxy3;
+        if (name === 'rezka2') return user_proxy1;
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
@@ -2314,28 +2314,36 @@
         };
 
         var query_search = function query_search(query, data, callback) {
-          var postdata = 'q=' + encodeURIComponent(query);
+          var get_url = more_url + '&q=' + encodeURIComponent(query) + '&page=1';
           network.clear();
           network.timeout(10000);
-          network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
+          network["native"](component.proxyLink(get_url, prox, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
-            var links = str.match(/<li><a href=.*?<\/li>/g);
-            var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
-            if (links && links.length) data = data.concat(links);
+            var links = str.match(/<div class="b-content__inline_item-link">\s*<a [^>]*>[^<]*<\/a>\s*<div>[^<]*<\/div>\s*<\/div>/g);
+            var have_more = !!str.match(/<a [^>]*>\s*<span class="b-navigation__next\b/);
+            if (links && links.length) {
+              var items = links.map(function (l) {
+                var li = $(l);
+                var link = $('a', li);
+                var info_div = $('div', li);
+                var titl = link.text().trim() || '';
+                var info = info_div.text().trim() || '';
+                var year;
+                var found = info.match(/^(\d{4})\b/);
+                if (found) year = parseInt(found[1]);
+                return { year: year, title: titl, orig_title: '', link: link.attr('href') || '' };
+              });
+              data = data.concat(items);
+            }
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
-            if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
-              Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
-            }
-
             if (a.status == 403 && a.responseText) {
               var str = (a.responseText || '').replace(/\n/g, '');
               checkErrorForm(str);
             }
-
-            if (error_message) component.empty(error_message);else if (callback) callback([], false, query);else component.empty(network.errorDecode(a, c));
-          }, postdata, {
+            if (error_message) component.empty(error_message);else if (callback) callback([], false, query);
+          }, false, {
             dataType: 'text',
             withCredentials: logged_in,
             headers: headers
