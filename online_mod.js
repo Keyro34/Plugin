@@ -17648,9 +17648,9 @@
           cookie = cookies.join('; ');
         }
 
-        if (cookie) {
+        if (cookie || sid) {
+          if (sid && cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + sid + (cookie ? '; ' + cookie : '');
           Lampa.Storage.set('online_mod_rezka2_cookie', cookie);
-          if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + (sid || Utils.randomId(26)) + (cookie ? '; ' + cookie : '');
           var prox_enc2 = prox_enc;
 
           if (prox) {
