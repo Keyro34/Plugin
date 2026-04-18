@@ -17517,7 +17517,6 @@
 
 
     function rezka2Login(success, error) {
-      if (!Lampa.Platform.is('android')) { rezka2FillCookie(success, error); return; }
       var host = Utils.rezka2Mirror();
       var url = host + '/ajax/login/';
       var postdata = 'login_name=' + encodeURIComponent(Lampa.Storage.get('online_mod_rezka2_name', ''));
@@ -17590,7 +17589,7 @@
       var prox_enc = '';
       var returnHeaders = androidHeaders;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
+      var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
