@@ -1,4 +1,4 @@
-//14.04.2026 - Fix
+//20.03.2026 - Fix
 
 (function () {
     'use strict';
@@ -236,7 +236,7 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = 'https://api.allorigins.win/raw?url=';
+      var proxy1 = new Date().getHours() % 2 ? 'https://cors.nb557.workers.dev/' : 'https://cors.fx666.workers.dev/';
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
@@ -255,7 +255,7 @@
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
       if (name === 'lumex_api') return user_proxy2;
       if (name === 'filmix_site') return proxy_other && proxy_secret_ip || user_proxy1;
-      if (name === 'filmix_abuse') return user_proxy2;
+      if (name === 'filmix_abuse') return '';
       if (name === 'zetflix') return '';
       if (name === 'allohacdn') return proxy_secret;
       if (name === 'cookie') return user_proxy1;
@@ -267,23 +267,23 @@
         if (name === 'iframe') return user_proxy2;
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
-        if (name === 'rezka2') return user_proxy1;
+        if (name === 'rezka2') return user_proxy2;
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
         if (name === 'filmix') return proxy_other && proxy_secret_ip || user_proxy1;
         if (name === 'videodb') return user_proxy2;
         if (name === 'fancdn') return user_proxy3;
-        if (name === 'fancdn2') return user_proxy1;
+        if (name === 'fancdn2') return user_proxy2;
         if (name === 'fanserials') return user_proxy1;
         if (name === 'fanserials_cdn') return proxy_secret;
-        if (name === 'videoseed') return proxy_secret;
+        if (name === 'videoseed') return user_proxy1;
         if (name === 'vibix') return user_proxy2;
         if (name === 'redheadsound') return user_proxy2;
         if (name === 'anilibria') return user_proxy2;
-        if (name === 'anilibria2') return user_proxy1;
+        if (name === 'anilibria2') return user_proxy2;
         if (name === 'animelib') return proxy_secret;
-        if (name === 'kodik') return user_proxy1;
+        if (name === 'kodik') return user_proxy2;
         if (name === 'kinopub') return user_proxy2;
       }
 
@@ -2041,9 +2041,9 @@
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       var prox = component.proxy('rezka2');
-      var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
+      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
       var ref = host + '/';
-      var logged_in = !prox && Lampa.Platform.is('android');
+      var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
       var headers = Lampa.Platform.is('android') ? {
         'Origin': host,
@@ -2334,7 +2334,7 @@
               checkErrorForm(str);
             }
 
-            if (error_message) component.empty(error_message);else if (callback) callback([], false, query);else component.empty(network.errorDecode(a, c));
+            if (error_message) component.empty(error_message);else component.empty(network.errorDecode(a, c));
           }, postdata, {
             dataType: 'text',
             withCredentials: logged_in,
@@ -5319,44 +5319,23 @@
       function checkAbuse(data) {
         var pl_links = data.player_links || {};
 
-        // Проверка фильмов
         if (pl_links.movie && Object.keys(pl_links.movie).length > 0) {
+
           for (var ID in pl_links.movie) {
             var file = pl_links.movie[ID];
             var stream_url = file.link || '';
+
             if (file.translation === 'Заблокировано правообладателем!' && stream_url.indexOf('/abuse_') !== -1) {
               var found = stream_url.match(/https?:\/\/[^\/]+(\/s\/[^\/]*\/)/);
-              if (found) {
-                secret = '$1' + found[1];
-                secret_url = '';
-                console.log('Filmix', 'abuse movie:', data.id);
-                return true;
-              }
-            }
-          }
-        }
 
-        // Проверка сериалов (playlist)
-        if (pl_links.playlist && Object.keys(pl_links.playlist).length > 0) {
-          for (var season_id in pl_links.playlist) {
-            var season = pl_links.playlist[season_id];
-            for (var voice_id in season) {
-              if (voice_id === 'Заблокировано правообладателем!') {
-                var episodes = season[voice_id];
-                for (var ep_id in episodes) {
-                  var ep = episodes[ep_id];
-                  var ep_url = ep.link || '';
-                  if (ep_url.indexOf('/abuse_') !== -1) {
-                    var ep_found = ep_url.match(/https?:\/\/[^\/]+(\/s\/[^\/]*\/)/);
-                    if (ep_found) {
-                      secret = '$1' + ep_found[1];
-                      secret_url = '';
-                      console.log('Filmix', 'abuse playlist:', data.id, voice_id);
-                      return true;
-                    }
-                  }
-                  break; // достаточно первого эпизода
+              if (found) {
+                {
+                  secret = '$1' + found[1];
+                  secret_url = '';
                 }
+
+                console.log('Filmix', 'abuse:', data.id, Object.keys(pl_links.movie).length);
+                return true;
               }
             }
           }
@@ -12973,7 +12952,7 @@
       var prefer_mp4 = false;
       var prox = component.proxy('kodik');
       var token = Utils.decodeSecret([124, 125, 1, 86, 90, 64, 12, 123, 108, 59, 122, 125, 82, 3, 90, 23, 90, 122, 60, 110, 43, 123, 84, 3, 91, 71, 88, 112, 111, 57, 122, 121], atob('ZmluZCB5b3VyIG93biB0b2tlbg=='));
-      var embed = 'https://kodik-api.com/search';
+      var embed = 'https://kodikapi.com/search';
       var last_player = '';
       var last_info = '';
       var filter_items = {};
@@ -14457,7 +14436,7 @@
     var proxyInitialized = {};
     var proxyWindow = {};
     var proxyCalls = {};
-    var default_balanser = 'kodik';
+    var default_balanser = 'vibix';
 
     function component(object) {
       var network = new Lampa.Reguest();
@@ -14649,6 +14628,13 @@
         kp: true,
         imdb: true,
         disabled: disable_dbg
+      }, {
+        name: 'vibix',
+        title: 'Vibix',
+        source: new vibix(this, object),
+        search: false,
+        kp: true,
+        imdb: true
       }, {
         name: 'redheadsound',
         title: 'RedHeadSound',
@@ -16153,7 +16139,7 @@
     function initStorage() {
       if (!Utils.isDebug()) {
         Lampa.Storage.set('online_mod_proxy_lumex', 'false');
-        Lampa.Storage.set('online_mod_proxy_rezka2', Lampa.Platform.is('android') ? 'false' : 'true');
+        Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
         Lampa.Storage.set('online_mod_proxy_kinobase', 'false');
         Lampa.Storage.set('online_mod_proxy_collaps', 'false');
         Lampa.Storage.set('online_mod_proxy_cdnmovies', 'false');
@@ -16183,7 +16169,6 @@
       Lampa.Storage.set('online_mod_proxy_videodb', 'false');
       Lampa.Storage.set('online_mod_proxy_zetflix', 'false');
       Lampa.Storage.set('online_mod_proxy_kinopub', 'true');
-      Lampa.Storage.set('online_mod_proxy_kodik', Lampa.Platform.is('android') ? 'false' : 'true');
       Lampa.Storage.set('online_mod_proxy_alloha', 'false');
       Lampa.Storage.set('online_mod_proxy_hdvb', 'false');
       Lampa.Storage.set('online_mod_proxy_kp', 'false');
@@ -17138,7 +17123,7 @@
             <div class="online-prestige__img omcard__img">
               <img class="online__still-img" alt="" src="{poster}"
                    style="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;font-size:1em!important;opacity:1;transition:opacity 0.3s;"
-                   onerror="this.style.display='none';">
+                   onerror="this.style.opacity='0.05';">
               <div class="online-prestige__episode-number omcard__epnum"></div>
             </div>
 
@@ -17589,7 +17574,7 @@
       var prox_enc = '';
       var returnHeaders = androidHeaders;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
+      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
