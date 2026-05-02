@@ -6362,7 +6362,7 @@
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomHex(32) + (cookie ? '; ' + cookie : '');
 
       if (cookie) {
-        if (is_android || no_proxy_pc) {
+        if (Lampa.Platform.is('android')) {
           headers.Cookie = cookie;
         }
 
