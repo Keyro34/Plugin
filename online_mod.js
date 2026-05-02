@@ -2042,12 +2042,9 @@
       var prox = component.proxy('rezka2');
       var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
       var ref = host + '/';
-      // На ПК без прокси — работаем как Android: передаём заголовки напрямую
-      var is_android = Lampa.Platform.is('android');
-      var no_proxy_pc = !prox && !is_android;
-      var logged_in = !prox; // withCredentials для cookie
+      var logged_in = !prox && Lampa.Platform.is('android');
       var user_agent = Utils.baseUserAgent();
-      var headers = (is_android || no_proxy_pc) ? {
+      var headers = Lampa.Platform.is('android') ? {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent
@@ -2064,7 +2061,7 @@
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
 
       if (cookie) {
-        if (is_android || no_proxy_pc) {
+        if (Lampa.Platform.is('android')) {
           headers.Cookie = cookie;
         }
 
