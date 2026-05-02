@@ -1,4 +1,4 @@
-//14.04.2026 - Fix
+//19.04.2026 - Fix
 
 (function () {
     'use strict';
@@ -2042,9 +2042,12 @@
       var prox = component.proxy('rezka2');
       var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
       var ref = host + '/';
-      var logged_in = !prox && Lampa.Platform.is('android');
+      // На ПК без прокси — работаем как Android: передаём заголовки напрямую
+      var is_android = Lampa.Platform.is('android');
+      var no_proxy_pc = !prox && !is_android;
+      var logged_in = !prox; // withCredentials для cookie
       var user_agent = Utils.baseUserAgent();
-      var headers = Lampa.Platform.is('android') ? {
+      var headers = (is_android || no_proxy_pc) ? {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent
@@ -2061,7 +2064,7 @@
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
 
       if (cookie) {
-        if (Lampa.Platform.is('android')) {
+        if (is_android || no_proxy_pc) {
           headers.Cookie = cookie;
         }
 
@@ -6359,7 +6362,7 @@
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomHex(32) + (cookie ? '; ' + cookie : '');
 
       if (cookie) {
-        if (Lampa.Platform.is('android')) {
+        if (is_android || no_proxy_pc) {
           headers.Cookie = cookie;
         }
 
