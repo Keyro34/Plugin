@@ -2042,32 +2042,29 @@
       var prox = component.proxy('rezka2');
       var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
       var ref = host + '/';
-      var logged_in = !prox && Lampa.Platform.is('android');
       var user_agent = Utils.baseUserAgent();
-      var headers = Lampa.Platform.is('android') ? {
-        'Origin': host,
-        'Referer': ref,
-        'User-Agent': user_agent
-      } : {};
       var prox_enc = '';
-
-      if (prox) {
-        prox_enc += 'param/Origin=' + encodeURIComponent(host) + '/';
-        prox_enc += 'param/Referer=' + encodeURIComponent(ref) + '/';
-        prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
-      }
 
       var cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '') + '';
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
 
-      if (cookie) {
-        if (Lampa.Platform.is('android')) {
-          headers.Cookie = cookie;
-        }
+      // Без прокси — передаём заголовки напрямую (Android WebView и ПК-браузер поддерживают это)
+      // С прокси — заголовки идут через param/
+      var logged_in = !prox; // withCredentials для cookie
+      var headers = {};
 
-        if (prox) {
-          prox_enc += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
-        }
+      if (!prox) {
+        // Прямой запрос — нужны все заголовки чтобы HDrezka не блокировала
+        headers['Origin'] = host;
+        headers['Referer'] = ref;
+        headers['User-Agent'] = user_agent;
+        if (cookie) headers['Cookie'] = cookie;
+      } else {
+        // Через прокси — заголовки в URL
+        prox_enc += 'param/Origin=' + encodeURIComponent(host) + '/';
+        prox_enc += 'param/Referer=' + encodeURIComponent(ref) + '/';
+        prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
+        if (cookie) prox_enc += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
       }
 
       var embed = ref;
