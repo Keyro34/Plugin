@@ -37,10 +37,7 @@
         items.forEach(function(i) {
             var score = 0;
 
-            var title = normalize(i.title);
-            var orig  = normalize(i.original_title);
-
-            // 1. TMDB (максимальный приоритет — но только если tmdb_id уникален для источника)
+            // 1. TMDB (максимальный приоритет)
             if (i.tmdb_id && movie.id && i.tmdb_id == movie.id) {
                 score += 100;
             }
@@ -50,24 +47,21 @@
                 score += 20;
             }
 
-            // 3. Название — строгое совпадение обязательно, иначе штраф
-            if (title && movieTitle && (title === movieTitle || orig === movieOrig)) {
+            var title = normalize(i.title);
+            var orig  = normalize(i.original_title);
+
+            // 3. Название
+            if (title == movieTitle || orig == movieOrig) {
                 score += 40;
-            } else if (title && movieTitle && (title.includes(movieTitle) || movieTitle.includes(title))) {
-                score += 15;
-            } else if (orig && movieOrig && (orig.includes(movieOrig) || movieOrig.includes(orig))) {
-                score += 15;
-            } else {
-                // Нет совпадения по названию — элемент почти наверняка не тот
-                score -= 30;
+            } else if (title.includes(movieTitle) || movieTitle.includes(title)) {
+                score += 20;
             }
 
             // 4. Год (с допуском ±1)
             if (i.year && movieYear) {
-                var diff = Math.abs(i.year - parseInt(movieYear));
+                var diff = Math.abs(i.year - movieYear);
                 if (diff === 0) score += 20;
                 else if (diff === 1) score += 10;
-                else if (diff > 3) score -= 10; // сильное расхождение — штраф
             }
 
             if (score > bestScore) {
@@ -76,9 +70,7 @@
             }
         });
 
-        // Минимальный порог: не возвращаем "что попало"
-        // Нужно хоть какое-то совпадение по названию или tmdb_id
-        return bestScore >= 20 ? best : null;
+        return best || items[0];
     }
 
     var myIp = '';
@@ -1166,9 +1158,7 @@
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
-          // НЕ перезаписываем tmdb_id источника — он должен остаться оригинальным
-          // element.tmdb_id = object.movie.id;
-          if (!element.tmdb_id) element.tmdb_id = object.movie.id;
+          element.tmdb_id = object.movie.id;
           element.year = (object.movie.release_date || '').slice(0,4);
           element.original_title = object.movie.original_title || object.movie.original_name || '';
           element.type = object.movie.name ? 'tv' : 'movie';
@@ -14856,10 +14846,6 @@
             object.search_date = year;
             selected_id = elem.id;
 
-            // Запоминаем выбор пользователя — при следующей загрузке автовыбор не будет его перебивать
-            object._userSelectedTitle = elem.title;
-            object._userSelectedYear  = year;
-
             _this5.extendChoice();
 
             sources[balanser].search(object, elem.kp_id || elem.kinopoisk_id || elem.kinopoiskId || elem.filmId || elem.imdb_id, [elem]);
@@ -14868,8 +14854,8 @@
           _this5.append(item);
         });
 
-        // Автовыбор лучшего совпадения (не срабатывает если пользователь сам ввёл поиск или уже выбрал вручную)
-        if (object && object.movie && !object.clarification && !object._userSelectedTitle) {
+        // Автовыбор лучшего совпадения (не срабатывает если пользователь сам ввёл поиск)
+        if (object && object.movie && !object.clarification) {
             var _similarsItems = json.map(function(elem) {
                 return {
                     title:          elem.title || '',
@@ -14884,8 +14870,6 @@
                 var _bestIdx = _similarsItems.indexOf(_best);
                 if (_bestIdx >= 0) {
                     setTimeout(function() {
-                        // Ещё раз проверяем: вдруг пользователь успел кликнуть
-                        if (object._userSelectedTitle) return;
                         var _el = json[_bestIdx];
                         if (_el) {
                             _this5.activity.loader(true);
