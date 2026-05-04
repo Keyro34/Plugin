@@ -1486,6 +1486,9 @@
                     }
                 });
             }, 200);
+        } else {
+            // Нет точного совпадения — показываем "нет результатов"
+            component.emptyForQuery(select_title);
         }
 
         component.start(true);
@@ -14879,6 +14882,10 @@
                         }
                     }, 200);
                 }
+            } else {
+                // Ни один результат не прошёл строгую проверку — показываем "нет результатов"
+                _this5.reset();
+                component.emptyForQuery(object.movie.title || object.movie.name || '');
             }
         }
 
