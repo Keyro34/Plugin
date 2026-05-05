@@ -1158,7 +1158,6 @@
           var view = Lampa.Timeline.view(hash);
           var item = Lampa.Template.get('online_mod', element);
           var hash_file = Lampa.Utils.hash(element.season ? [element.season, element.season > 10 ? ':' : '', element.episode, object.movie.original_title, filter_items.voice[choice.voice]].join('') : object.movie.original_title + element.title);
-          element.tmdb_id = object.movie.id;
           element.year = (object.movie.release_date || '').slice(0,4);
           element.original_title = object.movie.original_title || object.movie.original_name || '';
           element.type = object.movie.name ? 'tv' : 'movie';
