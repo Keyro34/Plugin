@@ -23,8 +23,29 @@
         return movie.name ? 'tv' : 'movie';
     }
 
+    function isSameMovie(i, movie) {
+        var title = normalize(i.title);
+        var movieTitle = normalize(movie.title || movie.name);
+        var orig = normalize(i.original_title);
+        var movieOrig = normalize(movie.original_title || movie.original_name);
+        var year = i.year;
+        var movieYear = (movie.release_date || movie.first_air_date || '').slice(0, 4);
+
+        var titleMatch = (title && movieTitle && (title === movieTitle || orig === movieOrig));
+        var yearMatch = !year || !movieYear || Math.abs(year - movieYear) <= 1;
+
+        return titleMatch && yearMatch;
+    }
+
     function findBestMatch(items, movie) {
         if (!items || !items.length) return null;
+
+        // Жёсткая фильтрация — только совпадающие фильмы
+        items = items.filter(function(i) {
+            return isSameMovie(i, movie);
+        });
+
+        if (!items.length) return null;
 
         var movieType  = getType(movie);
         var movieTitle = normalize(movie.title || movie.name);
@@ -70,7 +91,7 @@
             }
         });
 
-        return best || items[0];
+        return best;
     }
 
     var myIp = '';
@@ -1161,7 +1182,7 @@
           element.year = (object.movie.release_date || '').slice(0,4);
           element.original_title = object.movie.original_title || object.movie.original_name || '';
           element.type = object.movie.name ? 'tv' : 'movie';
-          item.attr('data-tmdb', element.tmdb_id);
+          if (element.tmdb_id) item.attr('data-tmdb', element.tmdb_id);
           element.timeline = view;
           var _tl = Lampa.Timeline.render(view);
           if (_tl) { _tl.css('display','none'); item.append(_tl); }
@@ -1480,7 +1501,6 @@
 
         if (best) {
             setTimeout(function () {
-                // найти DOM-элемент
                 component.render().find('.online_mod').each(function(){
                     var el = $(this);
 
