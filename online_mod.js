@@ -1,4 +1,4 @@
-//19.04.2026 - Fix
+//22.06.2026 - Fix
 
 (function () {
     'use strict';
@@ -14087,6 +14087,7 @@
 
       this.search = function () {
         this.activity.loader(true);
+        extended = false;
         this.filter({
           source: filter_sources
         }, {
