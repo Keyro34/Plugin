@@ -70,11 +70,7 @@
             }
         });
 
-        // Минимальный порог: должно совпасть хотя бы название (40) или TMDB id (100).
-        // Если score слишком низкий — это другой фильм/сериал, возвращаем null
-        // чтобы источник показал "нет результатов" вместо случайного контента.
-        var MIN_SCORE = 40;
-        return bestScore >= MIN_SCORE ? best : null;
+        return best || items[0];
     }
 
     var myIp = '';
@@ -14091,6 +14087,7 @@
 
       this.search = function () {
         this.activity.loader(true);
+        extended = false;
         this.filter({
           source: filter_sources
         }, {
