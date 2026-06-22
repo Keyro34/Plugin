@@ -14087,7 +14087,6 @@
 
       this.search = function () {
         this.activity.loader(true);
-        extended = false;
         this.filter({
           source: filter_sources
         }, {
