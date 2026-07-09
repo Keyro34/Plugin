@@ -1,4 +1,4 @@
-//09.07.2026 - Fix
+//19.04.2026 - Fix
 
 (function () {
     'use strict';
@@ -181,7 +181,7 @@
     }
 
     function filmixAppHost() {
-      return 'https://filmix.my';
+      return 'http://filmixapp.cyou';
     }
 
     function filmixToken(dev_id, token) {
@@ -236,7 +236,7 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = 'https://cors.lampa.workers.dev/';
+      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : (new Date().getHours() % 2 ? 'https://cors.nb557.workers.dev/' : 'https://cors.fx666.workers.dev/');
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
@@ -255,6 +255,7 @@
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
       if (name === 'lumex_api') return user_proxy2;
       if (name === 'filmix_site') return proxy_other && proxy_secret_ip || user_proxy1;
+      if (name === 'filmix_site_alt') return proxy_other && proxy_secret_ip || user_proxy2;
       if (name === 'filmix_abuse') return user_proxy2;
       if (name === 'zetflix') return '';
       if (name === 'allohacdn') return proxy_secret;
@@ -5005,6 +5006,7 @@
       var debug = _debug;
       var prox = component.proxy('filmix');
       var prox2 = component.proxy('filmix_site');
+      var prox2_alt = component.proxy('filmix_site_alt');
       var prox3 = component.proxy('filmix_abuse');
       var host = Utils.filmixHost();
       var ref = host + '/';
@@ -5030,7 +5032,7 @@
       };
       var prox2_enc = '';
 
-      if (prox2) {
+      if (prox2 || prox2_alt) {
         prox2_enc += 'param/Origin=' + encodeURIComponent(host) + '/';
         prox2_enc += 'param/Referer=' + encodeURIComponent(ref) + '/';
         prox2_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
@@ -5171,14 +5173,17 @@
           } else component.emptyForQuery(select_title);
         };
 
-        var siteSearch = function siteSearch() {
+        var siteSearch = function siteSearch(use_alt) {
+          var cur_prox = use_alt ? prox2_alt : prox2;
           var url = site + 'api/v2/suggestions?search_word=' + encodeURIComponent(clean_title);
           network.clear();
           network.timeout(15000);
-          network["native"](component.proxyLink(url, prox2, prox2_enc, 'enc2t'), function (json) {
+          network["native"](component.proxyLink(url, cur_prox, prox2_enc, 'enc2t'), function (json) {
             display(json && json.posts || []);
           }, function (a, c) {
-            component.empty(network.errorDecode(a, c));
+            // Основной прокси не ответил — пробуем запасной, прежде чем сдаваться
+            if (!use_alt && prox2_alt && prox2_alt !== cur_prox) siteSearch(true);
+            else component.empty(network.errorDecode(a, c));
           }, false, {
             headers: headers2
           });
