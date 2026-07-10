@@ -5178,6 +5178,7 @@
         var siteSearch = function siteSearch(stage) {
           stage = stage || 0;
           var cur_prox = stage === 0 ? prox2 : (stage === 1 ? prox2_alt : prox2_alt2);
+          var prox_label = stage === 0 ? 'осн.' : (stage === 1 ? 'onrender' : 'deno');
           var url = site + 'api/v2/suggestions?search_word=' + encodeURIComponent(clean_title);
           network.clear();
           network.timeout(15000);
@@ -5188,7 +5189,7 @@
             var next_stage = stage + 1;
             var next_prox = next_stage === 1 ? prox2_alt : (next_stage === 2 ? prox2_alt2 : null);
             if (next_prox && next_prox !== cur_prox) siteSearch(next_stage);
-            else component.empty(network.errorDecode(a, c));
+            else component.empty('[' + prox_label + '] ' + network.errorDecode(a, c));
           }, false, {
             headers: headers2
           });
