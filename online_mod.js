@@ -254,7 +254,7 @@
       var user_proxy1 = (proxy_other_url || proxy1) + param_ip;
       var user_proxy2 = (proxy_other_url || proxy2) + param_ip;
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
-      var user_proxy4 = proxy4 + param_ip;
+      var user_proxy4 = proxy4 + 'ipno/';
       if (name === 'lumex_api') return user_proxy2;
       if (name === 'filmix_site') return proxy_other && proxy_secret_ip || user_proxy1;
       if (name === 'filmix_site_alt') return proxy_other && proxy_secret_ip || user_proxy2;
