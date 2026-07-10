@@ -256,6 +256,7 @@
       if (name === 'lumex_api') return user_proxy2;
       if (name === 'filmix_site') return proxy_other && proxy_secret_ip || user_proxy1;
       if (name === 'filmix_site_alt') return proxy_other && proxy_secret_ip || user_proxy2;
+      if (name === 'filmix_site_alt2') return proxy_other && proxy_secret_ip || user_proxy3;
       if (name === 'filmix_abuse') return user_proxy2;
       if (name === 'zetflix') return '';
       if (name === 'allohacdn') return proxy_secret;
@@ -5007,6 +5008,7 @@
       var prox = component.proxy('filmix');
       var prox2 = component.proxy('filmix_site');
       var prox2_alt = component.proxy('filmix_site_alt');
+      var prox2_alt2 = component.proxy('filmix_site_alt2');
       var prox3 = component.proxy('filmix_abuse');
       var host = Utils.filmixHost();
       var ref = host + '/';
@@ -5032,7 +5034,7 @@
       };
       var prox2_enc = '';
 
-      if (prox2 || prox2_alt) {
+      if (prox2 || prox2_alt || prox2_alt2) {
         prox2_enc += 'param/Origin=' + encodeURIComponent(host) + '/';
         prox2_enc += 'param/Referer=' + encodeURIComponent(ref) + '/';
         prox2_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
@@ -5173,16 +5175,19 @@
           } else component.emptyForQuery(select_title);
         };
 
-        var siteSearch = function siteSearch(use_alt) {
-          var cur_prox = use_alt ? prox2_alt : prox2;
+        var siteSearch = function siteSearch(stage) {
+          stage = stage || 0;
+          var cur_prox = stage === 0 ? prox2 : (stage === 1 ? prox2_alt : prox2_alt2);
           var url = site + 'api/v2/suggestions?search_word=' + encodeURIComponent(clean_title);
           network.clear();
           network.timeout(15000);
           network["native"](component.proxyLink(url, cur_prox, prox2_enc, 'enc2t'), function (json) {
             display(json && json.posts || []);
           }, function (a, c) {
-            // Основной прокси не ответил — пробуем запасной, прежде чем сдаваться
-            if (!use_alt && prox2_alt && prox2_alt !== cur_prox) siteSearch(true);
+            // Текущий прокси не ответил — пробуем следующий по очереди, прежде чем сдаваться
+            var next_stage = stage + 1;
+            var next_prox = next_stage === 1 ? prox2_alt : (next_stage === 2 ? prox2_alt2 : null);
+            if (next_prox && next_prox !== cur_prox) siteSearch(next_stage);
             else component.empty(network.errorDecode(a, c));
           }, false, {
             headers: headers2
