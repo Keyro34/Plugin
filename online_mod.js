@@ -240,6 +240,7 @@
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
+      var proxy4 = 'https://proxy.keyro34.deno.net/';
       var proxy_secret = '';
       var proxy_secret_ip = '';
 
@@ -253,10 +254,11 @@
       var user_proxy1 = (proxy_other_url || proxy1) + param_ip;
       var user_proxy2 = (proxy_other_url || proxy2) + param_ip;
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
+      var user_proxy4 = proxy4 + param_ip;
       if (name === 'lumex_api') return user_proxy2;
       if (name === 'filmix_site') return proxy_other && proxy_secret_ip || user_proxy1;
       if (name === 'filmix_site_alt') return proxy_other && proxy_secret_ip || user_proxy2;
-      if (name === 'filmix_site_alt2') return proxy_other && proxy_secret_ip || user_proxy3;
+      if (name === 'filmix_site_alt2') return proxy_other && proxy_secret_ip || user_proxy4;
       if (name === 'filmix_abuse') return user_proxy2;
       if (name === 'zetflix') return '';
       if (name === 'allohacdn') return proxy_secret;
