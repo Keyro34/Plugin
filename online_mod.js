@@ -236,7 +236,7 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : (new Date().getHours() % 2 ? 'https://cors.nb557.workers.dev/' : 'https://cors.fx666.workers.dev/');
+      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : (new Date().getHours() % 2 ? 'https://proxy.keyro34.deno.dev' : 'https://cors.fx666.workers.dev/');
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
@@ -5245,7 +5245,7 @@
           url = abuse ? component.proxyLink(url, prox3, '', '') : component.proxyLink(url, prox, prox_enc, 'enc2t');
 
           var not_found = function not_found(str) {
-            if (abuse && abuse_error) success(abuse_error);else if (!abuse && abuse_token) find(filmix_id, true, null, true);else siteFind(0, str);
+            if (abuse && abuse_error) success(abuse_error);else if (!abuse && abuse_token) find(filmix_id, true, null, true);else if (str) component.empty(str);else component.emptyForQuery(select_title);
           };
 
           network.clear();
@@ -5265,36 +5265,6 @@
           }, false, {
             headers: headers
           });
-        }
-
-        // Попытка №3: обе API отвалились — пробуем получить плеер через сам сайт filmix.my,
-        // перебирая прокси prox2 → prox2_alt → prox2_alt2 (как в siteSearch)
-        function siteFind(stage, prev_error) {
-          stage = stage || 0;
-          var cur_prox = stage === 0 ? prox2 : (stage === 1 ? prox2_alt : prox2_alt2);
-          var url = host + '/api/v2/post/' + filmix_id + dev_token;
-          network.clear();
-          network.timeout(15000);
-          network["native"](component.proxyLink(url, cur_prox, prox2_enc, 'enc2t'), function (found) {
-            var pl_links = found && found.player_links || {};
-
-            if (pl_links.movie && Object.keys(pl_links.movie).length > 0 || pl_links.playlist && Object.keys(pl_links.playlist).length > 0) {
-              success(found, low_quality);
-            } else {
-              console.log('Filmix', 'site parse not found:', filmix_id, 'stage', stage);
-              give_up(prev_error);
-            }
-          }, function (a, c) {
-            var next_stage = stage + 1;
-            var next_prox = next_stage === 1 ? prox2_alt : (next_stage === 2 ? prox2_alt2 : null);
-            if (next_prox && next_prox !== cur_prox) siteFind(next_stage, prev_error);else give_up(prev_error || network.errorDecode(a, c));
-          }, false, {
-            headers: headers2
-          });
-        }
-
-        function give_up(str) {
-          if (str) component.empty(str);else component.emptyForQuery(select_title);
         }
       }
 
