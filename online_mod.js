@@ -236,7 +236,10 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : (new Date().getHours() % 2 ? 'https://cors.nb557.workers.dev/' : 'https://cors.fx666.workers.dev/');
+      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : (function () {
+        var h = new Date().getHours() % 3;
+        return h === 0 ? 'https://cors.nb557.workers.dev/' : (h === 1 ? 'https://cors.fx666.workers.dev/' : 'https://proxy.keyro34.deno.net/');
+      })();
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy3 = 'https://cors557.deno.dev/';
@@ -251,7 +254,7 @@
 
       var proxy_other = Lampa.Storage.field('online_mod_proxy_other') === true;
       var proxy_other_url = proxy_other ? Lampa.Storage.field('online_mod_proxy_other_url') + '' : '';
-      var user_proxy1 = (proxy_other_url || proxy1) + param_ip;
+      var user_proxy1 = (proxy_other_url || proxy1) + (proxy1.indexOf('keyro34') !== -1 ? 'ipno/' : param_ip);
       var user_proxy2 = (proxy_other_url || proxy2) + param_ip;
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
       var user_proxy4 = proxy4 + 'ipno/';
