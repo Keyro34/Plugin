@@ -275,6 +275,8 @@
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
         if (name === 'rezka2') return user_proxy1;
+        if (name === 'rezka2_alt') return user_proxy2;
+        if (name === 'rezka2_alt2') return user_proxy4;
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
@@ -2047,6 +2049,8 @@
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       var prox = component.proxy('rezka2');
+      var prox_alt = component.proxy('rezka2_alt');
+      var prox_alt2 = component.proxy('rezka2_alt2');
       var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
       var ref = host + '/';
       var logged_in = !prox && Lampa.Platform.is('android');
@@ -2319,11 +2323,13 @@
           } else if (error_message) component.empty(error_message);else component.emptyForQuery(select_title);
         };
 
-        var query_search = function query_search(query, data, callback) {
+        var query_search = function query_search(query, data, callback, stage) {
+          stage = stage || 0;
+          var cur_prox = stage === 0 ? prox : (stage === 1 ? prox_alt : prox_alt2);
           var postdata = 'q=' + encodeURIComponent(query);
           network.clear();
           network.timeout(10000);
-          network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
+          network["native"](component.proxyLink(url, cur_prox, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
             var links = str.match(/<li><a href=.*?<\/li>/g);
@@ -2331,13 +2337,21 @@
             if (links && links.length) data = data.concat(links);
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
-            if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
+            if (cur_prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
               Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
             }
 
             if (a.status == 403 && a.responseText) {
               var str = (a.responseText || '').replace(/\n/g, '');
               checkErrorForm(str);
+            }
+
+            // Текущий прокси не ответил — пробуем следующий по очереди, прежде чем сдаваться
+            var next_stage = stage + 1;
+            var next_prox = next_stage === 1 ? prox_alt : (next_stage === 2 ? prox_alt2 : null);
+            if (!error_message && next_prox && next_prox !== cur_prox) {
+              query_search(query, data, callback, next_stage);
+              return;
             }
 
             if (error_message) component.empty(error_message);else if (callback) callback([], false, query);else component.empty(network.errorDecode(a, c));
