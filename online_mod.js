@@ -14134,7 +14134,7 @@
       };
 
       this.cleanTitle = function (str) {
-        return str.replace(/[\s.,:;’'`!?]+/g, ' ').trim();
+        return str.replace(/[\s.,:;’'`!?_]+/g, ' ').trim();
       };
 
       this.kpCleanTitle = function (str) {
