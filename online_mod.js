@@ -6525,6 +6525,9 @@
         network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
           str = (str || '').replace(/\n/g, '');
           var links = str.match(/<div class="item-search-header">\s*<h2>\s*<a [^>]*>[^<]*<\/a>\s*<\/h2>\s*<div class="name-origin-search">[^<]*<\/div>/g);
+          console.log("===== HDRezka HTML START =====");
+          console.log(str.substring(0, 5000));
+          console.log("===== HDRezka HTML END =====");
           display(links);
         }, function (a, c) {
           component.empty(network.errorDecode(a, c));
@@ -14134,7 +14137,7 @@
       };
 
       this.cleanTitle = function (str) {
-        return str.replace(/[\s.,:;’'`!?_]+/g, ' ').trim();
+        return str.replace(/[\s.,:;’'`!?]+/g, ' ').trim();
       };
 
       this.kpCleanTitle = function (str) {
