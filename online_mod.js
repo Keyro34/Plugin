@@ -2152,16 +2152,15 @@
         var more_url = embed + 'search/?do=search&subaction=search';
 
         var query_more = function query_more(query, page, data, callback) {
+
+          console.log("query_more()");
+          console.log("query =", query);
+          console.log("page =", page);
           var url = more_url + '&q=' + encodeURIComponent(query) + '&page=' + encodeURIComponent(page);
           network.clear();
           network.timeout(10000);
           network["native"](component.proxyLink(url, prox, prox_enc, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
-
-            console.log("HTML length:", str.length);
-            console.log(str.substring(0, 3000));
-            console.log("Links:", str.match(/b-content__inline_item/g));
-
             checkErrorForm(str);
             var links = str.match(/<div class="b-content__inline_item-link">\s*<a [^>]*>[^<]*<\/a>\s*<div>[^<]*<\/div>\s*<\/div>/g);
             var have_more = !!str.match(/<a [^>]*>\s*<span class="b-navigation__next\b/);
