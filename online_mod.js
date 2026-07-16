@@ -2157,6 +2157,11 @@
           network.timeout(10000);
           network["native"](component.proxyLink(url, prox, prox_enc, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
+
+            console.log("HTML length:", str.length);
+            console.log(str.substring(0, 3000));
+            console.log("Links:", str.match(/b-content__inline_item/g));
+
             checkErrorForm(str);
             var links = str.match(/<div class="b-content__inline_item-link">\s*<a [^>]*>[^<]*<\/a>\s*<div>[^<]*<\/div>\s*<\/div>/g);
             var have_more = !!str.match(/<a [^>]*>\s*<span class="b-navigation__next\b/);
@@ -6525,9 +6530,6 @@
         network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
           str = (str || '').replace(/\n/g, '');
           var links = str.match(/<div class="item-search-header">\s*<h2>\s*<a [^>]*>[^<]*<\/a>\s*<\/h2>\s*<div class="name-origin-search">[^<]*<\/div>/g);
-          console.log("===== HDRezka HTML START =====");
-          console.log(str.substring(0, 5000));
-          console.log("===== HDRezka HTML END =====");
           display(links);
         }, function (a, c) {
           component.empty(network.errorDecode(a, c));
