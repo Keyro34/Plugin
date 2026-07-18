@@ -236,7 +236,7 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = 'https://keyro.prokeyro-9c7.workers.dev/';
+      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : 'https://keyro.prokeyro-9c7.workers.dev/';
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
       var proxy_nb557 = 'https://cors.nb557.workers.dev/';
@@ -15424,7 +15424,7 @@
     function initStorage() {
       if (!Utils.isDebug()) {
         Lampa.Storage.set('online_mod_proxy_lumex', 'false');
-        Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
+        Lampa.Storage.set('online_mod_proxy_rezka2', Lampa.Platform.is('android') ? 'false' : 'true');
         Lampa.Storage.set('online_mod_proxy_kinobase', 'false');
         Lampa.Storage.set('online_mod_proxy_collaps', 'false');
         Lampa.Storage.set('online_mod_proxy_cdnmovies', 'false');
