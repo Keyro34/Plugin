@@ -274,7 +274,7 @@
         if (name === 'iframe') return user_proxy2;
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
-        if (name === 'rezka2') return user_proxy1;
+        if (name === 'rezka2') return user_proxy4;
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
@@ -17302,7 +17302,16 @@
           rezka2_login.unbind('hover:enter').on('hover:enter', function () {
             var rezka2_login_status = $('.settings-param__status', rezka2_login).removeClass('active error wait').addClass('wait');
             rezka2Login(function () {
-              rezka2_login_status.removeClass('active error wait').addClass('active');
+              // Логин/пароль верны, но это ещё не значит, что прокси-запросы
+              // реально авторизованы — подтягиваем настоящую сессионную куку
+              // через прокси, иначе видео будет требовать авторизацию.
+              rezka2FillCookie(function () {
+                rezka2_login_status.removeClass('active error wait').addClass('active');
+                Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+              }, function () {
+                rezka2_login_status.removeClass('active error wait').addClass('error');
+                Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+              });
             }, function () {
               rezka2_login_status.removeClass('active error wait').addClass('error');
             });
