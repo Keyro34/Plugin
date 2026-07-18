@@ -236,14 +236,14 @@
     function proxy(name) {
       var ip = getMyIp() || '';
       var param_ip = Lampa.Storage.field('online_mod_proxy_find_ip') === true ? 'ip' + ip + '/' : '';
-      var proxy1 = Lampa.Platform.is('android') ? 'https://cors.lampa.workers.dev/' : (function () {
-        var h = new Date().getHours() % 3;
-        return h === 0 ? 'https://cors.nb557.workers.dev/' : (h === 1 ? 'https://cors.fx666.workers.dev/' : 'https://proxy.keyro34.deno.net/');
-      })();
+      var proxy1 = 'https://keyro.prokeyro-9c7.workers.dev/';
       var proxy2_base = 'https://apn-latest.onrender.com/';
       var proxy2 = proxy2_base + (param_ip ? '' : 'ip/');
+      var proxy_nb557 = 'https://cors.nb557.workers.dev/';
+      var proxy_fx666 = 'https://cors.fx666.workers.dev/';
       var proxy3 = 'https://cors557.deno.dev/';
       var proxy4 = 'https://proxy.keyro34.deno.net/';
+      var proxy5 = 'https://keyro.prokeyro-9c7.workers.dev/';
       var proxy_secret = '';
       var proxy_secret_ip = '';
 
@@ -256,8 +256,11 @@
       var proxy_other_url = proxy_other ? Lampa.Storage.field('online_mod_proxy_other_url') + '' : '';
       var user_proxy1 = (proxy_other_url || proxy1) + (proxy1.indexOf('keyro34') !== -1 ? 'ipno/' : param_ip);
       var user_proxy2 = (proxy_other_url || proxy2) + param_ip;
+      var user_proxy_nb557 = proxy_nb557 + param_ip;
+      var user_proxy_fx666 = proxy_fx666 + param_ip;
       var user_proxy3 = (proxy_other_url || proxy3) + param_ip;
       var user_proxy4 = proxy4 + 'ipno/';
+      var user_proxy5 = proxy5 + param_ip;
       if (name === 'lumex_api') return user_proxy2;
       if (name === 'filmix_site') return proxy_other && proxy_secret_ip || user_proxy1;
       if (name === 'filmix_site_alt') return proxy_other && proxy_secret_ip || user_proxy2;
@@ -275,6 +278,9 @@
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
         if (name === 'rezka2') return user_proxy1;
+        if (name === 'rezka2_alt') return user_proxy_nb557;
+        if (name === 'rezka2_alt2') return user_proxy_fx666;
+        if (name === 'rezka2_alt3') return user_proxy4;
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
@@ -2047,6 +2053,9 @@
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       var prox = component.proxy('rezka2');
+      var prox_alt = component.proxy('rezka2_alt');
+      var prox_alt2 = component.proxy('rezka2_alt2');
+      var prox_alt3 = component.proxy('rezka2_alt3');
       var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
       var ref = host + '/';
       var logged_in = !prox && Lampa.Platform.is('android');
@@ -2319,11 +2328,13 @@
           } else if (error_message) component.empty(error_message);else component.emptyForQuery(select_title);
         };
 
-        var query_search = function query_search(query, data, callback) {
+        var query_search = function query_search(query, data, callback, stage) {
+          stage = stage || 0;
+          var cur_prox = stage === 0 ? prox : (stage === 1 ? prox_alt : (stage === 2 ? prox_alt2 : prox_alt3));
           var postdata = 'q=' + encodeURIComponent(query);
           network.clear();
           network.timeout(10000);
-          network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
+          network["native"](component.proxyLink(url, cur_prox, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
             var links = str.match(/<li><a href=.*?<\/li>/g);
@@ -2331,13 +2342,21 @@
             if (links && links.length) data = data.concat(links);
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
-            if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
+            if (cur_prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
               Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
             }
 
             if (a.status == 403 && a.responseText) {
               var str = (a.responseText || '').replace(/\n/g, '');
               checkErrorForm(str);
+            }
+
+            // Текущий прокси не ответил — пробуем следующий по очереди, прежде чем сдаваться
+            var next_stage = stage + 1;
+            var next_prox = next_stage === 1 ? prox_alt : (next_stage === 2 ? prox_alt2 : (next_stage === 3 ? prox_alt3 : null));
+            if (!error_message && next_prox && next_prox !== cur_prox) {
+              query_search(query, data, callback, next_stage);
+              return;
             }
 
             if (error_message) component.empty(error_message);else if (callback) callback([], false, query);else component.empty(network.errorDecode(a, c));
@@ -5014,6 +5033,7 @@
       var prox2 = component.proxy('filmix_site');
       var prox2_alt = component.proxy('filmix_site_alt');
       var prox2_alt2 = component.proxy('filmix_site_alt2');
+      var prox2_alt3 = component.proxy('filmix_site_alt3');
       var prox3 = component.proxy('filmix_abuse');
       var host = Utils.filmixHost();
       var ref = host + '/';
@@ -5039,7 +5059,7 @@
       };
       var prox2_enc = '';
 
-      if (prox2 || prox2_alt || prox2_alt2) {
+      if (prox2 || prox2_alt || prox2_alt2 || prox2_alt3) {
         prox2_enc += 'param/Origin=' + encodeURIComponent(host) + '/';
         prox2_enc += 'param/Referer=' + encodeURIComponent(ref) + '/';
         prox2_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
@@ -5182,8 +5202,8 @@
 
         var siteSearch = function siteSearch(stage) {
           stage = stage || 0;
-          var cur_prox = stage === 0 ? prox2 : (stage === 1 ? prox2_alt : prox2_alt2);
-          var prox_label = stage === 0 ? 'осн.' : (stage === 1 ? 'onrender' : 'deno');
+          var cur_prox = stage === 0 ? prox2 : (stage === 1 ? prox2_alt : (stage === 2 ? prox2_alt2 : prox2_alt3));
+          var prox_label = stage === 0 ? 'осн.' : (stage === 1 ? 'onrender' : (stage === 2 ? 'deno' : 'keyro2'));
           var url = site + 'api/v2/suggestions?search_word=' + encodeURIComponent(clean_title);
           network.clear();
           network.timeout(15000);
@@ -5192,7 +5212,7 @@
           }, function (a, c) {
             // Текущий прокси не ответил — пробуем следующий по очереди, прежде чем сдаваться
             var next_stage = stage + 1;
-            var next_prox = next_stage === 1 ? prox2_alt : (next_stage === 2 ? prox2_alt2 : null);
+            var next_prox = next_stage === 1 ? prox2_alt : (next_stage === 2 ? prox2_alt2 : (next_stage === 3 ? prox2_alt3 : null));
             if (next_prox && next_prox !== cur_prox) siteSearch(next_stage);
             else component.empty('[' + prox_label + '] ' + network.errorDecode(a, c));
           }, false, {
