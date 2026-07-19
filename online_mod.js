@@ -2331,12 +2331,15 @@
           network.timeout(10000);
           network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
+            Lampa.Noty.show('DEBUG rezka2: OK query="' + query + '" len=' + str.length + ' snippet=' + str.substring(0, 80));
             checkErrorForm(str);
             var links = str.match(/<li><a href=.*?<\/li>/g);
             var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
             if (links && links.length) data = data.concat(links);
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
+            Lampa.Noty.show('DEBUG rezka2: FAIL query="' + query + '" status=' + (a && a.status) + ' err=' + network.errorDecode(a, c));
+
             if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
               Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
             }
