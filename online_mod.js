@@ -17307,10 +17307,14 @@
               // через прокси, иначе видео будет требовать авторизацию.
               rezka2FillCookie(function () {
                 rezka2_login_status.removeClass('active error wait').addClass('active');
-                Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+                try {
+                  Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+                } catch (err) {}
               }, function () {
                 rezka2_login_status.removeClass('active error wait').addClass('error');
-                Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+                try {
+                  Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+                } catch (err) {}
               });
             }, function () {
               rezka2_login_status.removeClass('active error wait').addClass('error');
@@ -17330,10 +17334,14 @@
             var rezka2_fill_cookie_status = $('.settings-param__status', rezka2_fill_cookie).removeClass('active error wait').addClass('wait');
             rezka2FillCookie(function () {
               rezka2_fill_cookie_status.removeClass('active error wait').addClass('active');
-              Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+              try {
+                Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+              } catch (err) {}
             }, function () {
               rezka2_fill_cookie_status.removeClass('active error wait').addClass('error');
-              Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+              try {
+                Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+              } catch (err) {}
             });
           });
           var fancdn_fill_cookie = e.body.find('[data-name="online_mod_fancdn_fill_cookie"]');
@@ -17341,10 +17349,14 @@
             var fancdn_fill_cookie_status = $('.settings-param__status', fancdn_fill_cookie).removeClass('active error wait').addClass('wait');
             fancdnFillCookie(function () {
               fancdn_fill_cookie_status.removeClass('active error wait').addClass('active');
-              Lampa.Params.update(e.body.find('[data-name="online_mod_fancdn_cookie"]'), [], e.body);
+              try {
+                Lampa.Params.update(e.body.find('[data-name="online_mod_fancdn_cookie"]'), [], e.body);
+              } catch (err) {}
             }, function () {
               fancdn_fill_cookie_status.removeClass('active error wait').addClass('error');
-              Lampa.Params.update(e.body.find('[data-name="online_mod_fancdn_cookie"]'), [], e.body);
+              try {
+                Lampa.Params.update(e.body.find('[data-name="online_mod_fancdn_cookie"]'), [], e.body);
+              } catch (err) {}
             });
           });
         }
