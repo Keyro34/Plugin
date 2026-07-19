@@ -146,7 +146,7 @@
 
     function rezka2Mirror() {
       var url = Lampa.Storage.get('online_mod_rezka2_mirror', '') + '';
-      if (!url) return 'https://kvk.zone';
+      if (!url) return 'https://rezka.si';
       if (url.indexOf('://') == -1) url = 'https://' + url;
       if (url.charAt(url.length - 1) === '/') url = url.substring(0, url.length - 1);
       return url;
@@ -2130,6 +2130,7 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
+        Lampa.Noty.show('DEBUG rezka2: search called, title=' + select_title + ', proxy=' + (prox ? prox : 'OFF'));
         if (this.wait_similars && data && data[0].is_similars) return getPage(data[0].link);
         error_message = '';
         var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
@@ -16602,13 +16603,13 @@
       if (Lampa.Storage.get('online_mod_use_stream_proxy', '') === '') {
         $.ajax({
           url: (window.location.protocol === 'https:' ? 'https://' : 'http://') + 'ipwho.is/?fields=ip,country_code',
-          jsonp: 'callback',
-          dataType: 'jsonp'
+          dataType: 'json',
+          timeout: 8000
         }).done(function (json) {
           if (json && json.country_code) {
             Lampa.Storage.set('online_mod_use_stream_proxy', '' + (json.country_code === 'UA'));
           }
-        });
+        }).fail(function () {});
       }
 
       if (Lampa.VPN && (Utils.isDebug() || Utils.isDebug2())) {
