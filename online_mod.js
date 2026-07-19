@@ -146,7 +146,7 @@
 
     function rezka2Mirror() {
       var url = Lampa.Storage.get('online_mod_rezka2_mirror', '') + '';
-      if (!url) return 'https://rezka.si';
+      if (!url) return 'https://kvk.zone';
       if (url.indexOf('://') == -1) url = 'https://' + url;
       if (url.charAt(url.length - 1) === '/') url = url.substring(0, url.length - 1);
       return url;
@@ -269,17 +269,12 @@
       if (name === 'cookie2') return user_proxy2;
       if (name === 'cookie3') return user_proxy3;
       if (name === 'ip') return proxy2_base;
-      // Отдельный ключ для логина/синхронизации кук HDrezka: используем
-      // вращающийся пул прокси (включает nb557/fx666), т.к. они умеют
-      // возвращать заголовок Set-Cookie в ответе, в отличие от keyro34,
-      // который закреплён за обычной загрузкой контента.
-      if (name === 'rezka2_auth') return Lampa.Storage.field('online_mod_proxy_rezka2') === true ? user_proxy1 : '';
 
       if (Lampa.Storage.field('online_mod_proxy_' + name) === true) {
         if (name === 'iframe') return user_proxy2;
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
-        if (name === 'rezka2') return user_proxy4;
+        if (name === 'rezka2') return user_proxy1;
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
@@ -2130,7 +2125,6 @@
 
         object = _object;
         select_title = object.search || object.movie.title;
-        Lampa.Noty.show('DEBUG rezka2: search called, title=' + select_title + ', proxy=' + (prox ? prox : 'OFF'));
         if (this.wait_similars && data && data[0].is_similars) return getPage(data[0].link);
         error_message = '';
         var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
@@ -2331,15 +2325,12 @@
           network.timeout(10000);
           network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
-            Lampa.Noty.show('DEBUG rezka2: OK query="' + query + '" len=' + str.length + ' snippet=' + str.substring(0, 80));
             checkErrorForm(str);
             var links = str.match(/<li><a href=.*?<\/li>/g);
             var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
             if (links && links.length) data = data.concat(links);
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
-            Lampa.Noty.show('DEBUG rezka2: FAIL query="' + query + '" status=' + (a && a.status) + ' err=' + network.errorDecode(a, c));
-
             if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
               Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
             }
@@ -16606,13 +16597,13 @@
       if (Lampa.Storage.get('online_mod_use_stream_proxy', '') === '') {
         $.ajax({
           url: (window.location.protocol === 'https:' ? 'https://' : 'http://') + 'ipwho.is/?fields=ip,country_code',
-          dataType: 'json',
-          timeout: 8000
+          jsonp: 'callback',
+          dataType: 'jsonp'
         }).done(function (json) {
           if (json && json.country_code) {
             Lampa.Storage.set('online_mod_use_stream_proxy', '' + (json.country_code === 'UA'));
           }
-        }).fail(function () {});
+        });
       }
 
       if (Lampa.VPN && (Utils.isDebug() || Utils.isDebug2())) {
@@ -16842,11 +16833,11 @@
     }
 
     function rezka2FillCookie(success, error) {
-      var prox = Utils.proxy('rezka2_auth');
+      var prox = Utils.proxy('rezka2');
       var prox_enc = '';
       var returnHeaders = androidHeaders;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
+      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
@@ -17311,20 +17302,7 @@
           rezka2_login.unbind('hover:enter').on('hover:enter', function () {
             var rezka2_login_status = $('.settings-param__status', rezka2_login).removeClass('active error wait').addClass('wait');
             rezka2Login(function () {
-              // Логин/пароль верны, но это ещё не значит, что прокси-запросы
-              // реально авторизованы — подтягиваем настоящую сессионную куку
-              // через прокси, иначе видео будет требовать авторизацию.
-              rezka2FillCookie(function () {
-                rezka2_login_status.removeClass('active error wait').addClass('active');
-                try {
-                  Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
-                } catch (err) {}
-              }, function () {
-                rezka2_login_status.removeClass('active error wait').addClass('error');
-                try {
-                  Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
-                } catch (err) {}
-              });
+              rezka2_login_status.removeClass('active error wait').addClass('active');
             }, function () {
               rezka2_login_status.removeClass('active error wait').addClass('error');
             });
@@ -17343,14 +17321,10 @@
             var rezka2_fill_cookie_status = $('.settings-param__status', rezka2_fill_cookie).removeClass('active error wait').addClass('wait');
             rezka2FillCookie(function () {
               rezka2_fill_cookie_status.removeClass('active error wait').addClass('active');
-              try {
-                Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
-              } catch (err) {}
+              Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
             }, function () {
               rezka2_fill_cookie_status.removeClass('active error wait').addClass('error');
-              try {
-                Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
-              } catch (err) {}
+              Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
             });
           });
           var fancdn_fill_cookie = e.body.find('[data-name="online_mod_fancdn_fill_cookie"]');
@@ -17358,14 +17332,10 @@
             var fancdn_fill_cookie_status = $('.settings-param__status', fancdn_fill_cookie).removeClass('active error wait').addClass('wait');
             fancdnFillCookie(function () {
               fancdn_fill_cookie_status.removeClass('active error wait').addClass('active');
-              try {
-                Lampa.Params.update(e.body.find('[data-name="online_mod_fancdn_cookie"]'), [], e.body);
-              } catch (err) {}
+              Lampa.Params.update(e.body.find('[data-name="online_mod_fancdn_cookie"]'), [], e.body);
             }, function () {
               fancdn_fill_cookie_status.removeClass('active error wait').addClass('error');
-              try {
-                Lampa.Params.update(e.body.find('[data-name="online_mod_fancdn_cookie"]'), [], e.body);
-              } catch (err) {}
+              Lampa.Params.update(e.body.find('[data-name="online_mod_fancdn_cookie"]'), [], e.body);
             });
           });
         }
