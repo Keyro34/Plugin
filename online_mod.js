@@ -269,6 +269,11 @@
       if (name === 'cookie2') return user_proxy2;
       if (name === 'cookie3') return user_proxy3;
       if (name === 'ip') return proxy2_base;
+      // Отдельный ключ для логина/синхронизации кук HDrezka: используем
+      // вращающийся пул прокси (включает nb557/fx666), т.к. они умеют
+      // возвращать заголовок Set-Cookie в ответе, в отличие от keyro34,
+      // который закреплён за обычной загрузкой контента.
+      if (name === 'rezka2_auth') return Lampa.Storage.field('online_mod_proxy_rezka2') === true ? user_proxy1 : '';
 
       if (Lampa.Storage.field('online_mod_proxy_' + name) === true) {
         if (name === 'iframe') return user_proxy2;
@@ -16833,7 +16838,7 @@
     }
 
     function rezka2FillCookie(success, error) {
-      var prox = Utils.proxy('rezka2');
+      var prox = Utils.proxy('rezka2_auth');
       var prox_enc = '';
       var returnHeaders = androidHeaders;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
