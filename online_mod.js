@@ -646,15 +646,15 @@
       var host = atob('aHR0cHM6Ly9wLmx1bWV4LnNwYWNl');
       var ref = host + '/';
       var user_agent = Utils.baseUserAgent();
-      var headers = Lampa.Platform.is('android') ? {
+      var headers =  {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent,
         'Sec-Fetch-Dest': 'empty',
         'Sec-Fetch-Mode': 'cors',
         'Sec-Fetch-Site': 'same-site'
-      } : {};
-      var headers2 = Lampa.Platform.is('android') ? {
+      };
+      var headers2 =  {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent,
@@ -663,7 +663,7 @@
         'Sec-Fetch-Site': 'same-site',
         'Cookie': '',
         'x-csrf-token': ''
-      } : {};
+      };
       var prox_enc = '';
 
       if (prox) {
@@ -2051,11 +2051,11 @@
       var ref = host + '/';
       var logged_in = !prox && Lampa.Platform.is('android');
       var user_agent = Utils.baseUserAgent();
-      var headers = Lampa.Platform.is('android') ? {
+      var headers = {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent
-      } : {};
+      };
       var prox_enc = '';
 
       if (prox) {
@@ -3178,12 +3178,12 @@
         if (this.wait_similars && data && data[0].is_similars) return getPage(data[0].link);
         var url = embed + 'search?query=' + encodeURIComponent(component.cleanTitle(select_title));
         var cookie = check_cookie;
-        var headers = Lampa.Platform.is('android') ? {
+        var headers = {
           'Origin': host,
           'Referer': ref,
           'User-Agent': user_agent,
           'Cookie': cookie
-        } : {};
+        };
         var prox_enc_page = '';
 
         if (prox) {
@@ -3523,12 +3523,12 @@
       function getPage(url) {
         url = component.fixLink(url, ref);
         var cookie = (check_cookie ? check_cookie + '; ' : '') + 'player_type=new; file_type=' + file_type;
-        var headers = Lampa.Platform.is('android') ? {
+        var headers = {
           'Origin': host,
           'Referer': url,
           'User-Agent': user_agent,
           'Cookie': cookie
-        } : {};
+        };
         var prox_enc_page = '';
 
         if (prox) {
@@ -4365,11 +4365,11 @@
       var host = Utils.decodeSecret([36, 63, 17, 6, 17, 0, 104, 90, 4, 49, 40, 46, 10, 30, 6, 20, 40, 27, 30, 49, 34, 46]);
       var ref = host + '/';
       var user_agent = 'Mozilla/5.0 (Linux; Android 10; K; client) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.6167.178 Mobile Safari/537.36';
-      var headers = Lampa.Platform.is('android') ? {
+      var headers = {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent
-      } : {};
+      };
       var prox_enc = '';
 
       if (prox) {
