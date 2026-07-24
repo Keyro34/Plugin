@@ -2051,11 +2051,15 @@
       var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
-      var headers = Lampa.Platform.is('android') ? {
+      var headers = {
         'Origin': host,
         'Referer': ref,
-        'User-Agent': user_agent
-      } : {};
+        'User-Agent': user_agent,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'ru-RU,ru;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Cache-Control': 'max-age=0'
+      };
       var prox_enc = '';
 
       if (prox) {
