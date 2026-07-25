@@ -2046,13 +2046,12 @@
       var prefer_http = Lampa.Storage.field('online_mod_prefer_http') === true;
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var prox = component.proxy('rezka2');
+      // На ПК отключаем proxy - используем резку напрямую через зеркало
+      var prox = Lampa.Platform.is('android') ? component.proxy('rezka2') : false;
       var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
       var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
-      
-      // Headers ВЕЗДЕ (ПК, ТВ, Android)
       var headers = {
         'Origin': host,
         'Referer': ref,
@@ -2074,7 +2073,7 @@
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
 
       if (cookie) {
-        // ВАЖНО: добавлять Cookie в headers ВЕЗДЕ (ПК, ТВ, Android)
+        // Добавлять Cookie в headers ВЕЗДЕ!
         headers.Cookie = cookie;
 
         if (prox) {
