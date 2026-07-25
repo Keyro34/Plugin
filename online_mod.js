@@ -646,18 +646,15 @@
       var host = atob('aHR0cHM6Ly9wLmx1bWV4LnNwYWNl');
       var ref = host + '/';
       var user_agent = Utils.baseUserAgent();
-      var headers = {
+      var headers = Lampa.Platform.is('android') ? {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent,
         'Sec-Fetch-Dest': 'empty',
         'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'same-site',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'ru-RU,ru;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br'
-      };
-      var headers2 = {
+        'Sec-Fetch-Site': 'same-site'
+      } : {};
+      var headers2 = Lampa.Platform.is('android') ? {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent,
@@ -665,10 +662,8 @@
         'Sec-Fetch-Mode': 'cors',
         'Sec-Fetch-Site': 'same-site',
         'Cookie': '',
-        'x-csrf-token': '',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'ru-RU,ru;q=0.9'
-      };
+        'x-csrf-token': ''
+      } : {};
       var prox_enc = '';
 
       if (prox) {
@@ -2056,6 +2051,8 @@
       var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
+      
+      // Headers ВЕЗДЕ (ПК, ТВ, Android)
       var headers = {
         'Origin': host,
         'Referer': ref,
@@ -2077,9 +2074,8 @@
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
 
       if (cookie) {
-        if (Lampa.Platform.is('android')) {
-          headers.Cookie = cookie;
-        }
+        // ВАЖНО: добавлять Cookie в headers ВЕЗДЕ (ПК, ТВ, Android)
+        headers.Cookie = cookie;
 
         if (prox) {
           prox_enc += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
@@ -3187,12 +3183,12 @@
         if (this.wait_similars && data && data[0].is_similars) return getPage(data[0].link);
         var url = embed + 'search?query=' + encodeURIComponent(component.cleanTitle(select_title));
         var cookie = check_cookie;
-        var headers = {
+        var headers = Lampa.Platform.is('android') ? {
           'Origin': host,
           'Referer': ref,
           'User-Agent': user_agent,
           'Cookie': cookie
-        };
+        } : {};
         var prox_enc_page = '';
 
         if (prox) {
@@ -3532,12 +3528,12 @@
       function getPage(url) {
         url = component.fixLink(url, ref);
         var cookie = (check_cookie ? check_cookie + '; ' : '') + 'player_type=new; file_type=' + file_type;
-        var headers = {
+        var headers = Lampa.Platform.is('android') ? {
           'Origin': host,
           'Referer': url,
           'User-Agent': user_agent,
           'Cookie': cookie
-        };
+        } : {};
         var prox_enc_page = '';
 
         if (prox) {
@@ -3938,11 +3934,11 @@
       }
 
       var net_method = lampa_player ? 'silent' : 'native';
-      var play_headers = !prox && !lampa_player && {
+      var play_headers = !prox && !lampa_player && Lampa.Platform.is('android') ? {
         'User-Agent': user_agent,
         'Origin': host,
         'Referer': ref
-      };
+      } : {};
       var filter_items = {};
       var choice = {
         season: 0,
@@ -4374,11 +4370,11 @@
       var host = Utils.decodeSecret([36, 63, 17, 6, 17, 0, 104, 90, 4, 49, 40, 46, 10, 30, 6, 20, 40, 27, 30, 49, 34, 46]);
       var ref = host + '/';
       var user_agent = 'Mozilla/5.0 (Linux; Android 10; K; client) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.6167.178 Mobile Safari/537.36';
-      var headers = {
+      var headers = Lampa.Platform.is('android') ? {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent
-      };
+      } : {};
       var prox_enc = '';
 
       if (prox) {
@@ -5029,9 +5025,9 @@
       var user_agent = Utils.baseUserAgent();
       var site = ref;
       var embed = Utils.filmixAppHost() + '/api/v2/';
-      var headers = {
+      var headers = Lampa.Platform.is('android') ? {
         'User-Agent': Utils.filmixUserAgent()
-      };
+      } : {};
       var prox_enc = '';
 
       if (prox) {
@@ -6348,11 +6344,11 @@
       var host = Utils.fanserialsHost();
       var ref = host + '/';
       var user_agent = Utils.baseUserAgent();
-      var headers = {
+      var headers = Lampa.Platform.is('android') ? {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent
-      };
+      } : {};
       var prox_enc = '';
 
       if (prox) {
@@ -6364,12 +6360,12 @@
       var host2 = Utils.fancdnHost();
       var ref2 = host2 + '/';
       var cookie2 = Utils.randomCookie();
-      var headers2 = {
+      var headers2 = Lampa.Platform.is('android') ? {
         'Origin': host2,
         'Referer': ref2,
         'User-Agent': user_agent,
         'Cookie': cookie2
-      };
+      } : {};
       var prox_enc2 = '';
 
       if (prox) {
@@ -7138,11 +7134,11 @@
       var host = Utils.fancdnHost();
       var ref = host + '/';
       var user_agent = Utils.baseUserAgent();
-      var headers = {
+      var headers = Lampa.Platform.is('android') ? {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent
-      };
+      } : {};
       var prox_enc = '';
 
       if (prox) {
@@ -7765,11 +7761,11 @@
       var host = Utils.fanserialsHost();
       var ref = host + '/';
       var user_agent = Utils.baseUserAgent();
-      var headers = {
+      var headers = Lampa.Platform.is('android') ? {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent
-      };
+      } : {};
       var prox_enc = '';
 
       if (prox) {
@@ -8362,11 +8358,11 @@
       var user_agent = Utils.baseUserAgent();
       var embed = atob('aHR0cHM6Ly9hcGkudmlkZW9zZWVkLnR2L2FwaXYyLnBocA==');
       var suffix = Utils.decodeSecret([56, 36, 14, 19, 12, 7, 117, 77, 17, 59, 120, 122, 3, 69, 82, 9, 119, 16, 71, 107, 42, 46, 0, 67, 87, 10, 116, 77, 74, 111, 125, 127, 80, 64, 84, 92, 115, 22]);
-      var headers = {
+      var headers = Lampa.Platform.is('android') ? {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent
-      };
+      } : {};
       var prox_enc = '';
 
       if (prox) {
@@ -9008,9 +9004,9 @@
       var prox = component.proxy('alloha');
       var prox2 = component.proxy('allohacdn');
       var user_agent = Utils.decodeSecret([1, 36, 31, 31, 14, 86, 38, 90, 71, 118, 124, 107, 77, 33, 11, 84, 35, 26, 5, 43, 108, 5, 49, 86, 83, 10, 105, 69, 73, 120, 27, 34, 11, 64, 86, 1, 103, 13, 68, 108, 101, 107, 36, 6, 18, 86, 34, 34, 23, 58, 7, 34, 17, 89, 87, 9, 112, 91, 65, 110, 108, 99, 46, 62, 54, 119, 11, 89, 82, 52, 37, 32, 0, 86, 37, 95, 36, 30, 29, 113, 108, 8, 13, 4, 13, 87, 34, 90, 67, 107, 123, 101, 85, 88, 82, 20, 119, 85, 33, 57, 42, 42, 23, 31, 77, 15, 116, 66, 92, 107, 122]);
-      var headers2 = {
+      var headers2 = Lampa.Platform.is('android') ? {
         'User-Agent': user_agent
-      };
+      } : {};
       var prox2_enc = '';
 
       if (prox2) {
@@ -9588,11 +9584,11 @@
       var host = 'https://redheadsound.studio';
       var ref = host + '/';
       var user_agent = Utils.baseUserAgent();
-      var headers = {
+      var headers = Lampa.Platform.is('android') ? {
         'Origin': host,
         'Referer': ref,
         'User-Agent': user_agent
-      };
+      } : {};
       var prox_enc = '';
 
       if (prox) {
@@ -16507,9 +16503,9 @@
       }
 
       var user_agent = Utils.baseUserAgent();
-      var headers = {
+      var headers = Lampa.Platform.is('android') ? {
         'User-Agent': user_agent
-      };
+      } : {};
 
       if (prox) {
         prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
@@ -16631,9 +16627,9 @@
     } ///////FILMIX/////////
 
 
-    var filmix_headers = {
+    var filmix_headers = Lampa.Platform.is('android') ? {
       'User-Agent': Utils.filmixUserAgent()
-    };
+    } : {};
     var api_url = Utils.filmixAppHost() + '/api/v2/';
     var dev_id = Utils.randomHex(16);
     var ping_auth;
@@ -16855,9 +16851,9 @@
       }
 
       var user_agent = Utils.baseUserAgent();
-      var headers = {
+      var headers = Lampa.Platform.is('android') ? {
         'User-Agent': user_agent
-      };
+      } : {};
 
       if (prox) {
         prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
@@ -17067,9 +17063,9 @@
 
       var host = Utils.fanserialsHost();
       var user_agent = Utils.baseUserAgent();
-      var headers = {
+      var headers = Lampa.Platform.is('android') ? {
         'User-Agent': user_agent
-      };
+      } : {};
 
       if (prox) {
         prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
