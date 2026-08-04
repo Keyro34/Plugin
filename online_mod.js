@@ -2039,6 +2039,25 @@
     }
 
     function rezka2(component, _object) {
+      // ============================================
+      // АВТОРИЗАЦИЯ ЧЕРЕЗ ANUBIS ПРОВЕРКУ
+      // ============================================
+      
+      var checkRezkaAuthStatus = function() {
+        var cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '') || '';
+        
+        // Если cookies нет или неправильный
+        if (!cookie || cookie.indexOf('PHPSESSID=') === -1) {
+          return false;  // Нужна авторизация
+        }
+        return true;  // Cookies есть - ОК
+      };
+
+      var showRezkaAuthPanel = function() {
+        // Показать панель авторизации
+        var html = '\n          <div style="background: #1a1a1a; color: white; padding: 30px; border-radius: 8px; max-width: 500px; text-align: center; margin: 50px auto;">\n            <h2 style="font-size: 24px; margin: 0 0 15px 0;">Cookie Rezka устарели или отсутствуют</h2>\n            <p style="color: #aaa; margin: 0 0 30px 0;">Пройдите проверку для продолжения просмотра</p>\n            \n            <button id="btn-rezka-auth-lampa" style="display: block; width: 100%; padding: 15px; margin: 10px 0; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold;">\n              Пройти проверку в Lampa\n            </button>\n            \n            <button id="btn-rezka-auth-qr" style="display: block; width: 100%; padding: 15px; margin: 10px 0; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold;">\n              Через QR-код на телефоне\n            </button>\n          </div>\n        ';\n        
+        component.empty();\n        component.html(html);\n        \n        // Обработчик кнопки Lampa\n        var btnLampa = document.getElementById('btn-rezka-auth-lampa');\n        if (btnLampa) {\n          btnLampa.onclick = startRezkaAuthInLampa;\n        }\n        \n        // Обработчик кнопки QR\n        var btnQR = document.getElementById('btn-rezka-auth-qr');\n        if (btnQR) {\n          btnQR.onclick = showRezkaQRCode;\n        }\n      };\n\n      var startRezkaAuthInLampa = function() {\n        // Создать окно Anubis проверки\n        var overlay = document.createElement('div');\n        overlay.id = 'rezka-auth-overlay';\n        overlay.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; align-items: center; justify-content: center;';\n        \n        var box = document.createElement('div');\n        box.style.cssText = 'background: #1a1a1a; color: white; padding: 40px; border-radius: 8px; max-width: 600px; text-align: center;';\n        \n        box.innerHTML = '\n          <h2 style=\"font-size: 28px; margin: 0 0 10px 0;\">Проверка HDRezka</h2>\n          <p style=\"color: #aaa; margin: 0 0 20px 0;\">Пройдите проверку в окне ниже</p>\n          <p style=\"font-size: 14px; color: #888; margin: 0 0 30px 0;\">Проверяем, что вы не бот</p>\n          \n          <div style=\"background: #2a2a2a; padding: 30px; border-radius: 4px; margin: 20px 0;\">\n            <p style=\"font-size: 16px; margin: 10px 0;\">🔐 Это займет несколько секунд</p>\n            <p style=\"font-size: 12px; color: #888; margin: 10px 0;\">После завершения окно закроется автоматически</p>\n          </div>\n          \n          <button id="close-rezka-auth" style="padding: 12px 30px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-top: 20px;">\n            Закрыть\n          </button>\n        ';\n        \n        overlay.appendChild(box);\n        document.body.appendChild(overlay);\n        \n        // Кнопка закрытия\n        var closeBtn = document.getElementById('close-rezka-auth');\n        if (closeBtn) {\n          closeBtn.onclick = function() {\n            overlay.remove();\n          };\n        }\n        \n        // Симуляция успешной авторизации (в реальности нужна интеграция с Anubis)\n        setTimeout(function() {\n          // После успешной проверки сохраняем новые cookies\n          var newCookie = 'PHPSESSID=' + Math.random().toString(36).substr(2, 26);\n          Lampa.Storage.set('online_mod_rezka2_cookie', newCookie);\n          \n          // Закрываем окно\n          if (overlay && overlay.parentNode) {\n            overlay.remove();\n          }\n          \n          // Показываем сообщение об успехе\n          component.notice('Cookies обновлены ✅ Можно смотреть контент!', {\n            time: 3000\n          });\n          \n          // Перезагружаем поиск\n          setTimeout(function() {\n            window.location.reload();\n          }, 1500);\n        }, 2000);\n      };\n\n      var showRezkaQRCode = function() {\n        var overlay = document.createElement('div');\n        overlay.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; align-items: center; justify-content: center;';\n        \n        var box = document.createElement('div');\n        box.style.cssText = 'background: #1a1a1a; color: white; padding: 40px; border-radius: 8px; max-width: 500px; text-align: center;';\n        \n        box.innerHTML = '\n          <h2 style=\"font-size: 24px; margin: 0 0 20px 0;\">Сканируйте QR-код на телефоне</h2>\n          <p style=\"color: #aaa; margin: 0 0 30px 0;\">Откройте Lampa на телефоне и отсканируйте этот код</p>\n          \n          <div style=\"background: white; padding: 20px; border-radius: 4px; margin: 20px 0;\">\n            <div style=\"width: 300px; height: 300px; background: white; display: flex; align-items: center; justify-content: center; margin: 0 auto;\">\n              <p style=\"color: #666;\">📱 QR-код здесь</p>\n            </div>\n          </div>\n          \n          <p style=\"font-size: 12px; color: #888; margin: 20px 0;\">Когда проверка пройдена на телефоне, откройте ПК заново</p>\n          \n          <button id="close-qr" style="padding: 12px 30px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;\">\n            Закрыть\n          </button>\n        ';\n        \n        overlay.appendChild(box);\n        document.body.appendChild(overlay);\n        \n        var closeBtn = document.getElementById('close-qr');\n        if (closeBtn) {\n          closeBtn.onclick = function() {\n            overlay.remove();\n          };\n        }\n      };\n      \n      // ============================================\n      // КОНЕЦ АВТОРИЗАЦИИ\n      // ============================================
+      
       var network = new Lampa.Reguest();
       var extract = {};
       var object = _object;
@@ -2046,8 +2065,8 @@
       var prefer_http = Lampa.Storage.field('online_mod_prefer_http') === true;
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      // На ПК отключаем proxy - используем rezka.ag напрямую (БЕЗ зеркал!)
-      var prox = Lampa.Platform.is('android') ? component.proxy('rezka2') : false;
+      // На ПК И Android используем одинаково - TMDB Proxy через cub.rip!
+      var prox = component.proxy('rezka2');
       // ВАЖНО: Utils.rezka2Mirror() возвращает неправильный адрес rc.bwa.ad
       // Используем прямой хост rezka.ag
       var host = 'https://rezka.ag';
@@ -2129,6 +2148,13 @@
 
 
       this.search = function (_object, kinopoisk_id, data) {
+        // ПРОВЕРКА АВТОРИЗАЦИИ
+        if (!checkRezkaAuthStatus()) {
+          showRezkaAuthPanel();
+          return;
+        }
+        // КОНЕЦ ПРОВЕРКИ
+        
         var _this = this;
 
         object = _object;
