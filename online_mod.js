@@ -17441,13 +17441,6 @@
         template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_cookie\" data-type=\"input\" data-string=\"true\" placeholder=\"#{settings_cub_not_specified}\">\n            <div class=\"settings-param__name\">#{online_mod_rezka2_cookie}</div>\n            <div class=\"settings-param__value\"></div>\n        </div>\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_fill_cookie\" data-static=\"true\">\n            <div class=\"settings-param__name\">#{online_mod_rezka2_fill_cookie}</div>\n            <div class=\"settings-param__status\"></div>\n        </div>";
       }
 
-      // === КНОПКИ АВТОРИЗАЦИИ REZKA2 ЧЕРЕЗ QR/TV ===
-      template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_auth_proxy\" data-type=\"input\" placeholder=\"https://rezka.lampasochka.workers.dev/\">\n            <div class=\"settings-param__name\">#{online_mod_rezka2_auth_proxy}</div>\n            <div class=\"settings-param__value\"></div>\n        </div>";
-
-      template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_auth_qr\" data-static=\"true\">\n            <div class=\"settings-param__name\">Авторизация HDRezka (QR-код)</div>\n            <div class=\"settings-param__status\"></div>\n        </div>";
-
-      template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_auth_tv\" data-static=\"true\">\n            <div class=\"settings-param__name\">Авторизация HDRezka (в Lampa)</div>\n            <div class=\"settings-param__status\"></div>\n        </div>";
-
       {
         template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_fix_stream\" data-type=\"toggle\">\n            <div class=\"settings-param__name\">#{online_mod_rezka2_fix_stream}</div>\n            <div class=\"settings-param__value\"></div>\n        </div>";
       }
@@ -17522,26 +17515,6 @@
               Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
             });
           });
-
-          // === ОБРАБОТЧИКИ QR/TV АВТОРИЗАЦИИ ===
-          var rezka2_auth_qr = e.body.find('[data-name="online_mod_rezka2_auth_qr"]');
-          rezka2_auth_qr.unbind('hover:enter').on('hover:enter', function () {
-            var rezka2_auth_qr_status = $('.settings-param__status', rezka2_auth_qr).removeClass('active error wait').addClass('wait');
-            openQrAuthModal(function () {
-              rezka2_auth_qr_status.removeClass('active error wait').addClass('active');
-              Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
-            });
-          });
-
-          var rezka2_auth_tv = e.body.find('[data-name="online_mod_rezka2_auth_tv"]');
-          rezka2_auth_tv.unbind('hover:enter').on('hover:enter', function () {
-            var rezka2_auth_tv_status = $('.settings-param__status', rezka2_auth_tv).removeClass('active error wait').addClass('wait');
-            openTvAuthModal(function () {
-              rezka2_auth_tv_status.removeClass('active error wait').addClass('active');
-              Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
-            });
-          });
-
           var fancdn_fill_cookie = e.body.find('[data-name="online_mod_fancdn_fill_cookie"]');
           fancdn_fill_cookie.unbind('hover:enter').on('hover:enter', function () {
             var fancdn_fill_cookie_status = $('.settings-param__status', fancdn_fill_cookie).removeClass('active error wait').addClass('wait');
