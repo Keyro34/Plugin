@@ -152,6 +152,174 @@
       return url;
     }
 
+    // === QR/TV АВТОРИЗАЦИЯ ДЛЯ REZKA2 ===
+    function repeatChar(ch, n) {
+      var s = '';
+      for (var i = 0; i < n; i++) s += ch;
+      return s;
+    }
+
+    function startsWithHttp(str) {
+      return str.indexOf('http') === 0;
+    }
+
+    function endsWithSlash(str) {
+      return str.charAt(str.length - 1) === '/';
+    }
+
+    function generateAuthCode() {
+      return Math.floor(1000 + Math.random() * 9000).toString();
+    }
+
+    function buildAuthUrl(proxyUrl, hostBare, code) {
+      if (!startsWithHttp(proxyUrl)) {
+        Lampa.Noty.show('Сначала настройте URL прокси-воркера в настройках плагина');
+        return null;
+      }
+      if (!endsWithSlash(proxyUrl)) proxyUrl += '/';
+      var authUrl = proxyUrl + 'auth/' + code + '/' + encodeURIComponent(hostBare);
+      return { proxyUrl: proxyUrl, code: code, authUrl: authUrl };
+    }
+
+    function pollAuthCode(proxyUrl, code, statusSelector, waitingText, onSuccess, onTimeout) {
+      var attempts = 0;
+      window.rezka2AuthInterval = setInterval(function () {
+        attempts++;
+        if (attempts > 90) {
+          clearInterval(window.rezka2AuthInterval);
+          $(statusSelector).text('Время ожидания истекло. Попробуйте снова.').css('color', '#ff5722');
+          if (onTimeout) onTimeout();
+          return;
+        }
+
+        $(statusSelector).text(waitingText + repeatChar('.', attempts % 4));
+
+        $.ajax({
+          url: proxyUrl + 'check?code=' + code,
+          type: 'GET',
+          dataType: 'json',
+          success: function (d) {
+            if (d && (d.status === 'success' || d.cookie)) {
+              clearInterval(window.rezka2AuthInterval);
+              Lampa.Storage.set('online_mod_rezka2_cookie', d.cookie);
+              console.log('[online_mod] rezka2 cookie saved:', d.cookie);
+
+              var tail = (d.cookie || '').slice(-16);
+              $(statusSelector).html('<span style="color: #4CAF50;">Успешно! Cookie сохранены (…' + tail + ').</span>');
+
+              if (onSuccess) setTimeout(onSuccess, 1500);
+            }
+          },
+          error: function () {}
+        });
+      }, 2000);
+    }
+
+    function closeAuthModal(modalClass) {
+      clearInterval(window.rezka2AuthInterval);
+      Lampa.Modal.close();
+      $(modalClass).remove();
+      try {
+        Lampa.Controller.toggle('content');
+      } catch (e) {}
+    }
+
+    function openQrAuthModal(onDone) {
+      var proxyUrl = (Lampa.Storage.get('online_mod_rezka2_auth_proxy', 'https://rezka.lampasochka.workers.dev/') || 'https://rezka.lampasochka.workers.dev/').trim();
+      var host = 'https://rezka.ag';
+      var hostBare = host.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+      var code = generateAuthCode();
+      var auth = buildAuthUrl(proxyUrl, hostBare, code);
+      
+      if (!auth) return;
+
+      var modalHtml = $(
+        '<div style="text-align: center; padding: 20px;">' +
+          '<div style="margin-bottom: 20px; font-size: 1.2em; color: #fff;">' +
+            'Отсканируйте код камерой телефона<br>' +
+            '<span style="font-size: 0.8em; opacity: 0.7;">или перейдите по ссылке:</span><br>' +
+            '<a href="' + auth.authUrl + '" target="_blank" style="font-size: 0.8em; color: #a335ff; word-break: break-all;">' + auth.authUrl + '</a>' +
+          '</div>' +
+          '<div id="rezka2_qr_container" style="background: white; padding: 15px; display: inline-block; border-radius: 10px;"></div>' +
+          '<div id="rezka2_qr_status" style="margin-top: 20px; font-size: 1.1em; color: #e5e5e5;">Ожидание сканирования...</div>' +
+        '</div>'
+      );
+
+      function finish() {
+        closeAuthModal('.modal--medium');
+        if (onDone) onDone();
+      }
+
+      Lampa.Modal.open({
+        title: 'Авторизация HDRezka (QR-код)',
+        html: modalHtml,
+        size: 'medium',
+        mask: true,
+        onBack: function () { closeAuthModal('.modal--medium'); }
+      });
+
+      var qrImgUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(auth.authUrl);
+      $('#rezka2_qr_container').html(
+        '<img src="' + qrImgUrl + '" width="250" height="250" alt="QR" onerror="this.parentElement.innerHTML=' +
+        "'<div style=\\'color:#333;font-size:0.9em;padding:20px;\\'>Не удалось загрузить QR. Используйте ссылку выше.</div>'" +
+        '">'
+      );
+
+      pollAuthCode(auth.proxyUrl, auth.code, '#rezka2_qr_status', 'Ожидание решения защиты на телефоне', finish, null);
+    }
+
+    function openTvAuthModal(onDone) {
+      var proxyUrl = (Lampa.Storage.get('online_mod_rezka2_auth_proxy', 'https://rezka.lampasochka.workers.dev/') || 'https://rezka.lampasochka.workers.dev/').trim();
+      var host = 'https://rezka.ag';
+      var hostBare = host.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+      var code = generateAuthCode();
+      var auth = buildAuthUrl(proxyUrl, hostBare, code);
+      
+      if (!auth) return;
+
+      var modalHtml = $(
+        '<div style="padding: 10px;">' +
+          '<iframe src="' + auth.authUrl + '" style="width:100%;height:60vh;border:none;background:#fff;border-radius:6px;"></iframe>' +
+          '<div id="rezka2_tv_status" style="margin-top: 15px; font-size: 1.1em; color: #e5e5e5; text-align:center;">Ожидание прохождения проверки...</div>' +
+        '</div>'
+      );
+
+      function finish() {
+        closeAuthModal('.modal--large');
+        if (onDone) onDone();
+      }
+
+      Lampa.Modal.open({
+        title: 'Проверка HDRezka',
+        html: modalHtml,
+        size: 'large',
+        mask: true,
+        onBack: function () { closeAuthModal('.modal--large'); }
+      });
+
+      pollAuthCode(auth.proxyUrl, auth.code, '#rezka2_tv_status', 'Ожидание решения защиты', finish, null);
+    }
+
+    function showCookieExpiredChoice(retryFn) {
+      Lampa.Select.show({
+        title: 'Cookie Rezka устарели или отсутствуют',
+        items: [
+          { title: 'Пройти проверку в Lampa', method: 'tv' },
+          { title: 'Через QR-код на телефоне', method: 'qr' }
+        ],
+        onBack: function () {
+          Lampa.Controller.toggle('content');
+        },
+        onSelect: function (item) {
+          if (item.method === 'tv') {
+            openTvAuthModal(retryFn);
+          } else {
+            openQrAuthModal(retryFn);
+          }
+        }
+      });
+    }
+
     function kinobaseMirror() {
       var url = Lampa.Storage.get('online_mod_kinobase_mirror', '') + '';
       if (!url) return 'https://kinobase.org';
@@ -2135,6 +2303,18 @@
         select_title = object.search || object.movie.title;
         if (this.wait_similars && data && data[0].is_similars) return getPage(data[0].link);
         error_message = '';
+
+        // === ПРОВЕРКА КУК ДЛЯ REZKA2 ===
+        var stored_cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '');
+        if (!stored_cookie || stored_cookie.trim() === '') {
+          // Куки отсутствуют - показываем диалог авторизации
+          showCookieExpiredChoice(function() {
+            // Повторить поиск после успешной авторизации
+            _this.search(_object, kinopoisk_id, data);
+          });
+          return;
+        }
+
         var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
         var search_year = parseInt((search_date + '').slice(0, 4));
         var orig_titles = [];
@@ -17261,6 +17441,13 @@
         template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_cookie\" data-type=\"input\" data-string=\"true\" placeholder=\"#{settings_cub_not_specified}\">\n            <div class=\"settings-param__name\">#{online_mod_rezka2_cookie}</div>\n            <div class=\"settings-param__value\"></div>\n        </div>\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_fill_cookie\" data-static=\"true\">\n            <div class=\"settings-param__name\">#{online_mod_rezka2_fill_cookie}</div>\n            <div class=\"settings-param__status\"></div>\n        </div>";
       }
 
+      // === КНОПКИ АВТОРИЗАЦИИ REZKA2 ЧЕРЕЗ QR/TV ===
+      template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_auth_proxy\" data-type=\"input\" placeholder=\"https://rezka.lampasochka.workers.dev/\">\n            <div class=\"settings-param__name\">#{online_mod_rezka2_auth_proxy}</div>\n            <div class=\"settings-param__value\"></div>\n        </div>";
+
+      template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_auth_qr\" data-static=\"true\">\n            <div class=\"settings-param__name\">Авторизация HDRezka (QR-код)</div>\n            <div class=\"settings-param__status\"></div>\n        </div>";
+
+      template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_auth_tv\" data-static=\"true\">\n            <div class=\"settings-param__name\">Авторизация HDRezka (в Lampa)</div>\n            <div class=\"settings-param__status\"></div>\n        </div>";
+
       {
         template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_fix_stream\" data-type=\"toggle\">\n            <div class=\"settings-param__name\">#{online_mod_rezka2_fix_stream}</div>\n            <div class=\"settings-param__value\"></div>\n        </div>";
       }
@@ -17335,6 +17522,26 @@
               Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
             });
           });
+
+          // === ОБРАБОТЧИКИ QR/TV АВТОРИЗАЦИИ ===
+          var rezka2_auth_qr = e.body.find('[data-name="online_mod_rezka2_auth_qr"]');
+          rezka2_auth_qr.unbind('hover:enter').on('hover:enter', function () {
+            var rezka2_auth_qr_status = $('.settings-param__status', rezka2_auth_qr).removeClass('active error wait').addClass('wait');
+            openQrAuthModal(function () {
+              rezka2_auth_qr_status.removeClass('active error wait').addClass('active');
+              Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+            });
+          });
+
+          var rezka2_auth_tv = e.body.find('[data-name="online_mod_rezka2_auth_tv"]');
+          rezka2_auth_tv.unbind('hover:enter').on('hover:enter', function () {
+            var rezka2_auth_tv_status = $('.settings-param__status', rezka2_auth_tv).removeClass('active error wait').addClass('wait');
+            openTvAuthModal(function () {
+              rezka2_auth_tv_status.removeClass('active error wait').addClass('active');
+              Lampa.Params.update(e.body.find('[data-name="online_mod_rezka2_cookie"]'), [], e.body);
+            });
+          });
+
           var fancdn_fill_cookie = e.body.find('[data-name="online_mod_fancdn_fill_cookie"]');
           fancdn_fill_cookie.unbind('hover:enter').on('hover:enter', function () {
             var fancdn_fill_cookie_status = $('.settings-param__status', fancdn_fill_cookie).removeClass('active error wait').addClass('wait');
