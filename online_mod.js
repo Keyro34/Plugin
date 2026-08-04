@@ -2303,18 +2303,6 @@
         select_title = object.search || object.movie.title;
         if (this.wait_similars && data && data[0].is_similars) return getPage(data[0].link);
         error_message = '';
-
-        // === ПРОВЕРКА КУК ДЛЯ REZKA2 ===
-        var stored_cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '');
-        if (!stored_cookie || stored_cookie.trim() === '') {
-          // Куки отсутствуют - показываем диалог авторизации
-          showCookieExpiredChoice(function() {
-            // Повторить поиск после успешной авторизации
-            _this.search(_object, kinopoisk_id, data);
-          });
-          return;
-        }
-
         var search_date = object.search_date || !object.clarification && (object.movie.release_date || object.movie.first_air_date || object.movie.last_air_date) || '0000';
         var search_year = parseInt((search_date + '').slice(0, 4));
         var orig_titles = [];
