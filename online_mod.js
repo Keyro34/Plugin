@@ -152,174 +152,6 @@
       return url;
     }
 
-    // === QR/TV АВТОРИЗАЦИЯ ДЛЯ REZKA2 ===
-    function repeatChar(ch, n) {
-      var s = '';
-      for (var i = 0; i < n; i++) s += ch;
-      return s;
-    }
-
-    function startsWithHttp(str) {
-      return str.indexOf('http') === 0;
-    }
-
-    function endsWithSlash(str) {
-      return str.charAt(str.length - 1) === '/';
-    }
-
-    function generateAuthCode() {
-      return Math.floor(1000 + Math.random() * 9000).toString();
-    }
-
-    function buildAuthUrl(proxyUrl, hostBare, code) {
-      if (!startsWithHttp(proxyUrl)) {
-        Lampa.Noty.show('Сначала настройте URL прокси-воркера в настройках плагина');
-        return null;
-      }
-      if (!endsWithSlash(proxyUrl)) proxyUrl += '/';
-      var authUrl = proxyUrl + 'auth/' + code + '/' + encodeURIComponent(hostBare);
-      return { proxyUrl: proxyUrl, code: code, authUrl: authUrl };
-    }
-
-    function pollAuthCode(proxyUrl, code, statusSelector, waitingText, onSuccess, onTimeout) {
-      var attempts = 0;
-      window.rezka2AuthInterval = setInterval(function () {
-        attempts++;
-        if (attempts > 90) {
-          clearInterval(window.rezka2AuthInterval);
-          $(statusSelector).text('Время ожидания истекло. Попробуйте снова.').css('color', '#ff5722');
-          if (onTimeout) onTimeout();
-          return;
-        }
-
-        $(statusSelector).text(waitingText + repeatChar('.', attempts % 4));
-
-        $.ajax({
-          url: proxyUrl + 'check?code=' + code,
-          type: 'GET',
-          dataType: 'json',
-          success: function (d) {
-            if (d && (d.status === 'success' || d.cookie)) {
-              clearInterval(window.rezka2AuthInterval);
-              Lampa.Storage.set('online_mod_rezka2_cookie', d.cookie);
-              console.log('[online_mod] rezka2 cookie saved:', d.cookie);
-
-              var tail = (d.cookie || '').slice(-16);
-              $(statusSelector).html('<span style="color: #4CAF50;">Успешно! Cookie сохранены (…' + tail + ').</span>');
-
-              if (onSuccess) setTimeout(onSuccess, 1500);
-            }
-          },
-          error: function () {}
-        });
-      }, 2000);
-    }
-
-    function closeAuthModal(modalClass) {
-      clearInterval(window.rezka2AuthInterval);
-      Lampa.Modal.close();
-      $(modalClass).remove();
-      try {
-        Lampa.Controller.toggle('content');
-      } catch (e) {}
-    }
-
-    function openQrAuthModal(onDone) {
-      var proxyUrl = (Lampa.Storage.get('online_mod_rezka2_auth_proxy', 'https://rezka.lampasochka.workers.dev/') || 'https://rezka.lampasochka.workers.dev/').trim();
-      var host = 'https://rezka.ag';
-      var hostBare = host.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
-      var code = generateAuthCode();
-      var auth = buildAuthUrl(proxyUrl, hostBare, code);
-      
-      if (!auth) return;
-
-      var modalHtml = $(
-        '<div style="text-align: center; padding: 20px;">' +
-          '<div style="margin-bottom: 20px; font-size: 1.2em; color: #fff;">' +
-            'Отсканируйте код камерой телефона<br>' +
-            '<span style="font-size: 0.8em; opacity: 0.7;">или перейдите по ссылке:</span><br>' +
-            '<a href="' + auth.authUrl + '" target="_blank" style="font-size: 0.8em; color: #a335ff; word-break: break-all;">' + auth.authUrl + '</a>' +
-          '</div>' +
-          '<div id="rezka2_qr_container" style="background: white; padding: 15px; display: inline-block; border-radius: 10px;"></div>' +
-          '<div id="rezka2_qr_status" style="margin-top: 20px; font-size: 1.1em; color: #e5e5e5;">Ожидание сканирования...</div>' +
-        '</div>'
-      );
-
-      function finish() {
-        closeAuthModal('.modal--medium');
-        if (onDone) onDone();
-      }
-
-      Lampa.Modal.open({
-        title: 'Авторизация HDRezka (QR-код)',
-        html: modalHtml,
-        size: 'medium',
-        mask: true,
-        onBack: function () { closeAuthModal('.modal--medium'); }
-      });
-
-      var qrImgUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(auth.authUrl);
-      $('#rezka2_qr_container').html(
-        '<img src="' + qrImgUrl + '" width="250" height="250" alt="QR" onerror="this.parentElement.innerHTML=' +
-        "'<div style=\\'color:#333;font-size:0.9em;padding:20px;\\'>Не удалось загрузить QR. Используйте ссылку выше.</div>'" +
-        '">'
-      );
-
-      pollAuthCode(auth.proxyUrl, auth.code, '#rezka2_qr_status', 'Ожидание решения защиты на телефоне', finish, null);
-    }
-
-    function openTvAuthModal(onDone) {
-      var proxyUrl = (Lampa.Storage.get('online_mod_rezka2_auth_proxy', 'https://rezka.lampasochka.workers.dev/') || 'https://rezka.lampasochka.workers.dev/').trim();
-      var host = 'https://rezka.ag';
-      var hostBare = host.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
-      var code = generateAuthCode();
-      var auth = buildAuthUrl(proxyUrl, hostBare, code);
-      
-      if (!auth) return;
-
-      var modalHtml = $(
-        '<div style="padding: 10px;">' +
-          '<iframe src="' + auth.authUrl + '" style="width:100%;height:60vh;border:none;background:#fff;border-radius:6px;"></iframe>' +
-          '<div id="rezka2_tv_status" style="margin-top: 15px; font-size: 1.1em; color: #e5e5e5; text-align:center;">Ожидание прохождения проверки...</div>' +
-        '</div>'
-      );
-
-      function finish() {
-        closeAuthModal('.modal--large');
-        if (onDone) onDone();
-      }
-
-      Lampa.Modal.open({
-        title: 'Проверка HDRezka',
-        html: modalHtml,
-        size: 'large',
-        mask: true,
-        onBack: function () { closeAuthModal('.modal--large'); }
-      });
-
-      pollAuthCode(auth.proxyUrl, auth.code, '#rezka2_tv_status', 'Ожидание решения защиты', finish, null);
-    }
-
-    function showCookieExpiredChoice(retryFn) {
-      Lampa.Select.show({
-        title: 'Cookie Rezka устарели или отсутствуют',
-        items: [
-          { title: 'Пройти проверку в Lampa', method: 'tv' },
-          { title: 'Через QR-код на телефоне', method: 'qr' }
-        ],
-        onBack: function () {
-          Lampa.Controller.toggle('content');
-        },
-        onSelect: function (item) {
-          if (item.method === 'tv') {
-            openTvAuthModal(retryFn);
-          } else {
-            openQrAuthModal(retryFn);
-          }
-        }
-      });
-    }
-
     function kinobaseMirror() {
       var url = Lampa.Storage.get('online_mod_kinobase_mirror', '') + '';
       if (!url) return 'https://kinobase.org';
@@ -2499,37 +2331,7 @@
           var postdata = 'q=' + encodeURIComponent(query);
           network.clear();
           network.timeout(10000);
-          
-          // Используем прокси с get_cookie для автоматической обработки куки
-          var targetUrl = component.proxyLink(url, prox, prox_enc, 'enc2t');
-          var proxyUrl = window.makeProxyUrl ? window.makeProxyUrl(targetUrl) : targetUrl;
-          
-          network["native"](proxyUrl, function (response) {
-            var str = '';
-            var receivedCookies = [];
-            
-            try {
-              var jsonResponse = typeof response === 'string' ? JSON.parse(response) : response;
-              
-              // Получаем куки из ответа прокси
-              if (jsonResponse.cookie && Array.isArray(jsonResponse.cookie)) {
-                receivedCookies = jsonResponse.cookie;
-                // Сохраняем куки в Storage (в виде строки)
-                if (receivedCookies.length > 0) {
-                  Lampa.Storage.set('online_mod_rezka2_cookie', receivedCookies.join('; '));
-                  console.log('[online_mod] Куки rezka2 обновлены из прокси:', receivedCookies);
-                }
-              }
-              
-              // Получаем HTML ответ (если есть)
-              if (jsonResponse.body) {
-                str = jsonResponse.body;
-              }
-            } catch (e) {
-              // Если ответ не JSON, используем как есть
-              str = response;
-            }
-            
+          network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
             var links = str.match(/<li><a href=.*?<\/li>/g);
@@ -2548,7 +2350,7 @@
 
             if (error_message) component.empty(error_message);else if (callback) callback([], false, query);else component.empty(network.errorDecode(a, c));
           }, postdata, {
-            dataType: 'json',
+            dataType: 'text',
             withCredentials: logged_in,
             headers: headers
           });
@@ -17459,9 +17261,6 @@
         template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_cookie\" data-type=\"input\" data-string=\"true\" placeholder=\"#{settings_cub_not_specified}\">\n            <div class=\"settings-param__name\">#{online_mod_rezka2_cookie}</div>\n            <div class=\"settings-param__value\"></div>\n        </div>\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_fill_cookie\" data-static=\"true\">\n            <div class=\"settings-param__name\">#{online_mod_rezka2_fill_cookie}</div>\n            <div class=\"settings-param__status\"></div>\n        </div>";
       }
 
-      // === ПАРАМЕТР ПРОКСИ ДЛЯ REZKA2 ===
-      template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_proxy\" data-type=\"input\" placeholder=\"https://cors.lampa.workers.dev/\">\n            <div class=\"settings-param__name\">Прокси для rezka2 (CORS)</div>\n            <div class=\"settings-param__value\"></div>\n        </div>";
-
       {
         template += "\n        <div class=\"settings-param selector\" data-name=\"online_mod_rezka2_fix_stream\" data-type=\"toggle\">\n            <div class=\"settings-param__name\">#{online_mod_rezka2_fix_stream}</div>\n            <div class=\"settings-param__value\"></div>\n        </div>";
       }
@@ -17562,16 +17361,5 @@
     }
 
     startPlugin();
-
-    // === ЭКСПОРТ ФУНКЦИЙ В ГЛОБАЛЬНЫЙ SCOPE ===
-    window.makeProxyUrl = function(targetUrl) {
-      var proxyBase = (Lampa.Storage.get('online_mod_rezka2_proxy', '') || 'https://cors.lampa.workers.dev/').trim();
-      if (!proxyBase) proxyBase = 'https://cors.lampa.workers.dev/';
-      if (!proxyBase.endsWith('/')) proxyBase += '/';
-      return proxyBase + 'get_cookie/' + encodeURIComponent(targetUrl);
-    };
-    window.openQrAuthModal = openQrAuthModal;
-    window.openTvAuthModal = openTvAuthModal;
-    window.showCookieExpiredChoice = showCookieExpiredChoice;
 
 })();
