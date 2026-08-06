@@ -373,33 +373,92 @@
       pageUrl = host + pageUrl;
     }
 
-    console.log('[RezkaVideo] opening video from:', pageUrl);
+    console.log('[RezkaVideo] loading page from:', pageUrl);
 
-    Lampa.Loading.stop();
-    
-    var videoUrl = proxy;
+    var fetchUrl = proxy;
     if (cookie) {
-      videoUrl += "param/Cookie=" + encodeURIComponent(cookie) + "/";
+      fetchUrl += "param/Cookie=" + encodeURIComponent(cookie) + "/";
     }
-    videoUrl += pageUrl;
+    fetchUrl += pageUrl;
 
-    var modal = $(
-      '<div style="width:100%; height:100%;">' +
-        '<iframe src="' + videoUrl + '" style="width:100%;height:100%;border:none;background:#000;" allow="fullscreen" allowfullscreen></iframe>' +
-      '</div>'
-    );
-
-    Lampa.Modal.open({
-      title: namemovie || "Видео",
-      html: modal,
-      size: "fullscreen",
-      mask: true,
-      onBack: function () {
-        Lampa.Modal.close();
-        $(".modal--fullscreen").remove();
-        Lampa.Controller.toggle("content");
+    // Загрузить страницу фильма
+    return fetchCompat(fetchUrl, {
+      method: "GET",
+      headers: { "Content-Type": "text/html" }
+    }).then(function (response) {
+      if (!response.ok) {
+        throw new Error('HTTP status ' + response.status);
       }
+      return response.text();
+    }).then(function (html) {
+      Lampa.Loading.stop();
+
+      // Попытка найти iframe плеера на странице
+      var dom = new DOMParser().parseFromString(html, "text/html");
+      var playerIframe = dom.querySelector("iframe[src*='player'], iframe[src*='stream'], iframe.player");
+      
+      if (playerIframe && playerIframe.src) {
+        var embedUrl = playerIframe.src;
+        if (!embedUrl.startsWith('http')) {
+          embedUrl = host + embedUrl;
+        }
+        console.log('[RezkaVideo] found player iframe:', embedUrl);
+        openVideoPlayer(embedUrl);
+        return;
+      }
+
+      // Попытка найти скрипт с данными плеера
+      var scripts = dom.querySelectorAll('script');
+      for (var i = 0; i < scripts.length; i++) {
+        var script = scripts[i];
+        if (script.textContent && script.textContent.indexOf('player') !== -1) {
+          console.log('[RezkaVideo] found player script, trying to extract URL...');
+          // Откроем всю страницу в плеере
+          openVideoPlayer(pageUrl);
+          return;
+        }
+      }
+
+      // Если не нашли плеер, просто откроем всю страницу
+      console.log('[RezkaVideo] opening full page in player');
+      openVideoPlayer(pageUrl);
+
+    }).catch(function (e) {
+      console.error('[RezkaVideo] error:', e);
+      Lampa.Noty.show('Ошибка загрузки видео: ' + e.message);
+      Lampa.Loading.stop();
     });
+
+    function openVideoPlayer(url) {
+      var playerUrl = url;
+      
+      // Если это обычная URL страницы, нужно загрузить её через прокси
+      if (!playerUrl.startsWith(proxy)) {
+        playerUrl = proxy;
+        if (cookie) {
+          playerUrl += "param/Cookie=" + encodeURIComponent(cookie) + "/";
+        }
+        playerUrl += url;
+      }
+
+      var modal = $(
+        '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#000;">' +
+          '<iframe src="' + playerUrl + '" style="width:100%;height:100%;border:none;background:#000;" allow="fullscreen" allowfullscreen></iframe>' +
+        '</div>'
+      );
+
+      Lampa.Modal.open({
+        title: namemovie || "Видео",
+        html: modal,
+        size: "fullscreen",
+        mask: true,
+        onBack: function () {
+          Lampa.Modal.close();
+          $(".modal--fullscreen").remove();
+          Lampa.Controller.toggle("content");
+        }
+      });
+    }
   }
 
   function startPlugin() {
