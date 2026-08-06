@@ -362,8 +362,14 @@
     var cookie = settings.cookie;
     var proxy = settings.proxy;
     
+    if (!pageUrl) {
+      Lampa.Loading.stop();
+      Lampa.Noty.show('URL видео не найден');
+      return;
+    }
+
     // Построить полный URL видео
-    if (!pageUrl.startsWith('http')) {
+    if (typeof pageUrl === 'string' && !pageUrl.startsWith('http')) {
       pageUrl = host + pageUrl;
     }
 
