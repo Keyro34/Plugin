@@ -152,15 +152,6 @@
       return url;
     }
 
-    // === ФУНКЦИЯ ДЛЯ ПРЕОБРАЗОВАНИЯ URL В ПРОКСИ С КУКАМИ ===
-    function makeProxyUrl(targetUrl) {
-      var proxyBase = (Lampa.Storage.get('online_mod_rezka2_proxy', 'https://cors.lampa.workers.dev/') || 'https://cors.lampa.workers.dev/').trim();
-      if (!proxyBase.endsWith('/')) proxyBase += '/';
-      
-      // Добавляем параметр get_cookie/ чтобы получать куки в JSON
-      return proxyBase + 'get_cookie/' + encodeURIComponent(targetUrl);
-    }
-
     // === QR/TV АВТОРИЗАЦИЯ ДЛЯ REZKA2 ===
     function repeatChar(ch, n) {
       var s = '';
@@ -2510,7 +2501,8 @@
           network.timeout(10000);
           
           // Используем прокси с get_cookie для автоматической обработки куки
-          var proxyUrl = makeProxyUrl(component.proxyLink(url, prox, prox_enc, 'enc2t'));
+          var targetUrl = component.proxyLink(url, prox, prox_enc, 'enc2t');
+          var proxyUrl = window.makeProxyUrl ? window.makeProxyUrl(targetUrl) : targetUrl;
           
           network["native"](proxyUrl, function (response) {
             var str = '';
@@ -17571,7 +17563,13 @@
 
     startPlugin();
 
-    // === ЭКСПОРТ ФУНКЦИЙ АВТОРИЗАЦИИ В ГЛОБАЛЬНЫЙ SCOPE ===
+    // === ЭКСПОРТ ФУНКЦИЙ В ГЛОБАЛЬНЫЙ SCOPE ===
+    window.makeProxyUrl = function(targetUrl) {
+      var proxyBase = (Lampa.Storage.get('online_mod_rezka2_proxy', '') || 'https://cors.lampa.workers.dev/').trim();
+      if (!proxyBase) proxyBase = 'https://cors.lampa.workers.dev/';
+      if (!proxyBase.endsWith('/')) proxyBase += '/';
+      return proxyBase + 'get_cookie/' + encodeURIComponent(targetUrl);
+    };
     window.openQrAuthModal = openQrAuthModal;
     window.openTvAuthModal = openTvAuthModal;
     window.showCookieExpiredChoice = showCookieExpiredChoice;
