@@ -1,5 +1,135 @@
 //19.04.2026 - Fix
 
+// ============================================================
+// МОДУЛЬ АВТОРИЗАЦИИ HDREZKA - RezkaAuth
+// ============================================================
+(function() {
+    'use strict';
+
+    var RezkaAuth = {
+        // Получить текущие настройки
+        getSettings: function() {
+            return {
+                host: Lampa.Storage.get('online_mod_rezka2_mirror', 'https://rezka.ag'),
+                proxy: Lampa.Storage.get('online_mod_proxy_rezka2', 'https://rezka.lampasochka.workers.dev'),
+                cookie: Lampa.Storage.get('online_mod_rezka2_cookie', ''),
+                name: Lampa.Storage.get('online_mod_rezka2_name', ''),
+                password: Lampa.Storage.get('online_mod_rezka2_password', '')
+            };
+        },
+
+        // Основной метод для fetch запросов к HDrezka
+        fetch: function(url, options, onSuccess, onError) {
+            var self = this;
+            var settings = this.getSettings();
+            
+            // Используем встроенную систему запросов Lampa
+            if (!this._network) {
+                this._network = new Lampa.Reguest();
+            }
+            
+            var network = this._network;
+            var timeout = options.timeout || 15000;
+            
+            // Очищаем предыдущие запросы
+            network.clear();
+            network.timeout(timeout);
+            
+            // Формируем заголовки
+            var headers = {
+                'User-Agent': this._getUserAgent(),
+                'Referer': settings.host
+            };
+            
+            if (settings.cookie && !settings.proxy) {
+                headers['Cookie'] = settings.cookie;
+            }
+            
+            // Объединяем с переданными заголовками
+            if (options.headers) {
+                for (var key in options.headers) {
+                    headers[key] = options.headers[key];
+                }
+            }
+            
+            var finalUrl = url;
+            var fetchOptions = {
+                withCredentials: true
+            };
+            
+            // Если используется прокси и есть cookie - кодируем их в URL
+            if (settings.proxy && settings.cookie) {
+                var proxyUrl = settings.proxy + '?url=' + encodeURIComponent(url);
+                proxyUrl += '&cookie=' + encodeURIComponent(settings.cookie);
+                finalUrl = proxyUrl;
+                fetchOptions.dataType = 'text';
+            }
+            
+            // Выполняем запрос
+            network.silent(finalUrl, function(response) {
+                if (onSuccess) {
+                    if (typeof response === 'string') {
+                        onSuccess(response);
+                    } else if (response && response.body) {
+                        onSuccess(response.body);
+                    } else {
+                        onSuccess(JSON.stringify(response));
+                    }
+                }
+            }, function(error, code) {
+                if (onError) {
+                    onError(new Error('Request failed: ' + code));
+                }
+            }, false, fetchOptions);
+        },
+
+        // Показать выбор способа авторизации
+        showAuthChoice: function(retryFn) {
+            Lampa.Select.show({
+                title: 'Авторизация HDrezka',
+                items: [
+                    { title: 'Авторизация с логином', method: 'tv' },
+                    { title: 'Получить cookie с зеркала', method: 'qr' }
+                ],
+                onBack: function() { Lampa.Controller.toggle('content'); },
+                onSelect: function(item) {
+                    if (item.method === 'tv') {
+                        // Используем встроенную TV авторизацию
+                        if (window.__onlineModRezka2Login) {
+                            window.__onlineModRezka2Login(retryFn, function() {
+                                Lampa.Noty.show('Ошибка авторизации');
+                            });
+                        } else {
+                            Lampa.Noty.show('Функция авторизации не инициализирована');
+                        }
+                    } else if (item.method === 'qr') {
+                        // Получение cookie
+                        if (window.__onlineModRezka2FillCookie) {
+                            window.__onlineModRezka2FillCookie(retryFn, function() {
+                                Lampa.Noty.show('Ошибка при получении cookie');
+                            });
+                        } else {
+                            Lampa.Noty.show('Функция получения cookie не инициализирована');
+                        }
+                    }
+                }
+            });
+        },
+
+        // Получить User-Agent
+        _getUserAgent: function() {
+            return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
+        }
+    };
+
+    // Экспортируем объект в глобальное пространство
+    window.RezkaAuth = RezkaAuth;
+
+})();
+
+// ============================================================
+// ОСНОВНОЙ ПЛАГИН ONLINE_MOD
+// ============================================================
 (function () {
     'use strict';
 
@@ -17355,6 +17485,14 @@
         }
       });
     }
+
+    // ============================================================
+    // Экспорт функций авторизации для модуля RezkaAuth
+    // ============================================================
+    window.__onlineModRezka2Login = rezka2Login;
+    window.__onlineModRezka2Logout = rezka2Logout;
+    window.__onlineModRezka2FillCookie = rezka2FillCookie;
+    window.__onlineModRezka2Mirror = function() { return Utils.rezka2Mirror(); };
 
     function startPlugin() {
       if (Utils.isDebug3()) return;
