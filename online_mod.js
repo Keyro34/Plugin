@@ -2,128 +2,323 @@
 
 // ============================================================
 // МОДУЛЬ АВТОРИЗАЦИИ HDREZKA - RezkaAuth
+// Использует настройки совместимые с rzcomment.js
 // ============================================================
 (function() {
     'use strict';
 
+    // Вспомогательные функции
+    function endsWithSlash(str) {
+        return str.charAt(str.length - 1) === '/';
+    }
+
+    function startsWithHttp(str) {
+        return str.indexOf('http') === 0;
+    }
+
+    function repeatChar(ch, n) {
+        var s = '';
+        for (var i = 0; i < n; i++) s += ch;
+        return s;
+    }
+
+    function generateAuthCode() {
+        return Math.floor(1000 + Math.random() * 9000).toString();
+    }
+
     var RezkaAuth = {
-        // Получить текущие настройки
+        // Получить настройки (совместимо с rzcomment.js)
         getSettings: function() {
-            return {
-                host: Lampa.Storage.get('online_mod_rezka2_mirror', 'https://rezka.ag'),
-                proxy: Lampa.Storage.get('online_mod_proxy_rezka2', 'https://rezka.lampasochka.workers.dev'),
-                cookie: Lampa.Storage.get('online_mod_rezka2_cookie', ''),
-                name: Lampa.Storage.get('online_mod_rezka2_name', ''),
-                password: Lampa.Storage.get('online_mod_rezka2_password', '')
-            };
+            var host = (Lampa.Storage.get('rezka_comment_host', 'https://rezka.ag') || 'https://rezka.ag').trim().replace(/\/+$/, '');
+            var cookie = (Lampa.Storage.get('rezka_comment_cookie', '') || '').trim();
+            var proxy = (Lampa.Storage.get('rezka_comment_proxy', 'https://rezka.lampasochka.workers.dev/') || 'https://rezka.lampasochka.workers.dev/').trim();
+            if (proxy && !endsWithSlash(proxy)) {
+                proxy += '/';
+            }
+            return { host: host, cookie: cookie, proxy: proxy };
         },
 
-        // Основной метод для fetch запросов к HDrezka
-        fetch: function(url, options, onSuccess, onError) {
-            var self = this;
+        // Проверка наличия cookie
+        hasCookie: function() {
+            return !!(this.getSettings().cookie);
+        },
+
+        // Построить URL для авторизации
+        buildAuthUrl: function() {
             var settings = this.getSettings();
+            var proxyUrl = settings.proxy;
+            var host = settings.host;
             
-            // Используем встроенную систему запросов Lampa
-            if (!this._network) {
-                this._network = new Lampa.Reguest();
+            if (!startsWithHttp(proxyUrl)) {
+                Lampa.Noty.show('Сначала настройте URL прокси-воркера в настройках плагина');
+                return null;
             }
-            
-            var network = this._network;
-            var timeout = options.timeout || 15000;
-            
-            // Очищаем предыдущие запросы
-            network.clear();
-            network.timeout(timeout);
-            
-            // Формируем заголовки
-            var headers = {
-                'User-Agent': this._getUserAgent(),
-                'Referer': settings.host
-            };
-            
-            if (settings.cookie && !settings.proxy) {
-                headers['Cookie'] = settings.cookie;
-            }
-            
-            // Объединяем с переданными заголовками
-            if (options.headers) {
-                for (var key in options.headers) {
-                    headers[key] = options.headers[key];
+            if (!endsWithSlash(proxyUrl)) proxyUrl += '/';
+
+            var hostBare = host.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+            var code = generateAuthCode();
+            var authUrl = proxyUrl + 'auth/' + code + '/' + encodeURIComponent(hostBare);
+
+            return { proxyUrl: proxyUrl, code: code, authUrl: authUrl };
+        },
+
+        // Проверка статуса авторизации (polling)
+        pollAuthCode: function(proxyUrl, code, statusSelector, waitingText, onSuccess, onTimeout) {
+            var attempts = 0;
+            var intervalId = setInterval(function() {
+                attempts++;
+                if (attempts > 90) {
+                    clearInterval(intervalId);
+                    $(statusSelector).text('Время ожидания истекло. Попробуйте снова.').css('color', '#ff5722');
+                    if (onTimeout) onTimeout();
+                    return;
                 }
+
+                $(statusSelector).text(waitingText + repeatChar('.', attempts % 4));
+
+                $.ajax({
+                    url: proxyUrl + 'check?code=' + code,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(d) {
+                        if (d && (d.status === 'success' || d.cookie)) {
+                            clearInterval(intervalId);
+                            Lampa.Storage.set('rezka_comment_cookie', d.cookie);
+                            console.log('[RezkaAuth] cookie saved:', d.cookie);
+
+                            var tail = (d.cookie || '').slice(-16);
+                            $(statusSelector).html('<span style="color: #4CAF50;">Успешно! Cookie сохранены (…' + tail + ').</span>');
+
+                            // Обновляем поле в настройках
+                            try {
+                                $('.settings-param[data-name="rezka_comment_cookie"] .settings-param__value').text(d.cookie);
+                            } catch(e) {}
+
+                            if (onSuccess) setTimeout(onSuccess, 1500);
+                        }
+                    },
+                    error: function() {}
+                });
+            }, 2000);
+
+            return intervalId;
+        },
+
+        // Закрыть модальное окно авторизации
+        closeAuthModal: function(modalClass) {
+            clearInterval(window.rezkaAuthInterval);
+            Lampa.Modal.close();
+            $(modalClass).remove();
+            try {
+                Lampa.Controller.toggle('content');
+            } catch (e) {
+                try { Lampa.Controller.toggle('settings_component'); } catch (e2) {}
             }
-            
-            var finalUrl = url;
-            var fetchOptions = {
-                withCredentials: true
-            };
-            
-            // Если используется прокси и есть cookie - кодируем их в URL
-            if (settings.proxy && settings.cookie) {
-                var proxyUrl = settings.proxy + '?url=' + encodeURIComponent(url);
-                proxyUrl += '&cookie=' + encodeURIComponent(settings.cookie);
-                finalUrl = proxyUrl;
-                fetchOptions.dataType = 'text';
+        },
+
+        // Открыть QR авторизацию
+        openQrAuth: function(onDone, onCancel) {
+            var auth = this.buildAuthUrl();
+            if (!auth) return;
+
+            var modalHtml = $(
+                '<div style="text-align: center; padding: 20px;">' +
+                    '<div style="margin-bottom: 20px; font-size: 1.2em; color: #fff;">' +
+                        'Отсканируйте код камерой телефона<br>' +
+                        '<span style="font-size: 0.8em; opacity: 0.7;">или перейдите по ссылке:</span><br>' +
+                        '<a href="' + auth.authUrl + '" target="_blank" style="font-size: 0.8em; color: #a335ff; word-break: break-all;">' + auth.authUrl + '</a>' +
+                    '</div>' +
+                    '<div id="rezka_qr_container" style="background: white; padding: 15px; display: inline-block; border-radius: 10px;"></div>' +
+                    '<div id="rezka_qr_status" style="margin-top: 20px; font-size: 1.1em; color: #e5e5e5;">Ожидание сканирования...</div>' +
+                '</div>'
+            );
+
+            var self = this;
+            function closeModal() {
+                self.closeAuthModal('.modal--medium');
+                if (onCancel) onCancel();
             }
-            
-            // Выполняем запрос
-            network.silent(finalUrl, function(response) {
-                if (onSuccess) {
-                    if (typeof response === 'string') {
-                        onSuccess(response);
-                    } else if (response && response.body) {
-                        onSuccess(response.body);
-                    } else {
-                        onSuccess(JSON.stringify(response));
-                    }
+
+            Lampa.Modal.open({
+                title: 'Авторизация HDRezka',
+                html: modalHtml,
+                size: 'medium',
+                mask: true,
+                onBack: closeModal
+            });
+
+            var qrImgUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(auth.authUrl);
+            $('#rezka_qr_container').html(
+                '<img src="' + qrImgUrl + '" width="250" height="250" alt="QR" onerror="this.parentElement.innerHTML=' +
+                "'<div style=\\'color:#333;font-size:0.9em;padding:20px;\\'>Не удалось загрузить QR. Используйте ссылку выше.</div>'" +
+                '">'
+            );
+
+            window.rezkaAuthInterval = this.pollAuthCode(
+                auth.proxyUrl, 
+                auth.code, 
+                '#rezka_qr_status', 
+                'Ожидание решения защиты на телефоне', 
+                function() {
+                    closeModal();
+                    if (onDone) onDone();
+                },
+                function() {
+                    // Таймаут - ничего не делаем, пользователь сам закроет
                 }
-            }, function(error, code) {
-                if (onError) {
-                    onError(new Error('Request failed: ' + code));
+            );
+        },
+
+        // Открыть TV авторизацию
+        openTvAuth: function(onDone, onCancel) {
+            var auth = this.buildAuthUrl();
+            if (!auth) return;
+
+            var modalHtml = $(
+                '<div style="padding: 10px;">' +
+                    '<iframe src="' + auth.authUrl + '" style="width:100%;height:60vh;border:none;background:#fff;border-radius:6px;"></iframe>' +
+                    '<div id="rezka_tv_status" style="margin-top: 15px; font-size: 1.1em; color: #e5e5e5; text-align:center;">Ожидание прохождения проверки...</div>' +
+                '</div>'
+            );
+
+            var self = this;
+            function closeModal() {
+                self.closeAuthModal('.modal--large');
+                if (onCancel) onCancel();
+            }
+
+            Lampa.Modal.open({
+                title: 'Проверка HDRezka',
+                html: modalHtml,
+                size: 'large',
+                mask: true,
+                onBack: closeModal
+            });
+
+            window.rezkaAuthInterval = this.pollAuthCode(
+                auth.proxyUrl, 
+                auth.code, 
+                '#rezka_tv_status', 
+                'Ожидание решения защиты', 
+                function() {
+                    closeModal();
+                    if (onDone) onDone();
+                },
+                function() {
+                    // Таймаут
                 }
-            }, false, fetchOptions);
+            );
         },
 
         // Показать выбор способа авторизации
         showAuthChoice: function(retryFn) {
+            var self = this;
+            
             Lampa.Select.show({
-                title: 'Авторизация HDrezka',
+                title: 'Cookie Rezka устарели или отсутствуют',
                 items: [
-                    { title: 'Авторизация с логином', method: 'tv' },
-                    { title: 'Получить cookie с зеркала', method: 'qr' }
+                    { title: 'Пройти проверку в Lampa', method: 'tv' },
+                    { title: 'Через QR-код на телефоне', method: 'qr' }
                 ],
-                onBack: function() { Lampa.Controller.toggle('content'); },
+                onBack: function() {
+                    Lampa.Controller.toggle('content');
+                },
                 onSelect: function(item) {
                     if (item.method === 'tv') {
-                        // Используем встроенную TV авторизацию
-                        if (window.__onlineModRezka2Login) {
-                            window.__onlineModRezka2Login(retryFn, function() {
-                                Lampa.Noty.show('Ошибка авторизации');
-                            });
-                        } else {
-                            Lampa.Noty.show('Функция авторизации не инициализирована');
-                        }
-                    } else if (item.method === 'qr') {
-                        // Получение cookie
-                        if (window.__onlineModRezka2FillCookie) {
-                            window.__onlineModRezka2FillCookie(retryFn, function() {
-                                Lampa.Noty.show('Ошибка при получении cookie');
-                            });
-                        } else {
-                            Lampa.Noty.show('Функция получения cookie не инициализирована');
-                        }
+                        self.openTvAuth(retryFn);
+                    } else {
+                        self.openQrAuth(retryFn);
                     }
                 }
             });
         },
 
-        // Получить User-Agent
-        _getUserAgent: function() {
-            return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
+        // Проверка на маркеры ботозащиты
+        hasExplicitBotMarkers: function(text) {
+            return text.indexOf("Проверяем, что вы не бот") !== -1 || 
+                   text.indexOf("Anubis") !== -1;
+        },
+
+        looksLikeBotBlockHtml: function(text, hasCookie) {
+            if (this.hasExplicitBotMarkers(text)) return true;
+            if (!hasCookie && text.indexOf("b-content") === -1) return true;
+            return false;
+        },
+
+        // Основной метод для fetch запросов (совместимо с rzcomment.js)
+        fetch: function(url, options, onSuccess, onError) {
+            var settings = this.getSettings();
+            var proxy = settings.proxy;
+            var cookie = settings.cookie;
+            
+            // Если нет cookie - предлагаем авторизацию
+            if (!cookie) {
+                this.showAuthChoice(function() {
+                    // После авторизации повторяем запрос
+                    window.RezkaAuth.fetch(url, options, onSuccess, onError);
+                });
+                return;
+            }
+
+            // Формируем URL как в rzcomment.js
+            var fullUrl = proxy;
+            if (cookie) {
+                fullUrl += "param/Cookie=" + encodeURIComponent(cookie) + "/";
+            }
+            fullUrl += url;
+
+            console.log('[RezkaAuth] fetch:', fullUrl);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open(options.method || 'GET', fullUrl, true);
+
+            var headers = options.headers || {};
+            for (var h in headers) {
+                if (headers.hasOwnProperty(h)) {
+                    try {
+                        xhr.setRequestHeader(h, headers[h]);
+                    } catch (e) {}
+                }
+            }
+
+            xhr.timeout = options.timeout || 15000;
+
+            xhr.onload = function() {
+                var responseText = xhr.responseText;
+
+                // Проверяем на бот-защиту
+                if (window.RezkaAuth.looksLikeBotBlockHtml(responseText, !!cookie)) {
+                    window.RezkaAuth.showAuthChoice(function() {
+                        // После успешной авторизации повторяем запрос
+                        window.RezkaAuth.fetch(url, options, onSuccess, onError);
+                    });
+                    return;
+                }
+
+                try {
+                    var result = JSON.parse(responseText);
+                    if (onSuccess) onSuccess(result);
+                } catch(e) {
+                    if (onSuccess) onSuccess(responseText);
+                }
+            };
+
+            xhr.onerror = function() {
+                if (onError) onError(new Error('Network error'));
+            };
+
+            xhr.ontimeout = function() {
+                if (onError) onError(new Error('Request timeout'));
+            };
+
+            xhr.send(options.body || null);
         }
     };
 
     // Экспортируем объект в глобальное пространство
     window.RezkaAuth = RezkaAuth;
+
+    console.log('[RezkaAuth] Module initialized with rzcomment.js compatibility');
 
 })();
 
