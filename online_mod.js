@@ -2353,12 +2353,18 @@
           stage = stage || 0;
           var cur_prox = stage === 0 ? prox : (stage === 1 ? prox_alt : prox_alt2);
           var postdata = 'q=' + encodeURIComponent(query);
+
+          console.log('[Rezka2] QUERY:', query);
+          console.log('[Rezka2] POSTDATA:', postdata);
+
           network.clear();
           network.timeout(10000);
           network["native"](
             component.proxyLink(url, cur_prox, prox_enc, 'enc2t'),
 
             function (str) {
+              console.log('[Rezka2] RESPONSE FOR QUERY:', query);
+            
               str = (str || '').replace(/\n/g, '');
 
               console.log('[Rezka2] response length:', str.length);
