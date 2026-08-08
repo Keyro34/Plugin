@@ -2362,6 +2362,7 @@
               str = (str || '').replace(/\n/g, '');
 
               console.log('[Rezka2] response length:', str.length);
+              console.log('[Rezka2] RESPONSE:', str);
 
               // Anubis / bot protection
               if (isAnubisPage(str)) {
