@@ -409,7 +409,7 @@
           var name = link.substring(posStart + 3, posEnd);
           posStart = name.lastIndexOf('/');
           name = posStart !== -1 ? name.substring(posStart + 1) : '';
-          return proxy + 'enc2/' + encodeURIComponent(btoa(proxy_enc + link)) + '/' + name + (enc === 'enc2t' ? "?jacred.test" : '');
+          return proxy + 'enc2/' + encodeURIComponent(btoa(proxy_enc + link)) + '/' + name;
         }
 
         return proxy + proxy_enc + link;
