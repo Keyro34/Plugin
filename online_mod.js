@@ -2118,6 +2118,32 @@
           return;
         }
       }
+
+      function isAnubisPage(str) {
+        if (!str) return false;
+
+        return str.indexOf('anubis_challenge') !== -1 ||
+               str.indexOf('anubis_version') !== -1 ||
+               str.indexOf('anubis_base_prefix') !== -1 ||
+               str.indexOf('Проверяем, что вы не бот') !== -1 ||
+               str.indexOf('TecharoHQ/anubis') !== -1;
+      }
+
+      function resetRezkaCookie() {
+        Lampa.Storage.set('online_mod_rezka2_cookie', '');
+        cookie = 'PHPSESSID=' + Utils.randomId(26);
+
+        if (prox) {
+          prox_enc = '';
+          prox_enc += 'param/Origin=' + encodeURIComponent(host) + '/';
+          prox_enc += 'param/Referer=' + encodeURIComponent(ref) + '/';
+          prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
+          prox_enc += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
+        } else if (Lampa.Platform.is('android')) {
+          headers.Cookie = cookie;
+        }
+      }
+
       /**
        * Поиск
        * @param {Object} _object
@@ -2329,14 +2355,42 @@
           var postdata = 'q=' + encodeURIComponent(query);
           network.clear();
           network.timeout(10000);
-          network["native"](component.proxyLink(url, cur_prox, prox_enc, 'enc2t'), function (str) {
-            str = (str || '').replace(/\n/g, '');
-            checkErrorForm(str);
-            var links = str.match(/<li><a href=.*?<\/li>/g);
-            var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
-            if (links && links.length) data = data.concat(links);
-            if (callback) callback(data, have_more, query);
-          }, function (a, c) {
+          network["native"](
+            component.proxyLink(url, cur_prox, prox_enc, 'enc2t'),
+
+            function (str) {
+              str = (str || '').replace(/\n/g, '');
+
+              console.log('[Rezka2] response length:', str.length);
+
+              // Anubis / bot protection
+              if (isAnubisPage(str)) {
+                console.log('[Rezka2] Anubis challenge detected');
+
+                resetRezkaCookie();
+
+                if (callback) {
+                  callback([], false, query);
+                }
+
+                return;
+              }
+
+              checkErrorForm(str);
+
+              var links = str.match(/<li><a href=.*?<\/li>/g);
+              var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
+
+              if (links && links.length) {
+                data = data.concat(links);
+              }
+
+              if (callback) {
+                callback(data, have_more, query);
+              }
+            },
+
+            function (a, c) {
             if (cur_prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
               Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
             }
