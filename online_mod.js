@@ -2068,8 +2068,15 @@
         prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
       }
 
-      var cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '') + '';
+      var cookie = Lampa.Storage.get('rezka_comment_cookie', '');
+      
+      if (!cookie) {
+        cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '') + '';
+      }
+      
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
+
+      console.log('[Rezka2] using cookie:', cookie ? 'YES (from rezka_comment_cookie)' : 'NO');
 
       if (cookie) {
         if (Lampa.Platform.is('android')) {
@@ -2353,31 +2360,27 @@
           stage = stage || 0;
           var cur_prox = stage === 0 ? prox : (stage === 1 ? prox_alt : prox_alt2);
           var postdata = 'q=' + encodeURIComponent(query);
-
-          console.log('[Rezka2] QUERY:', query);
-          console.log('[Rezka2] POSTDATA:', postdata);
-
           network.clear();
           network.timeout(10000);
           network["native"](
             component.proxyLink(url, cur_prox, prox_enc, 'enc2t'),
 
             function (str) {
-              console.log('[Rezka2] RESPONSE FOR QUERY:', query);
-            
               str = (str || '').replace(/\n/g, '');
 
               console.log('[Rezka2] response length:', str.length);
-              console.log('[Rezka2] RESPONSE:', str);
 
               // Anubis / bot protection
               if (isAnubisPage(str)) {
                 console.log('[Rezka2] Anubis challenge detected');
 
-                resetRezkaCookie();
-
-                if (callback) {
-                  callback([], false, query);
+                if (typeof showCookieExpiredChoice === 'function') {
+                  showCookieExpiredChoice(function () {
+                    console.log('[Rezka2] Authorization completed, retrying search');
+                    query_search(query, data, callback, stage);
+                  });
+                } else {
+                  Lampa.Noty.show('HDRezka требует пройти проверку Anubis');
                 }
 
                 return;
