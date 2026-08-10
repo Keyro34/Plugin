@@ -54,7 +54,6 @@
     });
   }
 
-  // --- Дублированная логика QR/TV авторизации для быстрого вызова с карточки фильма ---
   function generateAuthCodeQuick() {
     return Math.floor(1000 + Math.random() * 9000).toString();
   }
@@ -204,7 +203,6 @@
       }
     });
   }
-  // --- конец дублированной логики ---
 
   function hasExplicitBotMarkers(text) {
     return text.indexOf("Проверяем, что вы не бот") !== -1 || text.indexOf("Anubis") !== -1;
@@ -226,7 +224,6 @@
     return { host: host, cookie: cookie, proxy: proxy };
   }
 
-  // Новая функция для получения видео с Rezka
   function getVideoFromRezka(name, ye) {
     var settings = getSettings();
     var host = settings.host;
@@ -243,7 +240,10 @@
 
     return fetchCompat(searchUrl, {
       method: "GET",
-      headers: { "Content-Type": "text/html" }
+      headers: { 
+        "Content-Type": "text/html",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+      }
     }).then(function (response) {
       if (!response.ok) {
         throw new Error('HTTP status ' + response.status);
@@ -252,8 +252,8 @@
     }).then(function (fc) {
       var dom = new DOMParser().parseFromString(fc, "text/html");
 
-      var item = dom.querySelector(".b-content__inline_item");
-      if (!item) {
+      var items = dom.querySelectorAll(".b-content__inline_item");
+      if (!items || items.length === 0) {
         console.warn('[RezkaComment] show not found on Rezka:', name, ye);
         Lampa.Loading.stop();
         if (looksLikeBotBlockHtml(fc, !!cookie)) {
@@ -267,12 +267,22 @@
         return;
       }
 
+      // Берем первый результат
+      var item = items[0];
       var linkEl = item.querySelector(".b-content__inline_item-link");
       namemovie = linkEl ? linkEl.innerText : "";
 
       var itemUrl = linkEl ? linkEl.getAttribute("href") : "";
+      if (!itemUrl) {
+        Lampa.Noty.show('Не удалось найти ссылку на фильм');
+        Lampa.Loading.stop();
+        return;
+      }
       
-      // Переходим на страницу фильма для получения ссылки на видео
+      if (!itemUrl.startsWith('http')) {
+        itemUrl = host + itemUrl;
+      }
+      
       return getVideoUrlFromPage(itemUrl);
     }).catch(function (e) {
       console.error('[RezkaComment] getVideoFromRezka error:', e);
@@ -281,11 +291,11 @@
     });
   }
 
-  // Функция получения URL видео со страницы фильма
   function getVideoUrlFromPage(pageUrl) {
     var settings = getSettings();
     var proxy = settings.proxy;
     var cookie = settings.cookie;
+    var host = settings.host;
     
     var fullUrl = proxy;
     if (cookie) {
@@ -298,59 +308,112 @@
 
     return fetchCompat(fullUrl, {
       method: "GET",
-      headers: { "Content-Type": "text/html" }
+      headers: { 
+        "Content-Type": "text/html",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+      }
     }).then(function (response) {
       if (!response.ok) {
         throw new Error('HTTP status ' + response.status);
       }
       return response.text();
     }).then(function (html) {
-      // Парсим страницу для извлечения ссылки на видео
       var dom = new DOMParser().parseFromString(html, "text/html");
       
-      // Ищем плеер
-      var player = dom.querySelector("#player, .player, .video-player");
-      if (!player) {
-        // Ищем ссылку на видео в другом месте
-        var videoSource = dom.querySelector("video source, source[type='video/mp4']");
-        if (videoSource) {
-          var videoUrl = videoSource.getAttribute("src");
-          if (videoUrl) {
-            showVideo(videoUrl);
-            return;
-          }
+      // Метод 1: Ищем в CDN-ссылках
+      var cdnPatterns = [
+        /https?:\/\/[a-z0-9\-]+\.cdn\.rezka\.ag\/[^"'\s<>]+\.(?:mp4|m3u8)/gi,
+        /https?:\/\/[a-z0-9\-]+\.cdn-express\.xyz\/[^"'\s<>]+\.(?:mp4|m3u8)/gi,
+        /https?:\/\/[a-z0-9\-]+\.rezka\.ag\/[^"'\s<>]+\.(?:mp4|m3u8)/gi
+      ];
+      
+      var allText = html;
+      for (var p = 0; p < cdnPatterns.length; p++) {
+        var matches = allText.match(cdnPatterns[p]);
+        if (matches && matches.length > 0) {
+          showVideo(matches[0]);
+          return;
         }
-        
-        // Ищем в скриптах
-        var scripts = dom.querySelectorAll("script");
-        for (var i = 0; i < scripts.length; i++) {
-          var scriptText = scripts[i].textContent || "";
-          var match = scriptText.match(/file\s*:\s*["']([^"']+)["']/);
-          if (match) {
-            showVideo(match[1]);
-            return;
-          }
-          match = scriptText.match(/src\s*:\s*["']([^"']+\.(?:mp4|m3u8)[^"']*)["']/);
-          if (match) {
-            showVideo(match[1]);
-            return;
-          }
-        }
-        
-        Lampa.Noty.show('Не удалось найти ссылку на видео');
-        Lampa.Loading.stop();
-        return;
       }
       
-      // Ищем iframe внутри плеера
-      var iframe = player.querySelector("iframe");
-      if (iframe) {
-        var iframeSrc = iframe.getAttribute("src");
-        if (iframeSrc) {
-          // Пытаемся извлечь ссылку из iframe
+      // Метод 2: Ищем в скриптах video.js
+      var scripts = dom.querySelectorAll("script");
+      for (var i = 0; i < scripts.length; i++) {
+        var scriptText = scripts[i].textContent || "";
+        
+        // Ищем config или player config
+        var configMatch = scriptText.match(/player\.init\s*\(\s*\{[^}]*url\s*:\s*["']([^"']+)["']/);
+        if (configMatch) {
+          showVideo(configMatch[1]);
+          return;
+        }
+        
+        // Ищем file в объекте
+        var fileMatch = scriptText.match(/file\s*:\s*["']([^"']+\.(?:mp4|m3u8)[^"']*)["']/);
+        if (fileMatch) {
+          showVideo(fileMatch[1]);
+          return;
+        }
+        
+        // Ищем src в video
+        var srcMatch = scriptText.match(/src\s*:\s*["']([^"']+\.(?:mp4|m3u8)[^"']*)["']/);
+        if (srcMatch) {
+          showVideo(srcMatch[1]);
+          return;
+        }
+        
+        // Ищем ссылки на CDN в скриптах
+        var cdnInScript = scriptText.match(/https?:\/\/[^"'\s]+\.cdn[^"'\s]+\.(?:mp4|m3u8)/);
+        if (cdnInScript) {
+          showVideo(cdnInScript[0]);
+          return;
+        }
+      }
+      
+      // Метод 3: Ищем video тег
+      var videoElement = dom.querySelector("video");
+      if (videoElement) {
+        var src = videoElement.getAttribute("src");
+        if (src) {
+          showVideo(src);
+          return;
+        }
+        
+        var sources = videoElement.querySelectorAll("source");
+        for (var s = 0; s < sources.length; s++) {
+          var srcAttr = sources[s].getAttribute("src");
+          if (srcAttr) {
+            showVideo(srcAttr);
+            return;
+          }
+        }
+      }
+      
+      // Метод 4: Ищем в data-атрибутах плеера
+      var player = dom.querySelector("#player, .player, .video-player, #videoplayer");
+      if (player) {
+        var dataUrl = player.getAttribute("data-url") || player.getAttribute("data-src") || player.getAttribute("data-video");
+        if (dataUrl) {
+          showVideo(dataUrl);
+          return;
+        }
+      }
+      
+      // Метод 5: Ищем iframe с видео
+      var iframes = dom.querySelectorAll("iframe");
+      for (var f = 0; f < iframes.length; f++) {
+        var iframeSrc = iframes[f].getAttribute("src");
+        if (iframeSrc && (iframeSrc.indexOf('youtube') > -1 || iframeSrc.indexOf('vimeo') > -1 || iframeSrc.indexOf('rezka') > -1)) {
           showVideo(iframeSrc);
           return;
         }
+      }
+      
+      // Метод 6: Пробуем найти ссылку в тексте страницы (костыль)
+      var linkMatches = html.match(/https?:\/\/[^\s<>"']+\.(?:mp4|m3u8|webm)[^\s<>"']*/gi);
+      if (linkMatches && linkMatches.length > 0) {
+        showVideo(linkMatches[0]);
+        return;
       }
       
       Lampa.Noty.show('Не удалось найти ссылку на видео');
@@ -362,25 +425,26 @@
     });
   }
 
-  // Функция показа видео
   function showVideo(videoUrl) {
     Lampa.Loading.stop();
     
-    // Проверяем, является ли ссылка на видео или на страницу с плеером
+    // Нормализуем URL
+    if (videoUrl.startsWith('//')) {
+      videoUrl = 'https:' + videoUrl;
+    }
+    
     var isVideo = videoUrl.match(/\.(mp4|m3u8|webm|mkv|avi|mov|flv|wmv|ts)$/i);
     var isIframe = !isVideo && (videoUrl.indexOf('//') > -1);
     
     var modalHtml;
     
     if (isVideo) {
-      // Прямая ссылка на видео
       modalHtml = $(
         '<div style="width:100%;display:flex;justify-content:center;align-items:center;background:#000;border-radius:8px;overflow:hidden;">' +
           '<video controls autoplay style="width:100%;max-height:80vh;background:#000;" src="' + videoUrl + '" preload="metadata"></video>' +
         '</div>'
       );
     } else if (isIframe) {
-      // Ссылка на страницу с плеером
       modalHtml = $(
         '<div style="width:100%;height:80vh;background:#000;border-radius:8px;overflow:hidden;">' +
           '<iframe src="' + videoUrl + '" style="width:100%;height:100%;border:none;" allowfullscreen></iframe>' +
@@ -391,7 +455,6 @@
       return;
     }
     
-    // Добавляем стиль для видео
     if (!document.getElementById("rezka-video-style")) {
       var styleEl = document.createElement("style");
       styleEl.id = "rezka-video-style";
@@ -411,7 +474,6 @@
         Lampa.Modal.close();
         $(".modal--large").remove();
         Lampa.Controller.toggle("content");
-        // Останавливаем видео при закрытии
         var video = document.querySelector("video");
         if (video) {
           video.pause();
