@@ -2350,53 +2350,53 @@
         };
 
         var query_search = function query_search(query, data, callback, stage) {
-            stage = stage || 0;
+          stage = stage || 0;
 
-            var cur_prox = stage === 0 ? prox : (stage === 1 ? prox_alt : prox_alt2);
+          var cur_prox = stage === 0
+              ? prox
+              : (stage === 1 ? prox_alt : prox_alt2);
 
-            var postdata = 'q=' + encodeURIComponent(query);
+          var postdata = 'q=' + encodeURIComponent(query);
 
-            // Берём ту же Cookie, которую получает Rezka Comments
-            var rezkaCookie = (
-                Lampa.Storage.get('rezka_comment_cookie', '') || ''
-            ).trim();
+          console.log('[Rezka2] QUERY:', query);
+          console.log('[Rezka2] POSTDATA:', postdata);
 
-            console.log('[Rezka2] QUERY:', query);
-            console.log('[Rezka2] POSTDATA:', postdata);
-            console.log('[Rezka2] Cookie:', rezkaCookie ? 'YES' : 'NO');
+          // Cookie, полученная через авторизацию Rezka Comments
+          var rezkaCookie = (
+              Lampa.Storage.get('rezka_comment_cookie', '') || ''
+          ).trim();
 
-            /*
-            * Добавляем Cookie через механизм param/Cookie,
-            * который уже используется твоим рабочим плагином комментариев.
-            *
-            * ВАЖНО:
-            * component.proxyLink() должен получить исходный URL,
-            * поэтому Cookie добавляем к URL прокси после формирования ссылки.
-            */
+          console.log(
+              '[Rezka2] REZKA COOKIE:',
+              rezkaCookie ? 'YES' : 'NO'
+          );
 
-            var requestUrl = component.proxyLink(
-                url,
-                cur_prox,
-                prox_enc,
-                'enc2t'
-            );
+          network.clear();
+          network.timeout(10000);
 
-            if (rezkaCookie) {
-                requestUrl =
-                    cur_prox +
-                    'param/Cookie=' +
-                    encodeURIComponent(rezkaCookie) +
-                    '/' +
-                    requestUrl.substring(cur_prox.length);
-            }
+          var proxyRequest = component.proxyLink(
+              url,
+              cur_prox,
+              prox_enc,
+              'enc2t'
+          );
 
-            console.log('[Rezka2] REQUEST URL:', requestUrl);
+          // Добавляем Cookie ПЕРЕД enc2
+          if (rezkaCookie) {
+              proxyRequest =
+                  cur_prox +
+                  'param/Cookie=' +
+                  encodeURIComponent(rezkaCookie) +
+                  '/' +
+                  proxyRequest.substring(cur_prox.length);
 
-            network.clear();
-            network.timeout(10000);
+              console.log('[Rezka2] COOKIE ADDED TO PROXY');
+          }
 
-            network["native"](
-                requestUrl,
+          console.log('[Rezka2] REQUEST:', proxyRequest);
+
+          network["native"](
+              proxyRequest,
 
                 function (str) {
                     console.log('[Rezka2] RESPONSE FOR QUERY:', query);
