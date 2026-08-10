@@ -2068,15 +2068,8 @@
         prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
       }
 
-      var cookie = Lampa.Storage.get('rezka_comment_cookie', '');
-      
-      if (!cookie) {
-        cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '') + '';
-      }
-      
+      var cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '') + '';
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
-
-      console.log('[Rezka2] using cookie:', cookie ? 'YES (from rezka_comment_cookie)' : 'NO');
 
       if (cookie) {
         if (Lampa.Platform.is('android')) {
@@ -2357,73 +2350,156 @@
         };
 
         var query_search = function query_search(query, data, callback, stage) {
-          stage = stage || 0;
-          var cur_prox = stage === 0 ? prox : (stage === 1 ? prox_alt : prox_alt2);
-          var postdata = 'q=' + encodeURIComponent(query);
-          network.clear();
-          network.timeout(10000);
-          network["native"](
-            component.proxyLink(url, cur_prox, prox_enc, 'enc2t'),
+            stage = stage || 0;
 
-            function (str) {
-              str = (str || '').replace(/\n/g, '');
+            var cur_prox = stage === 0 ? prox : (stage === 1 ? prox_alt : prox_alt2);
 
-              console.log('[Rezka2] response length:', str.length);
+            var postdata = 'q=' + encodeURIComponent(query);
 
-              // Anubis / bot protection
-              if (isAnubisPage(str)) {
-                console.log('[Rezka2] Anubis challenge detected');
+            // Берём ту же Cookie, которую получает Rezka Comments
+            var rezkaCookie = (
+                Lampa.Storage.get('rezka_comment_cookie', '') || ''
+            ).trim();
 
-                if (typeof showCookieExpiredChoice === 'function') {
-                  showCookieExpiredChoice(function () {
-                    console.log('[Rezka2] Authorization completed, retrying search');
-                    query_search(query, data, callback, stage);
-                  });
-                } else {
-                  Lampa.Noty.show('HDRezka требует пройти проверку Anubis');
+            console.log('[Rezka2] QUERY:', query);
+            console.log('[Rezka2] POSTDATA:', postdata);
+            console.log('[Rezka2] Cookie:', rezkaCookie ? 'YES' : 'NO');
+
+            /*
+            * Добавляем Cookie через механизм param/Cookie,
+            * который уже используется твоим рабочим плагином комментариев.
+            *
+            * ВАЖНО:
+            * component.proxyLink() должен получить исходный URL,
+            * поэтому Cookie добавляем к URL прокси после формирования ссылки.
+            */
+
+            var requestUrl = component.proxyLink(
+                url,
+                cur_prox,
+                prox_enc,
+                'enc2t'
+            );
+
+            if (rezkaCookie) {
+                requestUrl =
+                    cur_prox +
+                    'param/Cookie=' +
+                    encodeURIComponent(rezkaCookie) +
+                    '/' +
+                    requestUrl.substring(cur_prox.length);
+            }
+
+            console.log('[Rezka2] REQUEST URL:', requestUrl);
+
+            network.clear();
+            network.timeout(10000);
+
+            network["native"](
+                requestUrl,
+
+                function (str) {
+                    console.log('[Rezka2] RESPONSE FOR QUERY:', query);
+
+                    str = (str || '').replace(/\n/g, '');
+
+                    console.log('[Rezka2] response length:', str.length);
+                    console.log('[Rezka2] RESPONSE:', str);
+
+                    // Anubis / bot protection
+                    if (isAnubisPage(str)) {
+                        console.log('[Rezka2] Anubis challenge detected');
+
+                        /*
+                        * НЕ удаляем rezka_comment_cookie.
+                        *
+                        * Она может быть рабочей и используется
+                        * плагином комментариев.
+                        */
+                        console.log('[Rezka2] Saved Rezka cookie was preserved');
+
+                        if (callback) {
+                            callback([], false, query);
+                        }
+
+                        return;
+                    }
+
+                    checkErrorForm(str);
+
+                    var links = str.match(/<li><a href=.*?<\/li>/g);
+                    var have_more =
+                        str.indexOf('<a class="b-search__live_all"') !== -1;
+
+                    if (links && links.length) {
+                        data = data.concat(links);
+                    }
+
+                    if (callback) {
+                        callback(data, have_more, query);
+                    }
+                },
+
+                function (a, c) {
+
+                    if (
+                        cur_prox &&
+                        a.status == 403 &&
+                        (!a.responseText ||
+                            a.responseText.indexOf('<div>105</div>') !== -1)
+                    ) {
+                        Lampa.Storage.set(
+                            'online_mod_proxy_rezka2',
+                            'false'
+                        );
+                    }
+
+                    if (a.status == 403 && a.responseText) {
+                        var str = (a.responseText || '').replace(/\n/g, '');
+                        checkErrorForm(str);
+                    }
+
+                    // Следующий прокси
+                    var next_stage = stage + 1;
+
+                    var next_prox =
+                        next_stage === 1
+                            ? prox_alt
+                            : (next_stage === 2 ? prox_alt2 : null);
+
+                    if (
+                        !error_message &&
+                        next_prox &&
+                        next_prox !== cur_prox
+                    ) {
+                        query_search(
+                            query,
+                            data,
+                            callback,
+                            next_stage
+                        );
+
+                        return;
+                    }
+
+                    if (error_message) {
+                        component.empty(error_message);
+                    } else if (callback) {
+                        callback([], false, query);
+                    } else {
+                        component.empty(
+                            network.errorDecode(a, c)
+                        );
+                    }
+                },
+
+                postdata,
+                {
+                    dataType: 'text',
+                    withCredentials: logged_in,
+                    headers: headers
                 }
-
-                return;
-              }
-
-              checkErrorForm(str);
-
-              var links = str.match(/<li><a href=.*?<\/li>/g);
-              var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
-
-              if (links && links.length) {
-                data = data.concat(links);
-              }
-
-              if (callback) {
-                callback(data, have_more, query);
-              }
-            },
-
-            function (a, c) {
-            if (cur_prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
-              Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
-            }
-
-            if (a.status == 403 && a.responseText) {
-              var str = (a.responseText || '').replace(/\n/g, '');
-              checkErrorForm(str);
-            }
-
-            // Текущий прокси не ответил — пробуем следующий по очереди, прежде чем сдаваться
-            var next_stage = stage + 1;
-            var next_prox = next_stage === 1 ? prox_alt : (next_stage === 2 ? prox_alt2 : null);
-            if (!error_message && next_prox && next_prox !== cur_prox) {
-              query_search(query, data, callback, next_stage);
-              return;
-            }
-
-            if (error_message) component.empty(error_message);else if (callback) callback([], false, query);else component.empty(network.errorDecode(a, c));
-          }, postdata, {
-            dataType: 'text',
-            withCredentials: logged_in,
-            headers: headers
-          });
+            );
         };
 
         // Формируем очередь запросов: original+year, title+year, просто title
