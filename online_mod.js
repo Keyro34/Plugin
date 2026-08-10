@@ -409,7 +409,7 @@
           var name = link.substring(posStart + 3, posEnd);
           posStart = name.lastIndexOf('/');
           name = posStart !== -1 ? name.substring(posStart + 1) : '';
-          return proxy + 'enc2/' + encodeURIComponent(btoa(proxy_enc + link)) + '/' + name;
+          return proxy + 'enc2/' + encodeURIComponent(btoa(proxy_enc + link)) + '/' + name + (enc === 'enc2t' ? "?jacred.test" : '');
         }
 
         return proxy + proxy_enc + link;
@@ -2118,32 +2118,6 @@
           return;
         }
       }
-
-      function isAnubisPage(str) {
-        if (!str) return false;
-
-        return str.indexOf('anubis_challenge') !== -1 ||
-               str.indexOf('anubis_version') !== -1 ||
-               str.indexOf('anubis_base_prefix') !== -1 ||
-               str.indexOf('Проверяем, что вы не бот') !== -1 ||
-               str.indexOf('TecharoHQ/anubis') !== -1;
-      }
-
-      function resetRezkaCookie() {
-        Lampa.Storage.set('online_mod_rezka2_cookie', '');
-        cookie = 'PHPSESSID=' + Utils.randomId(26);
-
-        if (prox) {
-          prox_enc = '';
-          prox_enc += 'param/Origin=' + encodeURIComponent(host) + '/';
-          prox_enc += 'param/Referer=' + encodeURIComponent(ref) + '/';
-          prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
-          prox_enc += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
-        } else if (Lampa.Platform.is('android')) {
-          headers.Cookie = cookie;
-        }
-      }
-
       /**
        * Поиск
        * @param {Object} _object
@@ -2351,155 +2325,41 @@
 
         var query_search = function query_search(query, data, callback, stage) {
           stage = stage || 0;
-
-          var cur_prox = stage === 0
-              ? prox
-              : (stage === 1 ? prox_alt : prox_alt2);
-
+          var cur_prox = stage === 0 ? prox : (stage === 1 ? prox_alt : prox_alt2);
           var postdata = 'q=' + encodeURIComponent(query);
-
-          console.log('[Rezka2] QUERY:', query);
-          console.log('[Rezka2] POSTDATA:', postdata);
-
-          // Cookie, полученная через авторизацию Rezka Comments
-          var rezkaCookie = (
-              Lampa.Storage.get('rezka_comment_cookie', '') || ''
-          ).trim();
-
-          console.log(
-              '[Rezka2] REZKA COOKIE:',
-              rezkaCookie ? 'YES' : 'NO'
-          );
-
           network.clear();
           network.timeout(10000);
+          network["native"](component.proxyLink(url, cur_prox, prox_enc, 'enc2t'), function (str) {
+            str = (str || '').replace(/\n/g, '');
+            checkErrorForm(str);
+            var links = str.match(/<li><a href=.*?<\/li>/g);
+            var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
+            if (links && links.length) data = data.concat(links);
+            if (callback) callback(data, have_more, query);
+          }, function (a, c) {
+            if (cur_prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
+              Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
+            }
 
-          var proxyRequest = component.proxyLink(
-              url,
-              cur_prox,
-              prox_enc,
-              'enc2t'
-          );
+            if (a.status == 403 && a.responseText) {
+              var str = (a.responseText || '').replace(/\n/g, '');
+              checkErrorForm(str);
+            }
 
-          // Добавляем Cookie ПЕРЕД enc2
-          if (rezkaCookie) {
-              proxyRequest =
-                  cur_prox +
-                  'param/Cookie=' +
-                  encodeURIComponent(rezkaCookie) +
-                  '/' +
-                  proxyRequest.substring(cur_prox.length);
+            // Текущий прокси не ответил — пробуем следующий по очереди, прежде чем сдаваться
+            var next_stage = stage + 1;
+            var next_prox = next_stage === 1 ? prox_alt : (next_stage === 2 ? prox_alt2 : null);
+            if (!error_message && next_prox && next_prox !== cur_prox) {
+              query_search(query, data, callback, next_stage);
+              return;
+            }
 
-              console.log('[Rezka2] COOKIE ADDED TO PROXY');
-          }
-
-          console.log('[Rezka2] REQUEST:', proxyRequest);
-
-          network["native"](
-              proxyRequest,
-
-                function (str) {
-                    console.log('[Rezka2] RESPONSE FOR QUERY:', query);
-
-                    str = (str || '').replace(/\n/g, '');
-
-                    console.log('[Rezka2] response length:', str.length);
-                    console.log('[Rezka2] RESPONSE:', str);
-
-                    // Anubis / bot protection
-                    if (isAnubisPage(str)) {
-                        console.log('[Rezka2] Anubis challenge detected');
-
-                        /*
-                        * НЕ удаляем rezka_comment_cookie.
-                        *
-                        * Она может быть рабочей и используется
-                        * плагином комментариев.
-                        */
-                        console.log('[Rezka2] Saved Rezka cookie was preserved');
-
-                        if (callback) {
-                            callback([], false, query);
-                        }
-
-                        return;
-                    }
-
-                    checkErrorForm(str);
-
-                    var links = str.match(/<li><a href=.*?<\/li>/g);
-                    var have_more =
-                        str.indexOf('<a class="b-search__live_all"') !== -1;
-
-                    if (links && links.length) {
-                        data = data.concat(links);
-                    }
-
-                    if (callback) {
-                        callback(data, have_more, query);
-                    }
-                },
-
-                function (a, c) {
-
-                    if (
-                        cur_prox &&
-                        a.status == 403 &&
-                        (!a.responseText ||
-                            a.responseText.indexOf('<div>105</div>') !== -1)
-                    ) {
-                        Lampa.Storage.set(
-                            'online_mod_proxy_rezka2',
-                            'false'
-                        );
-                    }
-
-                    if (a.status == 403 && a.responseText) {
-                        var str = (a.responseText || '').replace(/\n/g, '');
-                        checkErrorForm(str);
-                    }
-
-                    // Следующий прокси
-                    var next_stage = stage + 1;
-
-                    var next_prox =
-                        next_stage === 1
-                            ? prox_alt
-                            : (next_stage === 2 ? prox_alt2 : null);
-
-                    if (
-                        !error_message &&
-                        next_prox &&
-                        next_prox !== cur_prox
-                    ) {
-                        query_search(
-                            query,
-                            data,
-                            callback,
-                            next_stage
-                        );
-
-                        return;
-                    }
-
-                    if (error_message) {
-                        component.empty(error_message);
-                    } else if (callback) {
-                        callback([], false, query);
-                    } else {
-                        component.empty(
-                            network.errorDecode(a, c)
-                        );
-                    }
-                },
-
-                postdata,
-                {
-                    dataType: 'text',
-                    withCredentials: logged_in,
-                    headers: headers
-                }
-            );
+            if (error_message) component.empty(error_message);else if (callback) callback([], false, query);else component.empty(network.errorDecode(a, c));
+          }, postdata, {
+            dataType: 'text',
+            withCredentials: logged_in,
+            headers: headers
+          });
         };
 
         // Формируем очередь запросов: original+year, title+year, просто title
