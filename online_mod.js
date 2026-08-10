@@ -3,7 +3,6 @@
 
   var year;
   var namemovie;
-  var savedHTML = null;
 
   function endsWithSlash(str) {
     return str.charAt(str.length - 1) === '/';
@@ -59,14 +58,14 @@
   }
 
   function buildAuthUrlQuick() {
-    var proxyUrl = (Lampa.Storage.get('rezka_comment_proxy', 'https://rezka.lampasochka.workers.dev/') || 'https://rezka.lampasochka.workers.dev/').trim();
+    var proxyUrl = (Lampa.Storage.get('rezka_video_proxy', 'https://rezka.lampasochka.workers.dev/') || 'https://rezka.lampasochka.workers.dev/').trim();
     if (!startsWithHttp(proxyUrl)) {
       Lampa.Noty.show('Сначала настройте URL прокси-воркера в настройках плагина');
       return null;
     }
     if (!endsWithSlash(proxyUrl)) proxyUrl += '/';
 
-    var host = (Lampa.Storage.get('rezka_comment_host', 'https://rezka.ag') || 'https://rezka.ag').trim();
+    var host = (Lampa.Storage.get('rezka_video_host', 'https://rezka.ag') || 'https://rezka.ag').trim();
     var hostBare = host.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
 
     var code = generateAuthCodeQuick();
@@ -77,10 +76,10 @@
 
   function pollAuthCodeQuick(proxyUrl, code, statusSelector, waitingText, onSuccess, onTimeout) {
     var attempts = 0;
-    window.rezkaQuickAuthInterval = setInterval(function () {
+    window.rezkaVideoAuthInterval = setInterval(function () {
       attempts++;
       if (attempts > 90) {
-        clearInterval(window.rezkaQuickAuthInterval);
+        clearInterval(window.rezkaVideoAuthInterval);
         $(statusSelector).text('Время ожидания истекло. Попробуйте снова.').css('color', '#ff5722');
         if (onTimeout) onTimeout();
         return;
@@ -94,9 +93,9 @@
         dataType: 'json',
         success: function (d) {
           if (d && (d.status === 'success' || d.cookie)) {
-            clearInterval(window.rezkaQuickAuthInterval);
-            Lampa.Storage.set('rezka_comment_cookie', d.cookie);
-            console.log('[RezkaComment] (quick) cookie saved:', d.cookie);
+            clearInterval(window.rezkaVideoAuthInterval);
+            Lampa.Storage.set('rezka_video_cookie', d.cookie);
+            console.log('[RezkaVideo] cookie saved:', d.cookie);
 
             var tail = (d.cookie || '').slice(-16);
             $(statusSelector).html('<span style="color: #4CAF50;">Успешно! Cookie сохранены (…' + tail + ').</span>');
@@ -110,7 +109,7 @@
   }
 
   function closeAuthModalQuick(modalClass) {
-    clearInterval(window.rezkaQuickAuthInterval);
+    clearInterval(window.rezkaVideoAuthInterval);
     Lampa.Modal.close();
     $(modalClass).remove();
     try {
@@ -215,16 +214,17 @@
   }
 
   function getSettings() {
-    var host = (Lampa.Storage.get('rezka_comment_host', 'https://rezka.ag') || 'https://rezka.ag').trim().replace(/\/+$/, '');
-    var cookie = (Lampa.Storage.get('rezka_comment_cookie', '') || '').trim();
-    var proxy = (Lampa.Storage.get('rezka_comment_proxy', 'https://rezka.lampasochka.workers.dev/') || 'https://rezka.lampasochka.workers.dev/').trim();
+    var host = (Lampa.Storage.get('rezka_video_host', 'https://rezka.ag') || 'https://rezka.ag').trim().replace(/\/+$/, '');
+    var cookie = (Lampa.Storage.get('rezka_video_cookie', '') || '').trim();
+    var proxy = (Lampa.Storage.get('rezka_video_proxy', 'https://rezka.lampasochka.workers.dev/') || 'https://rezka.lampasochka.workers.dev/').trim();
     if (proxy && !endsWithSlash(proxy)) {
       proxy += '/';
     }
     return { host: host, cookie: cookie, proxy: proxy };
   }
 
-  function getVideoFromRezka(name, ye) {
+  // Поиск фильма на Rezka
+  function searchRezkaForVideo(name, ye) {
     var settings = getSettings();
     var host = settings.host;
     var cookie = settings.cookie;
@@ -236,45 +236,41 @@
     }
     searchUrl += path;
 
-    console.log('[RezkaComment] searching hdrezka with url:', searchUrl);
+    console.log('[RezkaVideo] searching:', searchUrl);
 
     return fetchCompat(searchUrl, {
       method: "GET",
       headers: { 
         "Content-Type": "text/html",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
       }
     }).then(function (response) {
-      if (!response.ok) {
-        throw new Error('HTTP status ' + response.status);
-      }
+      if (!response.ok) throw new Error('HTTP ' + response.status);
       return response.text();
-    }).then(function (fc) {
-      var dom = new DOMParser().parseFromString(fc, "text/html");
-
+    }).then(function (html) {
+      var dom = new DOMParser().parseFromString(html, "text/html");
       var items = dom.querySelectorAll(".b-content__inline_item");
+      
       if (!items || items.length === 0) {
-        console.warn('[RezkaComment] show not found on Rezka:', name, ye);
         Lampa.Loading.stop();
-        if (looksLikeBotBlockHtml(fc, !!cookie)) {
-          showCookieExpiredChoice(function () {
+        if (looksLikeBotBlockHtml(html, !!cookie)) {
+          showCookieExpiredChoice(function() {
             Lampa.Loading.start();
-            getVideoFromRezka(name, ye);
+            searchRezkaForVideo(name, ye);
           });
         } else {
-          Lampa.Noty.show('Фильм/сериал не найден на Rezka');
+          Lampa.Noty.show('Фильм не найден на Rezka');
         }
         return;
       }
 
-      // Берем первый результат
       var item = items[0];
       var linkEl = item.querySelector(".b-content__inline_item-link");
       namemovie = linkEl ? linkEl.innerText : "";
-
       var itemUrl = linkEl ? linkEl.getAttribute("href") : "";
+      
       if (!itemUrl) {
-        Lampa.Noty.show('Не удалось найти ссылку на фильм');
+        Lampa.Noty.show('Не найден URL фильма');
         Lampa.Loading.stop();
         return;
       }
@@ -283,19 +279,20 @@
         itemUrl = host + itemUrl;
       }
       
-      return getVideoUrlFromPage(itemUrl);
+      // Получаем видео со страницы фильма
+      getVideoFromPage(itemUrl);
     }).catch(function (e) {
-      console.error('[RezkaComment] getVideoFromRezka error:', e);
-      Lampa.Noty.show('Ошибка поиска на Rezka: ' + e.message);
+      console.error('[RezkaVideo] search error:', e);
+      Lampa.Noty.show('Ошибка: ' + e.message);
       Lampa.Loading.stop();
     });
   }
 
-  function getVideoUrlFromPage(pageUrl) {
+  // Получение видео со страницы фильма
+  function getVideoFromPage(pageUrl) {
     var settings = getSettings();
     var proxy = settings.proxy;
     var cookie = settings.cookie;
-    var host = settings.host;
     
     var fullUrl = proxy;
     if (cookie) {
@@ -304,166 +301,107 @@
     fullUrl += "param/Referer=" + encodeURIComponent(pageUrl) + "/";
     fullUrl += pageUrl;
 
-    console.log('[RezkaComment] getting video from page:', fullUrl);
+    console.log('[RezkaVideo] getting video from:', fullUrl);
 
-    return fetchCompat(fullUrl, {
+    fetchCompat(fullUrl, {
       method: "GET",
-      headers: { 
+      headers: {
         "Content-Type": "text/html",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
       }
     }).then(function (response) {
-      if (!response.ok) {
-        throw new Error('HTTP status ' + response.status);
-      }
+      if (!response.ok) throw new Error('HTTP ' + response.status);
       return response.text();
     }).then(function (html) {
-      var dom = new DOMParser().parseFromString(html, "text/html");
-      
-      // Метод 1: Ищем в CDN-ссылках
-      var cdnPatterns = [
-        /https?:\/\/[a-z0-9\-]+\.cdn\.rezka\.ag\/[^"'\s<>]+\.(?:mp4|m3u8)/gi,
-        /https?:\/\/[a-z0-9\-]+\.cdn-express\.xyz\/[^"'\s<>]+\.(?:mp4|m3u8)/gi,
-        /https?:\/\/[a-z0-9\-]+\.rezka\.ag\/[^"'\s<>]+\.(?:mp4|m3u8)/gi
-      ];
-      
-      var allText = html;
-      for (var p = 0; p < cdnPatterns.length; p++) {
-        var matches = allText.match(cdnPatterns[p]);
-        if (matches && matches.length > 0) {
-          showVideo(matches[0]);
-          return;
-        }
+      var videoUrl = extractVideoUrl(html);
+      if (videoUrl) {
+        showVideo(videoUrl);
+      } else {
+        Lampa.Noty.show('Не найдена ссылка на видео');
+        Lampa.Loading.stop();
       }
-      
-      // Метод 2: Ищем в скриптах video.js
-      var scripts = dom.querySelectorAll("script");
-      for (var i = 0; i < scripts.length; i++) {
-        var scriptText = scripts[i].textContent || "";
-        
-        // Ищем config или player config
-        var configMatch = scriptText.match(/player\.init\s*\(\s*\{[^}]*url\s*:\s*["']([^"']+)["']/);
-        if (configMatch) {
-          showVideo(configMatch[1]);
-          return;
-        }
-        
-        // Ищем file в объекте
-        var fileMatch = scriptText.match(/file\s*:\s*["']([^"']+\.(?:mp4|m3u8)[^"']*)["']/);
-        if (fileMatch) {
-          showVideo(fileMatch[1]);
-          return;
-        }
-        
-        // Ищем src в video
-        var srcMatch = scriptText.match(/src\s*:\s*["']([^"']+\.(?:mp4|m3u8)[^"']*)["']/);
-        if (srcMatch) {
-          showVideo(srcMatch[1]);
-          return;
-        }
-        
-        // Ищем ссылки на CDN в скриптах
-        var cdnInScript = scriptText.match(/https?:\/\/[^"'\s]+\.cdn[^"'\s]+\.(?:mp4|m3u8)/);
-        if (cdnInScript) {
-          showVideo(cdnInScript[0]);
-          return;
-        }
-      }
-      
-      // Метод 3: Ищем video тег
-      var videoElement = dom.querySelector("video");
-      if (videoElement) {
-        var src = videoElement.getAttribute("src");
-        if (src) {
-          showVideo(src);
-          return;
-        }
-        
-        var sources = videoElement.querySelectorAll("source");
-        for (var s = 0; s < sources.length; s++) {
-          var srcAttr = sources[s].getAttribute("src");
-          if (srcAttr) {
-            showVideo(srcAttr);
-            return;
-          }
-        }
-      }
-      
-      // Метод 4: Ищем в data-атрибутах плеера
-      var player = dom.querySelector("#player, .player, .video-player, #videoplayer");
-      if (player) {
-        var dataUrl = player.getAttribute("data-url") || player.getAttribute("data-src") || player.getAttribute("data-video");
-        if (dataUrl) {
-          showVideo(dataUrl);
-          return;
-        }
-      }
-      
-      // Метод 5: Ищем iframe с видео
-      var iframes = dom.querySelectorAll("iframe");
-      for (var f = 0; f < iframes.length; f++) {
-        var iframeSrc = iframes[f].getAttribute("src");
-        if (iframeSrc && (iframeSrc.indexOf('youtube') > -1 || iframeSrc.indexOf('vimeo') > -1 || iframeSrc.indexOf('rezka') > -1)) {
-          showVideo(iframeSrc);
-          return;
-        }
-      }
-      
-      // Метод 6: Пробуем найти ссылку в тексте страницы (костыль)
-      var linkMatches = html.match(/https?:\/\/[^\s<>"']+\.(?:mp4|m3u8|webm)[^\s<>"']*/gi);
-      if (linkMatches && linkMatches.length > 0) {
-        showVideo(linkMatches[0]);
-        return;
-      }
-      
-      Lampa.Noty.show('Не удалось найти ссылку на видео');
-      Lampa.Loading.stop();
     }).catch(function (e) {
-      console.error('[RezkaComment] getVideoUrlFromPage error:', e);
+      console.error('[RezkaVideo] getVideo error:', e);
       Lampa.Noty.show('Ошибка получения видео: ' + e.message);
       Lampa.Loading.stop();
     });
   }
 
+  // Извлечение URL видео из HTML
+  function extractVideoUrl(html) {
+    // Метод 1: CDN ссылки
+    var cdnMatches = html.match(/https?:\/\/[a-z0-9\-]+\.cdn[^"'\s<>]+\.(?:mp4|m3u8)/gi);
+    if (cdnMatches && cdnMatches.length > 0) {
+      return cdnMatches[0];
+    }
+
+    // Метод 2: Поиск в скриптах
+    var scriptMatch = html.match(/file\s*:\s*["']([^"']+\.(?:mp4|m3u8)[^"']*)["']/);
+    if (scriptMatch) {
+      return scriptMatch[1];
+    }
+
+    // Метод 3: video тег
+    var videoMatch = html.match(/<video[^>]*src=["']([^"']+)["']/);
+    if (videoMatch) {
+      return videoMatch[1];
+    }
+
+    // Метод 4: source тег
+    var sourceMatch = html.match(/<source[^>]*src=["']([^"']+\.(?:mp4|m3u8)[^"']*)["']/);
+    if (sourceMatch) {
+      return sourceMatch[1];
+    }
+
+    // Метод 5: data-атрибуты
+    var dataMatch = html.match(/data-(?:video|url|src)=["']([^"']+\.(?:mp4|m3u8)[^"']*)["']/);
+    if (dataMatch) {
+      return dataMatch[1];
+    }
+
+    // Метод 6: Любая ссылка на видео
+    var anyMatch = html.match(/https?:\/\/[^\s<>"']+\.(?:mp4|m3u8|webm|mkv)[^\s<>"']*/i);
+    if (anyMatch) {
+      return anyMatch[0];
+    }
+
+    return null;
+  }
+
+  // Показ видео в модальном окне
   function showVideo(videoUrl) {
     Lampa.Loading.stop();
     
-    // Нормализуем URL
     if (videoUrl.startsWith('//')) {
       videoUrl = 'https:' + videoUrl;
     }
-    
-    var isVideo = videoUrl.match(/\.(mp4|m3u8|webm|mkv|avi|mov|flv|wmv|ts)$/i);
-    var isIframe = !isVideo && (videoUrl.indexOf('//') > -1);
+
+    var isVideo = /\.(mp4|m3u8|webm|mkv|avi|mov|flv|wmv|ts)$/i.test(videoUrl);
     
     var modalHtml;
-    
     if (isVideo) {
       modalHtml = $(
         '<div style="width:100%;display:flex;justify-content:center;align-items:center;background:#000;border-radius:8px;overflow:hidden;">' +
-          '<video controls autoplay style="width:100%;max-height:80vh;background:#000;" src="' + videoUrl + '" preload="metadata"></video>' +
+          '<video controls autoplay style="width:100%;max-height:80vh;background:#000;" src="' + videoUrl + '"></video>' +
         '</div>'
       );
-    } else if (isIframe) {
+    } else {
       modalHtml = $(
         '<div style="width:100%;height:80vh;background:#000;border-radius:8px;overflow:hidden;">' +
           '<iframe src="' + videoUrl + '" style="width:100%;height:100%;border:none;" allowfullscreen></iframe>' +
         '</div>'
       );
-    } else {
-      Lampa.Noty.show('Неизвестный формат видео');
-      return;
     }
-    
+
     if (!document.getElementById("rezka-video-style")) {
-      var styleEl = document.createElement("style");
-      styleEl.id = "rezka-video-style";
-      styleEl.textContent =
-        '.video-modal .modal__body{padding:0 !important;background:#000;}' +
+      var style = document.createElement("style");
+      style.id = "rezka-video-style";
+      style.textContent = 
+        '.video-modal .modal__body{padding:0!important;background:#000;}' +
         '.video-modal .modal__head{background:#1a1a1a;border-bottom:1px solid #333;}';
-      document.head.appendChild(styleEl);
+      document.head.appendChild(style);
     }
-    
+
     Lampa.Modal.open({
       title: namemovie || "Видео с Rezka",
       html: modalHtml,
@@ -474,323 +412,235 @@
         Lampa.Modal.close();
         $(".modal--large").remove();
         Lampa.Controller.toggle("content");
-        var video = document.querySelector("video");
-        if (video) {
-          video.pause();
-          video.removeAttribute("src");
-          video.load();
-        }
+        var v = document.querySelector("video");
+        if (v) { v.pause(); v.src = ''; v.load(); }
       }
     });
   }
 
+  // Получение английского названия из TMDB
   function getEnTitle(id, type) {
     var tmdbType = type === 'movie' ? 'movie' : 'tv';
-    var tmdbCacheKey = tmdbType + '_' + id;
+    var cacheKey = tmdbType + '_' + id;
 
-    window.__tmdbTranslationsCache = window.__tmdbTranslationsCache || {};
-    window.__tmdbFallbackTitleCache = window.__tmdbFallbackTitleCache || {};
-    var cachedTr = window.__tmdbTranslationsCache[tmdbCacheKey];
-    var fallbackTitle = window.__tmdbFallbackTitleCache[tmdbCacheKey] || '';
+    window.__tmdbCache = window.__tmdbCache || {};
+    window.__tmdbFallback = window.__tmdbFallback || {};
 
-    var trPromise;
+    var cached = window.__tmdbCache[cacheKey];
+    var fallback = window.__tmdbFallback[cacheKey] || '';
 
-    if (cachedTr) {
-      console.log('[RezkaComment] using shared translations cache for', tmdbCacheKey);
-      trPromise = Promise.resolve(cachedTr);
-    } else {
-      trPromise = new Promise(function (res, rej) {
-        Lampa.Api.sources.tmdb.get(
-          tmdbType + '/' + id,
-          { append_to_response: 'translations' },
-          res,
-          rej
-        );
-      }).then(function (data) {
-        var tr = (data && data.translations && data.translations.translations) || [];
-        window.__tmdbTranslationsCache[tmdbCacheKey] = tr;
+    var promise = cached ? Promise.resolve(cached) : new Promise(function(res, rej) {
+      Lampa.Api.sources.tmdb.get(tmdbType + '/' + id, { append_to_response: 'translations' }, res, rej);
+    }).then(function(data) {
+      var tr = (data && data.translations && data.translations.translations) || [];
+      window.__tmdbCache[cacheKey] = tr;
+      if (data && data.original_language === 'en') {
+        fallback = (data && data.title) || (data && data.name) || (data && data.original_title) || '';
+      }
+      window.__tmdbFallback[cacheKey] = fallback;
+      return tr;
+    });
 
-        if (data && data.original_language === 'en') {
-          fallbackTitle = (data && data.title) || (data && data.name) || (data && data.original_title) || (data && data.original_name) || '';
-        }
-        window.__tmdbFallbackTitleCache[tmdbCacheKey] = fallbackTitle;
-
-        console.log('[RezkaComment] TMDB raw response for', tmdbCacheKey, data);
-        return tr;
-      });
-    }
-
-    return trPromise.then(function (tr) {
+    return promise.then(function(tr) {
       var enTitle = '';
-      var enList = tr.filter(function (t) {
-        return t.iso_639_1 === 'en';
-      });
+      var enList = tr.filter(function(t) { return t.iso_639_1 === 'en'; });
       for (var i = 0; i < enList.length; i++) {
         var cand = enList[i];
-        var candTitle = (cand && cand.data && cand.data.title) || (cand && cand.data && cand.data.name);
-        if (candTitle) {
-          enTitle = candTitle;
-          break;
-        }
+        var title = (cand && cand.data && cand.data.title) || (cand && cand.data && cand.data.name);
+        if (title) { enTitle = title; break; }
       }
-      if (!enTitle) enTitle = fallbackTitle;
+      if (!enTitle) enTitle = fallback;
 
       if (enTitle) {
-        return getVideoFromRezka(normalizeTitle(enTitle), year);
+        searchRezkaForVideo(normalizeTitle(enTitle), year);
       } else {
-        console.warn('[RezkaComment] English title not found for', tmdbCacheKey, tr, 'fallbackTitle:', fallbackTitle);
         Lampa.Noty.show('Английское название не найдено');
         Lampa.Loading.stop();
       }
-    }).catch(function (e) {
-      console.error('[RezkaComment] TMDB error', e);
-      var reason = (e && (e.message || e.status_message)) ? (e.message || e.status_message) : JSON.stringify(e);
-      Lampa.Noty.show('Ошибка получения данных TMDB: ' + reason);
+    }).catch(function(e) {
+      console.error('[RezkaVideo] TMDB error:', e);
+      Lampa.Noty.show('Ошибка TMDB: ' + (e.message || ''));
       Lampa.Loading.stop();
     });
   }
 
-  function cleanTitle(str) {
-    return str.replace(/[\s.,:;’'`!?]+/g, " ").trim();
-  }
-
   function normalizeTitle(str) {
-    return cleanTitle(
-      str
-        .toLowerCase()
-        .replace(/[\-\u2010-\u2015\u2E3A\u2E3B\uFE58\uFE63\uFF0D]+/g, "-")
-        .replace(/ё/g, "е")
-    );
+    return str.toLowerCase()
+      .replace(/[\s.,:;’'`!?]+/g, " ")
+      .replace(/[\-\u2010-\u2015]+/g, "-")
+      .replace(/ё/g, "е")
+      .trim();
   }
 
   function startPlugin() {
-    window.comment_plugin = true;
+    if (window.rezkaVideoStarted) return;
+    window.rezkaVideoStarted = true;
 
-    function generateAuthCode() {
-        return Math.floor(1000 + Math.random() * 9000).toString();
+    function genCode() {
+      return Math.floor(1000 + Math.random() * 9000).toString();
     }
 
     try {
       Lampa.SettingsApi.addComponent({
-        component: 'rezka_comment',
+        component: 'rezka_video',
         name: 'Rezka Video',
-        icon: '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>'
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>'
       });
 
       Lampa.SettingsApi.addParam({
-        component: 'rezka_comment',
+        component: 'rezka_video',
         param: {
-          name: 'rezka_comment_host',
+          name: 'rezka_video_host',
           type: 'input',
           placeholder: 'https://rezka.ag',
-          values: Lampa.Storage.get('rezka_comment_host', 'https://rezka.ag'),
+          values: Lampa.Storage.get('rezka_video_host', 'https://rezka.ag'),
           default: 'https://rezka.ag'
         },
         field: {
-          name: 'Зеркало hdrezka',
-          description: 'Адрес зеркала hdrezka (например, https://hdrezka.me)'
+          name: 'Зеркало HDRezka',
+          description: 'Адрес зеркала'
         },
-        onChange: function(value) {
-          Lampa.Storage.set('rezka_comment_host', value);
-        }
+        onChange: function(v) { Lampa.Storage.set('rezka_video_host', v); }
       });
 
       Lampa.SettingsApi.addParam({
-        component: 'rezka_comment',
+        component: 'rezka_video',
         param: {
-          name: 'rezka_comment_proxy',
+          name: 'rezka_video_proxy',
           type: 'input',
           placeholder: 'https://ваш-воркер.workers.dev/',
-          values: Lampa.Storage.get('rezka_comment_proxy', 'https://rezka.lampasochka.workers.dev/'),
+          values: Lampa.Storage.get('rezka_video_proxy', 'https://rezka.lampasochka.workers.dev/'),
           default: 'https://rezka.lampasochka.workers.dev/'
         },
         field: {
-          name: 'CORS Прокси (Умный)',
-          description: 'URL вашего Cloudflare Worker с поддержкой авторизации (с / на конце)'
+          name: 'CORS Прокси',
+          description: 'URL Cloudflare Worker'
         },
-        onChange: function(value) {
-          Lampa.Storage.set('rezka_comment_proxy', value);
-        }
+        onChange: function(v) { Lampa.Storage.set('rezka_video_proxy', v); }
       });
 
       Lampa.SettingsApi.addParam({
-        component: 'rezka_comment',
+        component: 'rezka_video',
         param: {
-          name: 'rezka_comment_cookie',
+          name: 'rezka_video_cookie',
           type: 'input',
           placeholder: 'вставьте cookie',
-          values: Lampa.Storage.get('rezka_comment_cookie', ''),
+          values: Lampa.Storage.get('rezka_video_cookie', ''),
           default: ''
         },
         field: {
-          name: 'Cookie авторизации (Ручной ввод)'
+          name: 'Cookie (ручной ввод)'
         },
-        onChange: function(value) {
-          Lampa.Storage.set('rezka_comment_cookie', value);
-        }
+        onChange: function(v) { Lampa.Storage.set('rezka_video_cookie', v); }
       });
 
-      function pollAuthCode(proxyUrl, code, statusSelector, waitingText, onSuccess, onTimeout) {
-          var attempts = 0;
-          window.rezkaAuthInterval = setInterval(function() {
-              attempts++;
-              if(attempts > 90) {
-                  clearInterval(window.rezkaAuthInterval);
-                  $(statusSelector).text('Время ожидания истекло. Попробуйте снова.').css('color', '#ff5722');
-                  if (onTimeout) onTimeout();
-                  return;
+      function pollAuth(pUrl, code, sel, text, onOk, onTimeout) {
+        var attempts = 0;
+        window.rezkaVideoPoll = setInterval(function() {
+          attempts++;
+          if (attempts > 90) {
+            clearInterval(window.rezkaVideoPoll);
+            $(sel).text('Время истекло').css('color', '#ff5722');
+            if (onTimeout) onTimeout();
+            return;
+          }
+          $(sel).text(text + repeatChar('.', attempts % 4));
+          $.ajax({
+            url: pUrl + 'check?code=' + code,
+            type: 'GET',
+            dataType: 'json',
+            success: function(d) {
+              if (d && (d.status === 'success' || d.cookie)) {
+                clearInterval(window.rezkaVideoPoll);
+                Lampa.Storage.set('rezka_video_cookie', d.cookie);
+                var tail = (d.cookie || '').slice(-16);
+                $(sel).html('<span style="color:#4CAF50;">Успешно! …' + tail + '</span>');
+                try {
+                  $('.settings-param[data-name="rezka_video_cookie"] .settings-param__value').text(d.cookie);
+                } catch(e) {}
+                if (onOk) setTimeout(onOk, 1500);
               }
-
-              $(statusSelector).text(waitingText + repeatChar('.', attempts % 4));
-
-              $.ajax({
-                  url: proxyUrl + 'check?code=' + code,
-                  type: 'GET',
-                  dataType: 'json',
-                  success: function(d) {
-                      if(d && (d.status === 'success' || d.cookie)) {
-                          clearInterval(window.rezkaAuthInterval);
-                          Lampa.Storage.set('rezka_comment_cookie', d.cookie);
-                          console.log('[RezkaComment] cookie saved:', d.cookie);
-
-                          var tail = (d.cookie || '').slice(-16);
-                          $(statusSelector).html('<span style="color: #4CAF50;">Успешно! Cookie сохранены (…' + tail + ').</span>');
-
-                          try {
-                              $('.settings-param[data-name="rezka_comment_cookie"] .settings-param__value').text(d.cookie);
-                          } catch(e) {}
-
-                          if (onSuccess) setTimeout(onSuccess, 2500);
-                      }
-                  },
-                  error: function() {}
-              });
-          }, 2000);
+            }
+          });
+        }, 2000);
       }
 
-      function closeAuthModal(modalClass) {
-          clearInterval(window.rezkaAuthInterval);
-          Lampa.Modal.close();
-          $(modalClass).remove();
-          try {
-              Lampa.Controller.toggle('settings_component');
-          } catch (e) {
-              try { Lampa.Controller.toggle('settings'); } catch (e2) {}
-          }
+      function closeAuth(cls) {
+        clearInterval(window.rezkaVideoPoll);
+        Lampa.Modal.close();
+        $(cls).remove();
+        try { Lampa.Controller.toggle('settings_component'); } catch(e) {}
       }
 
-      function buildAuthUrl() {
-          var proxyUrl = (Lampa.Storage.get('rezka_comment_proxy', 'https://rezka.lampasochka.workers.dev/') || 'https://rezka.lampasochka.workers.dev/').trim();
-          if(!startsWithHttp(proxyUrl)) {
-              Lampa.Noty.show('Сначала настройте URL прокси-воркера');
-              return null;
-          }
-          if(!endsWithSlash(proxyUrl)) proxyUrl += '/';
-
-          var host = (Lampa.Storage.get('rezka_comment_host', 'https://rezka.ag') || 'https://rezka.ag').trim();
-          var hostBare = host.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
-
-          var code = generateAuthCode();
-          var authUrl = proxyUrl + 'auth/' + code + '/' + encodeURIComponent(hostBare);
-
-          return { proxyUrl: proxyUrl, code: code, authUrl: authUrl };
+      function buildAuth() {
+        var proxy = (Lampa.Storage.get('rezka_video_proxy', 'https://rezka.lampasochka.workers.dev/') || '').trim();
+        if (!startsWithHttp(proxy)) { Lampa.Noty.show('Настройте прокси'); return null; }
+        if (!endsWithSlash(proxy)) proxy += '/';
+        var host = (Lampa.Storage.get('rezka_video_host', 'https://rezka.ag') || '').trim();
+        var bare = host.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+        var code = genCode();
+        return { proxyUrl: proxy, code: code, authUrl: proxy + 'auth/' + code + '/' + encodeURIComponent(bare) };
       }
 
       Lampa.SettingsApi.addParam({
-        component: 'rezka_comment',
-        param: {
-          name: 'rezka_auth_qr',
-          type: 'button'
-        },
-        field: {
-          name: 'Авторизация через QR-код',
-          description: 'Отсканируйте код телефоном, чтобы автоматически получить Cookie'
-        },
+        component: 'rezka_video',
+        param: { name: 'rezka_auth_qr', type: 'button' },
+        field: { name: 'QR-код', description: 'Отсканируйте телефоном' },
         onChange: function() {
-            var auth = buildAuthUrl();
-            if (!auth) return;
-
-            var modalHtml = $(
-                '<div style="text-align: center; padding: 20px;">' +
-                    '<div style="margin-bottom: 20px; font-size: 1.2em; color: #fff;">' +
-                        'Отсканируйте код камерой телефона<br>' +
-                        '<span style="font-size: 0.8em; opacity: 0.7;">или перейдите по ссылке:</span><br>' +
-                        '<a href="' + auth.authUrl + '" target="_blank" style="font-size: 0.8em; color: #a335ff; word-break: break-all;">' + auth.authUrl + '</a>' +
-                    '</div>' +
-                    '<div id="rezka_qr_container" style="background: white; padding: 15px; display: inline-block; border-radius: 10px;"></div>' +
-                    '<div id="rezka_qr_status" style="margin-top: 20px; font-size: 1.1em; color: #e5e5e5;">Ожидание сканирования...</div>' +
-                '</div>'
-            );
-
-            function closeThisModal() { closeAuthModal('.modal--medium'); }
-
-            Lampa.Modal.open({
-                title: 'Авторизация HDRezka',
-                html: modalHtml,
-                size: 'medium',
-                mask: true,
-                onBack: closeThisModal
-            });
-
-            var qrImgUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(auth.authUrl);
-            $('#rezka_qr_container').html(
-                '<img src="' + qrImgUrl + '" width="250" height="250" alt="QR" onerror="this.parentElement.innerHTML=' +
-                "'<div style=\\'color:#333;font-size:0.9em;padding:20px;\\'>Не удалось загрузить QR. Используйте ссылку выше.</div>'" +
-                '">'
-            );
-
-            pollAuthCode(auth.proxyUrl, auth.code, '#rezka_qr_status', 'Ожидание решения защиты на телефоне', closeThisModal, null);
+          var a = buildAuth();
+          if (!a) return;
+          var html = $(
+            '<div style="text-align:center;padding:20px;">' +
+              '<div style="margin-bottom:20px;font-size:1.2em;color:#fff;">Отсканируйте код<br>' +
+              '<a href="' + a.authUrl + '" target="_blank" style="font-size:0.8em;color:#a335ff;">' + a.authUrl + '</a></div>' +
+              '<div id="r_qr" style="background:#fff;padding:15px;display:inline-block;border-radius:10px;"></div>' +
+              '<div id="r_status" style="margin-top:20px;font-size:1.1em;color:#e5e5e5;">Ожидание...</div>' +
+            '</div>'
+          );
+          var close = function() { closeAuth('.modal--medium'); };
+          Lampa.Modal.open({ title: 'Авторизация', html: html, size: 'medium', mask: true, onBack: close });
+          var qr = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(a.authUrl);
+          $('#r_qr').html('<img src="' + qr + '" width="250" height="250">');
+          pollAuth(a.proxyUrl, a.code, '#r_status', 'Ожидание', close);
         }
       });
 
       Lampa.SettingsApi.addParam({
-        component: 'rezka_comment',
-        param: {
-          name: 'rezka_auth_tv',
-          type: 'button'
-        },
-        field: {
-          name: 'Пройти проверку в Lampa',
-          description: 'Без телефона — открывает окно проверки в самой Lampa. Может не сработать на слабых/старых ТВ'
-        },
+        component: 'rezka_video',
+        param: { name: 'rezka_auth_tv', type: 'button' },
+        field: { name: 'Проверка в Lampa', description: 'Открыть проверку в приложении' },
         onChange: function() {
-            var auth = buildAuthUrl();
-            if (!auth) return;
-
-            var modalHtml = $(
-                '<div style="padding: 10px;">' +
-                    '<iframe src="' + auth.authUrl + '" style="width:100%;height:60vh;border:none;background:#fff;border-radius:6px;"></iframe>' +
-                    '<div id="rezka_tv_status" style="margin-top: 15px; font-size: 1.1em; color: #e5e5e5; text-align:center;">Ожидание прохождения проверки...</div>' +
-                '</div>'
-            );
-
-            function closeThisModal() { closeAuthModal('.modal--large'); }
-
-            Lampa.Modal.open({
-                title: 'Проверка HDRezka',
-                html: modalHtml,
-                size: 'large',
-                mask: true,
-                onBack: closeThisModal
-            });
-
-            pollAuthCode(auth.proxyUrl, auth.code, '#rezka_tv_status', 'Ожидание решения защиты', closeThisModal, null);
+          var a = buildAuth();
+          if (!a) return;
+          var html = $(
+            '<div style="padding:10px;">' +
+              '<iframe src="' + a.authUrl + '" style="width:100%;height:60vh;border:none;background:#fff;border-radius:6px;"></iframe>' +
+              '<div id="r_tv_status" style="margin-top:15px;font-size:1.1em;color:#e5e5e5;text-align:center;">Ожидание...</div>' +
+            '</div>'
+          );
+          var close = function() { closeAuth('.modal--large'); };
+          Lampa.Modal.open({ title: 'Проверка', html: html, size: 'large', mask: true, onBack: close });
+          pollAuth(a.proxyUrl, a.code, '#r_tv_status', 'Ожидание', close);
         }
       });
-    } catch (e) {
-      console.error('[RezkaComment] Settings init error:', e);
+
+    } catch(e) {
+      console.error('[RezkaVideo] Settings error:', e);
     }
 
-    Lampa.Listener.follow("full", function (e) {
+    // Добавляем кнопку в плеер
+    Lampa.Listener.follow("full", function(e) {
       if (e.type == "complite") {
-        $(".button--comment").remove();
+        $(".button--rezka-video").remove();
         $(".full-start-new__buttons").append(
-          '<div class="full-start__button selector button--comment"><svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 356.484 356.484"><g><path d="M293.984 7.23H62.5C28.037 7.23 0 35.268 0 69.731v142.78c0 34.463 28.037 62.5 62.5 62.5l147.443.001 70.581 70.58a12.492 12.492 0 0 0 13.622 2.709 12.496 12.496 0 0 0 7.717-11.547v-62.237c30.759-3.885 54.621-30.211 54.621-62.006V69.731c0-34.463-28.037-62.501-62.5-62.501zm37.5 205.282c0 20.678-16.822 37.5-37.5 37.5h-4.621c-6.903 0-12.5 5.598-12.5 12.5v44.064l-52.903-52.903a12.493 12.493 0 0 0-8.839-3.661H62.5c-20.678 0-37.5-16.822-37.5-37.5V69.732c0-20.678 16.822-37.5 37.5-37.5h231.484c20.678 0 37.5 16.822 37.5 37.5v142.78z" fill="currentcolor"/></g></svg><span>' +
-          Lampa.Lang.translate("Смотреть на Rezka") +
-          '</span></div>'
+          '<div class="full-start__button selector button--rezka-video">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 356.484 356.484">' +
+              '<path d="M293.984 7.23H62.5C28.037 7.23 0 35.268 0 69.731v142.78c0 34.463 28.037 62.5 62.5 62.5l147.443.001 70.581 70.58a12.492 12.492 0 0 0 13.622 2.709 12.496 12.496 0 0 0 7.717-11.547v-62.237c30.759-3.885 54.621-30.211 54.621-62.006V69.731c0-34.463-28.037-62.501-62.5-62.501zm37.5 205.282c0 20.678-16.822 37.5-37.5 37.5h-4.621c-6.903 0-12.5 5.598-12.5 12.5v44.064l-52.903-52.903a12.493 12.493 0 0 0-8.839-3.661H62.5c-20.678 0-37.5-16.822-37.5-37.5V69.732c0-20.678 16.822-37.5 37.5-37.5h231.484c20.678 0 37.5 16.822 37.5 37.5v142.78z" fill="currentcolor"/>' +
+            '</svg><span>Смотреть на Rezka</span>' +
+          '</div>'
         );
 
-        $(".button--comment").on("hover:enter", function (card) {
+        $(".button--rezka-video").on("hover:enter", function() {
           year = 0;
           if (e.data.movie.release_date) {
             year = e.data.movie.release_date.slice(0, 4);
@@ -804,5 +654,5 @@
     });
   }
 
-  if (!window.comment_plugin) startPlugin();
+  startPlugin();
 })();
