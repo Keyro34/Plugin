@@ -73,6 +73,164 @@
         return best || items[0];
     }
 
+    // ============================================================================
+    // ANUBIS BYPASS MODULE (v1.0 - 19.04.2026)
+    // ============================================================================
+
+    /**
+     * Пулы безопасных User-Agent'ов для обхода Anubis
+     */
+    function getAnubisFreePools() {
+      return {
+        curl: [
+          'curl/8.5.0',
+          'curl/8.0.0',
+          'curl/7.88.1',
+          'curl/7.85.0',
+          'Wget/1.21.3',
+          'Wget/1.20.3',
+        ],
+        python: [
+          'python-requests/2.28.2',
+          'python-httpx/0.24.0',
+          'python-urllib3/1.26.16',
+        ],
+        custom: [
+          'LampaMediaClient/1.0',
+          'MediaPlayer/1.0',
+          'StreamAggregator/2.0',
+        ],
+        android: [
+          'okhttp/3.10.0',
+          'okhttp/4.9.0',
+          'Dalvik/2.1.0 (Linux; U; Android 10; K)',
+          'Dalvik/2.1.0 (Linux; U; Android 11)',
+        ],
+        tv: [
+          'Kodi/20.0 (Windows)',
+          'DLNA compatible client',
+        ]
+      };
+    }
+
+    /**
+     * Выбрать безопасный UA для конкретного источника
+     */
+    function selectAnubisFreePUA(source, isAndroid, retryCount) {
+      retryCount = retryCount || 0;
+      
+      if (source === 'filmix') {
+        return 'okhttp/3.10.0';
+      }
+      
+      if (source === 'kodik') {
+        return 'curl/8.5.0';
+      }
+      
+      var pools = getAnubisFreePools();
+      var poolList;
+      
+      if (isAndroid) {
+        poolList = pools.android;
+      } else {
+        if (retryCount >= 2) {
+          poolList = pools.tv;
+        } else if (retryCount >= 1) {
+          poolList = pools.custom;
+        } else {
+          poolList = pools.curl;
+        }
+      }
+      
+      return poolList[Math.floor(Math.random() * poolList.length)];
+    }
+
+    /**
+     * Получить User-Agent для резка2 с поддержкой Anubis bypass
+     */
+    function getRezka2UserAgent(retryCount) {
+      var isAndroid = Lampa.Platform.is('android');
+      return selectAnubisFreePUA('rezka2', isAndroid, retryCount);
+    }
+
+    /**
+     * Расширенная проверка Anubis (лучше, чем исходная)
+     */
+    function isAnubisPageExtended(str) {
+      if (!str || typeof str !== 'string') return false;
+      
+      var markers = [
+        'anubis_challenge',
+        'anubis_version',
+        'anubis_base_prefix',
+        'Проверяем, что вы не бот',
+        'TecharoHQ/anubis',
+        'window.anubis',
+      ];
+      
+      for (var i = 0; i < markers.length; i++) {
+        if (str.indexOf(markers[i]) !== -1) {
+          return true;
+        }
+      }
+      
+      return false;
+    }
+
+    /**
+     * Обработка Anubis challenge с автоматическим восстановлением
+     */
+    function handleAnubisChallenge(context, retryCallback, onError, retryCount) {
+      retryCount = retryCount || 0;
+      
+      if (retryCount > 3) {
+        console.error('[Anubis] Исчерпаны попытки восстановления');
+        if (onError) onError('MAX_RETRIES');
+        return;
+      }
+      
+      console.warn('[Anubis] Challenge #' + (retryCount + 1) + '. Восстановление...');
+      
+      if (context.resetCookie) {
+        context.resetCookie();
+      }
+      
+      var newUA = selectAnubisFreePUA(
+        context.source || 'rezka2',
+        Lampa.Platform.is('android'),
+        retryCount
+      );
+      
+      if (context.setUserAgent) {
+        context.setUserAgent(newUA);
+        console.log('[Anubis] Новый UA: ' + newUA);
+      }
+      
+      var delayMs = 1500 + (retryCount * 500);
+      
+      setTimeout(function() {
+        retryCallback(retryCount + 1);
+      }, delayMs);
+    }
+
+    /**
+     * Конфигурация по платформе
+     */
+    function rezka2ConfigureByPlatform() {
+      var isAndroid = Lampa.Platform.is('android');
+      
+      return {
+        isAndroid: isAndroid,
+        platform: isAndroid ? 'Android' : 'PC/TV',
+        strategy: isAndroid ? 'native' : 'proxy',
+        defaultUA: isAndroid ? 'okhttp/4.9.0' : 'curl/8.5.0'
+      };
+    }
+
+    // ============================================================================
+    // END ANUBIS BYPASS MODULE
+    // ============================================================================
+
     var myIp = '';
     var currentFanserialsHost = decodeSecret([95, 57, 28, 42, 55, 125, 28, 124, 75, 83, 86, 35, 27, 63, 54, 46, 82, 63, 9, 27, 81, 56, 6], atob('RnVja0Zhbg=='));
 
@@ -409,7 +567,7 @@
           var name = link.substring(posStart + 3, posEnd);
           posStart = name.lastIndexOf('/');
           name = posStart !== -1 ? name.substring(posStart + 1) : '';
-          return proxy + 'enc2/' + encodeURIComponent(btoa(proxy_enc + link)) + '/' + name + (enc === 'enc2t' ? "?jacred.test" : '');
+          return proxy + 'enc2/' + encodeURIComponent(btoa(proxy_enc + link)) + '/' + name;
         }
 
         return proxy + proxy_enc + link;
@@ -2054,7 +2212,7 @@
       var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
       var ref = host + '/';
       var logged_in = !prox && Lampa.Platform.is('android');
-      var user_agent = Utils.baseUserAgent();
+      var user_agent = getRezka2UserAgent(); // Anubis bypass: использовать безопасный UA
       var headers = Lampa.Platform.is('android') ? {
         'Origin': host,
         'Referer': ref,
@@ -2118,6 +2276,37 @@
           return;
         }
       }
+
+      function isAnubisPage(str) {
+        if (!str) return false;
+
+        return str.indexOf('anubis_challenge') !== -1 ||
+               str.indexOf('anubis_version') !== -1 ||
+               str.indexOf('anubis_base_prefix') !== -1 ||
+               str.indexOf('Проверяем, что вы не бот') !== -1 ||
+               str.indexOf('TecharoHQ/anubis') !== -1;
+      }
+
+      function resetRezkaCookie() {
+        Lampa.Storage.set('online_mod_rezka2_cookie', '');
+        cookie = 'PHPSESSID=' + Utils.randomId(26);
+        
+        // Anubis bypass: смена UA при сбросе куки
+        user_agent = getRezka2UserAgent();
+        console.log('[Rezka2] Cookie reset, new UA: ' + user_agent);
+
+        if (prox) {
+          prox_enc = '';
+          prox_enc += 'param/Origin=' + encodeURIComponent(host) + '/';
+          prox_enc += 'param/Referer=' + encodeURIComponent(ref) + '/';
+          prox_enc += 'param/User-Agent=' + encodeURIComponent(user_agent) + '/';
+          prox_enc += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
+        } else if (Lampa.Platform.is('android')) {
+          headers.Cookie = cookie;
+          headers['User-Agent'] = user_agent;
+        }
+      }
+
       /**
        * Поиск
        * @param {Object} _object
@@ -2327,16 +2516,66 @@
           stage = stage || 0;
           var cur_prox = stage === 0 ? prox : (stage === 1 ? prox_alt : prox_alt2);
           var postdata = 'q=' + encodeURIComponent(query);
+
+          console.log('[Rezka2] QUERY:', query);
+          console.log('[Rezka2] POSTDATA:', postdata);
+
           network.clear();
           network.timeout(10000);
-          network["native"](component.proxyLink(url, cur_prox, prox_enc, 'enc2t'), function (str) {
-            str = (str || '').replace(/\n/g, '');
-            checkErrorForm(str);
-            var links = str.match(/<li><a href=.*?<\/li>/g);
-            var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
-            if (links && links.length) data = data.concat(links);
-            if (callback) callback(data, have_more, query);
-          }, function (a, c) {
+          network["native"](
+            component.proxyLink(url, cur_prox, prox_enc, 'enc2t'),
+
+            function (str) {
+              console.log('[Rezka2] RESPONSE FOR QUERY:', query);
+            
+              str = (str || '').replace(/\n/g, '');
+
+              console.log('[Rezka2] response length:', str.length);
+              console.log('[Rezka2] RESPONSE:', str);
+
+              // Anubis / bot protection (улучшенная обработка)
+              if (isAnubisPageExtended(str)) {
+                console.log('[Rezka2] Anubis challenge detected. Initiating bypass...');
+
+                var anubisContext = {
+                  source: 'rezka2',
+                  resetCookie: resetRezkaCookie,
+                  setUserAgent: function(ua) { user_agent = ua; }
+                };
+
+                handleAnubisChallenge(
+                  anubisContext,
+                  function(retryCount) {
+                    // Повторить поиск с новыми параметрами
+                    rezka2Search(_object, callback);
+                  },
+                  function(error) {
+                    console.error('[Rezka2] Anubis bypass failed:', error);
+                    if (callback) {
+                      callback([], false, query);
+                    }
+                  },
+                  0
+                );
+
+                return;
+              }
+
+              checkErrorForm(str);
+
+              var links = str.match(/<li><a href=.*?<\/li>/g);
+              var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
+
+              if (links && links.length) {
+                data = data.concat(links);
+              }
+
+              if (callback) {
+                callback(data, have_more, query);
+              }
+            },
+
+            function (a, c) {
             if (cur_prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
               Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
             }
