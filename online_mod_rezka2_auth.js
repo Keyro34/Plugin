@@ -2146,6 +2146,12 @@
         if (prox) prox_enc = prox_enc.replace(/param\/Cookie=[^\/]*\//, '') + 'param/Cookie=' + encodeURIComponent(cookie) + '/';
       }
 
+      function rezkaLink(url) {
+        if (!prox) return url;
+        if (Lampa.Platform.is('android')) return rezkaLink(url);
+        return prox + prox_enc + url;
+      }
+
       function rezkaRetryAfterAuth(a, retry) {
         if (!rezkaIsBlocked(a && a.responseText)) return false;
         rezkaAuthOpen(function () {
@@ -2401,7 +2407,7 @@
           var postdata = 'q=' + encodeURIComponent(query);
           network.clear();
           network.timeout(10000);
-          network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
+          network["native"](rezkaLink(url), function (str) {
             if (rezkaRetryAfterAuth({ responseText: str }, function () { query_search(query, data, callback); })) return;
             console.log('[rezka dbg] search ok', str.length, str.slice(0, 500));
             Lampa.Noty.show('HDrezka ответ: ' + str.length + ' симв. ' + str.slice(0, 150).replace(/\s+/g, ' '));
@@ -2511,7 +2517,7 @@
         url = component.fixLink(url, ref);
         network.clear();
         network.timeout(10000);
-        network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
+        network["native"](rezkaLink(url), function (str) {
             if (rezkaRetryAfterAuth({ responseText: str }, function () { getPage(url); })) return;
           extractData(str);
 
@@ -2674,7 +2680,7 @@
               postdata += '&action=get_episodes';
               network.clear();
               network.timeout(10000);
-              network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (json) {
+              network["native"](rezkaLink(url), function (json) {
                 extractEpisodes(json, translator_id);
                 call();
               }, function (a, c) {
@@ -2804,7 +2810,7 @@
 
         network.clear();
         network.timeout(10000);
-        network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (json) {
+        network["native"](rezkaLink(url), function (json) {
           if (json && json.url) {
             var video = decode(json.url),
                 file = '',
