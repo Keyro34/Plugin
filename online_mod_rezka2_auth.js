@@ -16680,13 +16680,15 @@
 
       if (Lampa.Storage.get('online_mod_use_stream_proxy', '') === '') {
         $.ajax({
-          url: (window.location.protocol === 'https:' ? 'https://' : 'http://') + 'ipwho.is/?fields=ip,country_code',
-          jsonp: 'callback',
-          dataType: 'jsonp'
+          url: 'https://ipwho.is/?fields=ip,country_code',
+          dataType: 'json',
+          timeout: 8000
         }).done(function (json) {
           if (json && json.country_code) {
             Lampa.Storage.set('online_mod_use_stream_proxy', '' + (json.country_code === 'UA'));
           }
+        }).fail(function () {
+          // сервис недоступен - просто не меняем настройку
         });
       }
 
