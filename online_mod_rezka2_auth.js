@@ -2051,7 +2051,7 @@
     function rezkaAuthOpen(onDone) {
       var proxy = rezkaAuthProxy();
       var code = String(Math.floor(1000 + Math.random() * 9000));
-      var authUrl = proxy + 'auth/' + code + '/' + encodeURIComponent('rezka.ag');
+      var authUrl = proxy + 'auth/' + code + '/' + encodeURIComponent((Lampa.Storage.get('online_mod_rezka2_host', 'https://hdrezka.sh') + '').replace(/^https?:\/\//, '').replace(/\/+$/, ''));
       var timer = null;
 
       Lampa.Modal.open({
@@ -2100,10 +2100,11 @@
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       // На ПК отключаем proxy - используем rezka.ag напрямую (БЕЗ зеркал!)
-      var prox = Lampa.Platform.is('android') ? component.proxy('rezka2') : rezkaAuthProxy();
+      var prox = Lampa.Platform.is('android') ? component.proxy('rezka2')
+        : (Lampa.Storage.get('online_mod_rezka2_direct', 'true') === 'true' ? false : rezkaAuthProxy());
       // ВАЖНО: Utils.rezka2Mirror() возвращает неправильный адрес rc.bwa.ad
       // Используем прямой хост rezka.ag
-      var host = 'https://rezka.ag';
+      var host = (Lampa.Storage.get('online_mod_rezka2_host', 'https://hdrezka.sh') + '').replace(/\/+$/, '');
       var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
@@ -16933,7 +16934,7 @@
       var prox_enc = '';
       var returnHeaders = androidHeaders;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
+      var host = prox && !proxy_mirror ? (Lampa.Storage.get('online_mod_rezka2_host', 'https://hdrezka.sh') + '').replace(/\/+$/, '') : Utils.rezka2Mirror();
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
