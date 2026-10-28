@@ -2403,6 +2403,8 @@
           network.timeout(10000);
           network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
             if (rezkaRetryAfterAuth({ responseText: str }, function () { query_search(query, data, callback); })) return;
+            console.log('[rezka dbg] search ok', str.length, str.slice(0, 500));
+            Lampa.Noty.show('HDrezka ответ: ' + str.length + ' симв. ' + str.slice(0, 150).replace(/\s+/g, ' '));
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
             var links = str.match(/<li><a href=.*?<\/li>/g);
@@ -2411,6 +2413,8 @@
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
             if (rezkaRetryAfterAuth(a, function () { query_search(query, data, callback); })) return;
+            console.log('[rezka dbg] search err', a.status, a.responseText);
+            Lampa.Noty.show('HDrezka ошибка: статус ' + a.status + ' ' + String(a.responseText || '').slice(0, 150).replace(/\s+/g, ' '));
             if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
               Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
             }
