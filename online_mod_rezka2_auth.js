@@ -2411,7 +2411,8 @@
           network["native"](rezkaLink(url), function (str) {
             if (rezkaRetryAfterAuth({ responseText: str }, function () { query_search(query, data, callback); })) return;
             console.log('[rezka dbg] search ok', str.length, str.slice(0, 500));
-            Lampa.Noty.show('HDrezka ответ: ' + str.length + ' симв. ' + str.slice(0, 150).replace(/\s+/g, ' '));
+            var blocked199 = str.indexOf('Ошибка доступа') !== -1;
+            Lampa.Noty.show((blocked199 ? 'HDrezka: ОШИБКА ДОСТУПА (199)' : 'HDrezka: ответ ' + str.length + ' симв.') + ' | адрес: ' + url + ' | cookie: ' + (cookie ? 'есть' : 'нет'));
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
             var links = str.match(/<li><a href=.*?<\/li>/g);
