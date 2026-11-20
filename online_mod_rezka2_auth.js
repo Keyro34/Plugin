@@ -2038,59 +2038,6 @@
       }
     }
 
-    function rezkaAuthProxy() {
-      var p = (Lampa.Storage.get('online_mod_rezka2_auth_proxy', '') || '').trim() || 'https://rezka.lampasochka.workers.dev/';
-      if (p.slice(-1) !== '/') p += '/';
-      return p;
-    }
-
-    function rezkaIsBlocked(text) {
-      return typeof text === 'string' && (text.indexOf('Проверяем, что вы не бот') !== -1 || text.indexOf('Anubis') !== -1);
-    }
-
-    function rezkaAuthOpen(onDone) {
-      var proxy = rezkaAuthProxy();
-      var code = String(Math.floor(1000 + Math.random() * 9000));
-      var authUrl = proxy + 'auth/' + code + '/' + encodeURIComponent((Lampa.Storage.get('online_mod_rezka2_host', 'https://hdrezka.sh') + '').replace(/^https?:\/\//, '').replace(/\/+$/, ''));
-      var timer = null;
-
-      Lampa.Modal.open({
-        title: 'Авторизация HDRezka',
-        html: $('<div style="text-align:center;padding:20px">' +
-          '<div>Откройте ссылку на телефоне и пройдите проверку:</div>' +
-          '<a href="' + authUrl + '" target="_blank" style="word-break:break-all;color:#a335ff">' + authUrl + '</a>' +
-          '<div id="rezka_auth_status" style="margin-top:20px">Ожидание...</div></div>'),
-        size: 'medium',
-        onBack: function () {
-          clearInterval(timer);
-          Lampa.Modal.close();
-        }
-      });
-
-      var attempts = 0;
-      timer = setInterval(function () {
-        attempts++;
-        if (attempts > 90) {
-          clearInterval(timer);
-          $('#rezka_auth_status').text('Время ожидания истекло. Попробуйте снова.');
-          return;
-        }
-        $.ajax({
-          url: proxy + 'check?code=' + code,
-          type: 'GET',
-          dataType: 'json',
-          success: function (d) {
-            if (d && d.cookie) {
-              clearInterval(timer);
-              Lampa.Storage.set('online_mod_rezka2_cookie', d.cookie);
-              Lampa.Modal.close();
-              if (onDone) onDone();
-            }
-          },
-          error: function () {}
-        });
-      }, 2000);
-    }
     function rezka2(component, _object) {
       var network = new Lampa.Reguest();
       var extract = {};
@@ -2100,11 +2047,12 @@
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
       // На ПК отключаем proxy - используем rezka.ag напрямую (БЕЗ зеркал!)
-      var prox = Lampa.Platform.is('android') ? component.proxy('rezka2')
-        : (Lampa.Storage.get('online_mod_rezka2_direct', 'true') === 'true' ? false : rezkaAuthProxy());
+      var prox = Lampa.Platform.is('android') ? component.proxy('rezka2') : false;
       // ВАЖНО: Utils.rezka2Mirror() возвращает неправильный адрес rc.bwa.ad
       // Используем прямой хост rezka.ag
-      var host = (Lampa.Storage.get('online_mod_rezka2_host', 'https://hdrezka.sh') + '').replace(/\/+$/, '');
+      var host = (Lampa.Storage.get('online_mod_rezka2_mirror', '') || 'https://hdrezka.sh') + '';
+      if (host.indexOf('://') == -1) host = 'https://' + host;
+      host = host.replace(/\/+$/, '');
       var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
@@ -2140,27 +2088,6 @@
       }
 
       var embed = ref;
-      function refreshRezkaCookie() {
-        cookie = Lampa.Storage.get('online_mod_rezka2_cookie', '') + '';
-        if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
-        headers.Cookie = cookie;
-        if (prox) prox_enc = prox_enc.replace(/param\/Cookie=[^\/]*\//, '') + 'param/Cookie=' + encodeURIComponent(cookie) + '/';
-      }
-
-      function rezkaLink(url) {
-        if (!prox) return url;
-        if (Lampa.Platform.is('android')) return rezkaLink(url);
-        return prox + prox_enc + url;
-      }
-
-      function rezkaRetryAfterAuth(a, retry) {
-        if (!rezkaIsBlocked(a && a.responseText)) return false;
-        rezkaAuthOpen(function () {
-          refreshRezkaCookie();
-          retry();
-        });
-        return true;
-      }
       var filter_items = {};
       var choice = {
         season: 0,
@@ -2230,7 +2157,6 @@
           network.clear();
           network.timeout(10000);
           network["native"](component.proxyLink(url, prox, prox_enc, prox_enc, 'enc2t'), function (str) {
-            if (rezkaRetryAfterAuth({ responseText: str }, function () { query_more(query, page, data, callback); })) return;
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
             var links = str.match(/<div class="b-content__inline_item-link">\s*<a [^>]*>[^<]*<\/a>\s*<div>[^<]*<\/div>\s*<\/div>/g);
@@ -2263,7 +2189,6 @@
 
             if (callback) callback(data, have_more);
           }, function (a, c) {
-            if (rezkaRetryAfterAuth(a, function () { query_more(query, page, data, callback); })) return;
             component.empty(network.errorDecode(a, c));
           }, false, {
             dataType: 'text',
@@ -2405,40 +2330,10 @@
         };
 
         var query_search = function query_search(query, data, callback) {
-          var postdata = 'q=' + encodeURIComponent(query);
-          network.clear();
-          network.timeout(10000);
-          network["native"](rezkaLink(url), function (str) {
-            if (rezkaRetryAfterAuth({ responseText: str }, function () { query_search(query, data, callback); })) return;
-            console.log('[rezka dbg] search ok', str.length, str.slice(0, 500));
-            var blocked199 = str.indexOf('Ошибка доступа') !== -1;
-            Lampa.Noty.show((blocked199 ? 'HDrezka: ОШИБКА ДОСТУПА (199)' : 'HDrezka: ответ ' + str.length + ' симв.') + ' | адрес: ' + url + ' | cookie: ' + (cookie ? 'есть' : 'нет'));
-            str = (str || '').replace(/\n/g, '');
-            checkErrorForm(str);
-            var links = str.match(/<li><a href=.*?<\/li>/g);
-            var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
-            if (links && links.length) data = data.concat(links);
-            if (callback) callback(data, have_more, query);
-          }, function (a, c) {
-            if (rezkaRetryAfterAuth(a, function () { query_search(query, data, callback); })) return;
-            console.log('[rezka dbg] search err', a.status, url, cookie);
-            Lampa.Noty.show('HDrezka: статус ' + a.status + ', адрес: ' + url + ', cookie: ' + (cookie ? 'есть' : 'нет'));
-            console.log('[rezka dbg] search err', a.status, a.responseText);
-            Lampa.Noty.show('HDrezka ошибка: статус ' + a.status + ' ' + String(a.responseText || '').slice(0, 150).replace(/\s+/g, ' '));
-            if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
-              Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
-            }
-
-            if (a.status == 403 && a.responseText) {
-              var str = (a.responseText || '').replace(/\n/g, '');
-              checkErrorForm(str);
-            }
-
-            if (error_message) component.empty(error_message);else if (callback) callback([], false, query);else component.empty(network.errorDecode(a, c));
-          }, postdata, {
-            dataType: 'text',
-            withCredentials: logged_in,
-            headers: headers
+          // Поиск по полной странице /search/ (как в Lumen). Эндпоинт ajax/search.php
+          // отдаёт только подсказки-ссылки, поэтому фильмы по нему не находились.
+          query_more(query, 1, data, function (items, have_more) {
+            if (callback) callback(items, have_more, query);
           });
         };
 
@@ -2521,15 +2416,13 @@
         url = component.fixLink(url, ref);
         network.clear();
         network.timeout(10000);
-        network["native"](rezkaLink(url), function (str) {
-            if (rezkaRetryAfterAuth({ responseText: str }, function () { getPage(url); })) return;
+        network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
           extractData(str);
 
           if (extract.film_id) {
             getEpisodes(success);
           } else if (error_message) component.empty(error_message);else component.emptyForQuery(select_title);
         }, function (a, c) {
-            if (rezkaRetryAfterAuth(a, function () { getPage(url); })) return;
           component.empty(network.errorDecode(a, c));
         }, false, {
           dataType: 'text',
@@ -2684,11 +2577,10 @@
               postdata += '&action=get_episodes';
               network.clear();
               network.timeout(10000);
-              network["native"](rezkaLink(url), function (json) {
+              network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (json) {
                 extractEpisodes(json, translator_id);
                 call();
               }, function (a, c) {
-            if (rezkaRetryAfterAuth(a, function () { getEpisodes(call); })) return;
                 component.empty(network.errorDecode(a, c));
               }, postdata, {
                 withCredentials: logged_in,
@@ -2814,7 +2706,7 @@
 
         network.clear();
         network.timeout(10000);
-        network["native"](rezkaLink(url), function (json) {
+        network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (json) {
           if (json && json.url) {
             var video = decode(json.url),
                 file = '',
@@ -2849,7 +2741,6 @@
             } else error();
           } else error();
         }, function (a, c) {
-            if (rezkaRetryAfterAuth(a, function () { getStream(element, call, error); })) return;
           error();
         }, postdata, {
           withCredentials: logged_in,
@@ -16694,15 +16585,13 @@
 
       if (Lampa.Storage.get('online_mod_use_stream_proxy', '') === '') {
         $.ajax({
-          url: 'https://ipwho.is/?fields=ip,country_code',
-          dataType: 'json',
-          timeout: 8000
+          url: (window.location.protocol === 'https:' ? 'https://' : 'http://') + 'ipwho.is/?fields=ip,country_code',
+          jsonp: 'callback',
+          dataType: 'jsonp'
         }).done(function (json) {
           if (json && json.country_code) {
             Lampa.Storage.set('online_mod_use_stream_proxy', '' + (json.country_code === 'UA'));
           }
-        }).fail(function () {
-          // сервис недоступен - просто не меняем настройку
         });
       }
 
@@ -16937,7 +16826,7 @@
       var prox_enc = '';
       var returnHeaders = androidHeaders;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var host = prox && !proxy_mirror ? (Lampa.Storage.get('online_mod_rezka2_host', 'https://hdrezka.sh') + '').replace(/\/+$/, '') : Utils.rezka2Mirror();
+      var host = prox && !proxy_mirror ? 'https://hdrezka.sh' : Utils.rezka2Mirror();
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
