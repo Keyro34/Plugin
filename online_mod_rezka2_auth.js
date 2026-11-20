@@ -2096,6 +2096,39 @@
       var error_message = '';
 
       var anubis_shown = 0;
+
+      // Открывает сайт для прохождения проверки Anubis. Пробует доступные способы по очереди.
+      function openVerifyBrowser(url) {
+        try {
+          // 1) Встроенный браузер/открытие ссылки в приложении Lampa на Android (если есть в этой сборке)
+          if (typeof AndroidJS !== 'undefined') {
+            if (typeof AndroidJS.openUrl === 'function') return AndroidJS.openUrl(url);
+            if (typeof AndroidJS.openBrowser === 'function') return AndroidJS.openBrowser(url);
+          }
+        } catch (e) {}
+
+        try {
+          // 2) Окно внутри Lampa через iframe (cookie могут не сохраниться из-за изоляции iframe)
+          var frame = $('<iframe></iframe>').attr({ src: url, allow: 'cross-origin-isolated' }).css({ width: '100%', height: '80vh', border: '0', background: '#fff' });
+          var box = $('<div></div>').append(frame);
+          var prev = Lampa.Controller.enabled().name;
+          Lampa.Modal.open({
+            title: 'HDrezka: проверка Anubis',
+            html: box,
+            size: 'full',
+            onBack: function onBack() {
+              Lampa.Modal.close();
+              Lampa.Controller.toggle(prev);
+              setTimeout(function () { anubis_shown = 0; showAnubisDialog(); }, 300);
+            }
+          });
+          return;
+        } catch (e) {}
+
+        // 3) Обычное открытие во внешнем браузере
+        window.open(url, '_blank');
+      }
+
       function showAnubisDialog() {
         if (Date.now() - anubis_shown < 15000) return;
         anubis_shown = Date.now();
@@ -2106,7 +2139,7 @@
             items: [{ title: 'Открыть ' + host + ' для проверки', open: true }, { title: 'Я прошёл проверку, повторить поиск', retry: true }],
             onSelect: function (a) {
               if (a.open) {
-                window.open(host + '/', '_blank');
+                openVerifyBrowser(host + '/');
                 anubis_shown = 0;
                 setTimeout(showAnubisDialog, 500);
               } else {
