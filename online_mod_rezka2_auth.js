@@ -2050,9 +2050,7 @@
       var prox = Lampa.Platform.is('android') ? component.proxy('rezka2') : false;
       // ВАЖНО: Utils.rezka2Mirror() возвращает неправильный адрес rc.bwa.ad
       // Используем прямой хост rezka.ag
-      var host = (Lampa.Storage.get('online_mod_rezka2_mirror', '') || 'https://hdrezka.sh') + '';
-      if (host.indexOf('://') == -1) host = 'https://' + host;
-      host = host.replace(/\/+$/, '');
+      var host = 'https://rezka.ag';
       var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
@@ -2156,7 +2154,7 @@
           var url = more_url + '&q=' + encodeURIComponent(query) + '&page=' + encodeURIComponent(page);
           network.clear();
           network.timeout(10000);
-          network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
+          network["native"](component.proxyLink(url, prox, prox_enc, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
             var links = str.match(/<div class="b-content__inline_item-link">\s*<a [^>]*>[^<]*<\/a>\s*<div>[^<]*<\/div>\s*<\/div>/g);
@@ -2189,7 +2187,6 @@
 
             if (callback) callback(data, have_more);
           }, function (a, c) {
-            Lampa.Noty.show('Поиск HDrezka: статус ' + a.status + ' | адрес: ' + url);
             component.empty(network.errorDecode(a, c));
           }, false, {
             dataType: 'text',
@@ -2331,10 +2328,31 @@
         };
 
         var query_search = function query_search(query, data, callback) {
-          // Поиск по полной странице /search/ (как в Lumen). Эндпоинт ajax/search.php
-          // отдаёт только подсказки-ссылки, поэтому фильмы по нему не находились.
-          query_more(query, 1, data, function (items, have_more) {
-            if (callback) callback(items, have_more, query);
+          var postdata = 'q=' + encodeURIComponent(query);
+          network.clear();
+          network.timeout(10000);
+          network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
+            str = (str || '').replace(/\n/g, '');
+            checkErrorForm(str);
+            var links = str.match(/<li><a href=.*?<\/li>/g);
+            var have_more = str.indexOf('<a class="b-search__live_all"') !== -1;
+            if (links && links.length) data = data.concat(links);
+            if (callback) callback(data, have_more, query);
+          }, function (a, c) {
+            if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
+              Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
+            }
+
+            if (a.status == 403 && a.responseText) {
+              var str = (a.responseText || '').replace(/\n/g, '');
+              checkErrorForm(str);
+            }
+
+            if (error_message) component.empty(error_message);else if (callback) callback([], false, query);else component.empty(network.errorDecode(a, c));
+          }, postdata, {
+            dataType: 'text',
+            withCredentials: logged_in,
+            headers: headers
           });
         };
 
@@ -16827,7 +16845,7 @@
       var prox_enc = '';
       var returnHeaders = androidHeaders;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var host = prox && !proxy_mirror ? 'https://hdrezka.sh' : Utils.rezka2Mirror();
+      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
