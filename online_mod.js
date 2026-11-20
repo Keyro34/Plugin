@@ -275,8 +275,6 @@
         if (name === 'lumex') return proxy_secret;
         if (name === 'rezka') return user_proxy2;
         if (name === 'rezka2') return user_proxy1;
-        if (name === 'rezka2_alt') return user_proxy2;
-        if (name === 'rezka2_alt2') return user_proxy4;
         if (name === 'kinobase') return proxy_secret;
         if (name === 'collaps') return proxy_secret;
         if (name === 'cdnmovies') return proxy_secret;
@@ -2048,18 +2046,27 @@
       var prefer_http = Lampa.Storage.field('online_mod_prefer_http') === true;
       var prefer_mp4 = Lampa.Storage.field('online_mod_prefer_mp4') === true;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var prox = component.proxy('rezka2');
-      var prox_alt = component.proxy('rezka2_alt');
-      var prox_alt2 = component.proxy('rezka2_alt2');
-      var host = (!prox || proxy_mirror) ? Utils.rezka2Mirror() : (Lampa.Platform.is('android') ? 'https://rezka.ag' : Utils.rezka2Mirror());
+      // На ПК отключаем proxy - используем rezka.ag напрямую (БЕЗ зеркал!)
+      var prox = Lampa.Platform.is('android') ? component.proxy('rezka2') : false;
+      // ВАЖНО: Utils.rezka2Mirror() возвращает неправильный адрес rc.bwa.ad
+      // Используем прямой хост rezka.ag
+      var host = (Lampa.Storage.get('online_mod_rezka2_mirror', '') || 'https://hdrezka.sh') + '';
+      if (host.indexOf('://') == -1) host = 'https://' + host;
+      host = host.replace(/\/+$/, '');
       var ref = host + '/';
-      var logged_in = !prox && Lampa.Platform.is('android');
+      var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
-      var headers = Lampa.Platform.is('android') ? {
+      
+      // Headers ВЕЗДЕ (ПК, ТВ, Android) - ПОЛНЫЕ!
+      var headers = {
         'Origin': host,
         'Referer': ref,
-        'User-Agent': user_agent
-      } : {};
+        'User-Agent': user_agent,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'ru-RU,ru;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Cache-Control': 'max-age=0'
+      };
       var prox_enc = '';
 
       if (prox) {
@@ -2072,9 +2079,8 @@
       if (cookie.indexOf('PHPSESSID=') == -1) cookie = 'PHPSESSID=' + Utils.randomId(26) + (cookie ? '; ' + cookie : '');
 
       if (cookie) {
-        if (Lampa.Platform.is('android')) {
-          headers.Cookie = cookie;
-        }
+        // Cookie ВЕЗДЕ (ПК, ТВ, Android)!
+        headers.Cookie = cookie;
 
         if (prox) {
           prox_enc += 'param/Cookie=' + encodeURIComponent(cookie) + '/';
@@ -2323,13 +2329,11 @@
           } else if (error_message) component.empty(error_message);else component.emptyForQuery(select_title);
         };
 
-        var query_search = function query_search(query, data, callback, stage) {
-          stage = stage || 0;
-          var cur_prox = stage === 0 ? prox : (stage === 1 ? prox_alt : prox_alt2);
+        var query_search = function query_search(query, data, callback) {
           var postdata = 'q=' + encodeURIComponent(query);
           network.clear();
           network.timeout(10000);
-          network["native"](component.proxyLink(url, cur_prox, prox_enc, 'enc2t'), function (str) {
+          network["native"](component.proxyLink(url, prox, prox_enc, 'enc2t'), function (str) {
             str = (str || '').replace(/\n/g, '');
             checkErrorForm(str);
             var links = str.match(/<li><a href=.*?<\/li>/g);
@@ -2337,21 +2341,13 @@
             if (links && links.length) data = data.concat(links);
             if (callback) callback(data, have_more, query);
           }, function (a, c) {
-            if (cur_prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
+            if (prox && a.status == 403 && (!a.responseText || a.responseText.indexOf('<div>105</div>') !== -1)) {
               Lampa.Storage.set('online_mod_proxy_rezka2', 'false');
             }
 
             if (a.status == 403 && a.responseText) {
               var str = (a.responseText || '').replace(/\n/g, '');
               checkErrorForm(str);
-            }
-
-            // Текущий прокси не ответил — пробуем следующий по очереди, прежде чем сдаваться
-            var next_stage = stage + 1;
-            var next_prox = next_stage === 1 ? prox_alt : (next_stage === 2 ? prox_alt2 : null);
-            if (!error_message && next_prox && next_prox !== cur_prox) {
-              query_search(query, data, callback, next_stage);
-              return;
             }
 
             if (error_message) component.empty(error_message);else if (callback) callback([], false, query);else component.empty(network.errorDecode(a, c));
@@ -16851,7 +16847,7 @@
       var prox_enc = '';
       var returnHeaders = androidHeaders;
       var proxy_mirror = Lampa.Storage.field('online_mod_proxy_rezka2_mirror') === true;
-      var host = prox && !proxy_mirror ? 'https://rezka.ag' : Utils.rezka2Mirror();
+      var host = prox && !proxy_mirror ? 'https://hdrezka.sh' : Utils.rezka2Mirror();
       if (!prox && !returnHeaders) prox = Utils.proxy('cookie');
 
       if (!prox && !returnHeaders) {
