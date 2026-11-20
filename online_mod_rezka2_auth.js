@@ -2189,6 +2189,7 @@
 
             if (callback) callback(data, have_more);
           }, function (a, c) {
+            Lampa.Noty.show('Поиск HDrezka: статус ' + a.status + ' | адрес: ' + url);
             component.empty(network.errorDecode(a, c));
           }, false, {
             dataType: 'text',
