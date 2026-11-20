@@ -2107,25 +2107,7 @@
           }
         } catch (e) {}
 
-        try {
-          // 2) Окно внутри Lampa через iframe (cookie могут не сохраниться из-за изоляции iframe)
-          var frame = $('<iframe></iframe>').attr({ src: url, allow: 'cross-origin-isolated' }).css({ width: '100%', height: '80vh', border: '0', background: '#fff' });
-          var box = $('<div></div>').append(frame);
-          var prev = Lampa.Controller.enabled().name;
-          Lampa.Modal.open({
-            title: 'HDrezka: проверка Anubis',
-            html: box,
-            size: 'full',
-            onBack: function onBack() {
-              Lampa.Modal.close();
-              Lampa.Controller.toggle(prev);
-              setTimeout(function () { anubis_shown = 0; showAnubisDialog(); }, 300);
-            }
-          });
-          return;
-        } catch (e) {}
-
-        // 3) Обычное открытие во внешнем браузере
+        // 2) Обычное открытие во внешнем браузере
         window.open(url, '_blank');
       }
 
@@ -2136,9 +2118,15 @@
           var prev = Lampa.Controller.enabled().name;
           Lampa.Select.show({
             title: 'HDrezka: проверка Anubis',
-            items: [{ title: 'Открыть ' + host + ' для проверки', open: true }, { title: 'Я прошёл проверку, повторить поиск', retry: true }],
+            items: [{ title: 'Открыть ' + host + ' в браузере', open: true }, { title: 'Вставить cookie (Anubis + вход)', paste: true }, { title: 'Повторить поиск', retry: true }],
             onSelect: function (a) {
-              if (a.open) {
+              if (a.paste) {
+                Lampa.Input.edit({ free: true, title: 'Cookie для HDrezka', nosave: true, value: Lampa.Storage.get('online_mod_rezka2_cookie', '') + '' }, function (v) {
+                  if (typeof v === 'string') Lampa.Storage.set('online_mod_rezka2_cookie', v.trim());
+                  anubis_shown = 0;
+                  setTimeout(showAnubisDialog, 300);
+                });
+              } else if (a.open) {
                 openVerifyBrowser(host + '/');
                 anubis_shown = 0;
                 setTimeout(showAnubisDialog, 500);
