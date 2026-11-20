@@ -2050,7 +2050,7 @@
       var prox = Lampa.Platform.is('android') ? component.proxy('rezka2') : false;
       // ВАЖНО: Utils.rezka2Mirror() возвращает неправильный адрес rc.bwa.ad
       // Используем прямой хост rezka.ag
-      var host = 'https://rezka.ag';
+      var host = 'https://hdrezka.sh';
       var ref = host + '/';
       var logged_in = !(prox || Lampa.Platform.is('android'));
       var user_agent = Utils.baseUserAgent();
@@ -2095,7 +2095,37 @@
       };
       var error_message = '';
 
+      var anubis_shown = 0;
+      function showAnubisDialog() {
+        if (Date.now() - anubis_shown < 15000) return;
+        anubis_shown = Date.now();
+        try {
+          var prev = Lampa.Controller.enabled().name;
+          Lampa.Select.show({
+            title: 'HDrezka: проверка Anubis',
+            items: [{ title: 'Открыть ' + host + ' для проверки', open: true }, { title: 'Я прошёл проверку, повторить поиск', retry: true }],
+            onSelect: function (a) {
+              if (a.open) {
+                window.open(host + '/', '_blank');
+                anubis_shown = 0;
+                setTimeout(showAnubisDialog, 500);
+              } else {
+                Lampa.Controller.toggle(prev);
+                Lampa.Activity.replace();
+              }
+            },
+            onBack: function () { Lampa.Controller.toggle(prev); }
+          });
+        } catch (e) {}
+      }
+
       function checkErrorForm(str) {
+        if (/anubis|techaro|making sure you.re not a bot/i.test(str) || str.indexOf('\u041f\u0440\u043e\u0432\u0435\u0440\u044f\u0435\u043c, \u0447\u0442\u043e \u0432\u044b \u043d\u0435 \u0431\u043e\u0442') !== -1) {
+          error_message = '\u0421\u0430\u0439\u0442 \u0442\u0440\u0435\u0431\u0443\u0435\u0442 \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0443 Anubis: cookie \u043e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442 \u0438\u043b\u0438 \u0443\u0441\u0442\u0430\u0440\u0435\u043b\u0430, \u043d\u0435 \u0441\u043e\u0432\u043f\u0430\u0434\u0430\u0435\u0442 \u0434\u043e\u043c\u0435\u043d, User-Agent \u0438\u043b\u0438 IP. \u041e\u0431\u043d\u043e\u0432\u0438\u0442\u0435 cookie \u0432 \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430\u0445 HDrezka (\u0434\u043e\u043c\u0435\u043d: ' + host + ')';
+          showAnubisDialog();
+          return;
+        }
+
         var login_form = str.match(/<form id="check-form" class="check-form" method="post" action="\/ajax\/login\/">/);
 
         if (login_form) {
